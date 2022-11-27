@@ -1,0 +1,1 @@
+# zoft.MauiExtensions.AutoCompleteEntry
