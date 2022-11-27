@@ -1,0 +1,1 @@
+[assembly: XmlnsDefinition("http://zoft.MauiExtensions/Controls", "zoft.MauiExtensions.Controls")]

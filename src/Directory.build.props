@@ -1,0 +1,37 @@
+<Project>
+  <PropertyGroup>
+    <Copyright>Copyright (c) zleao</Copyright>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <Authors>zleao</Authors>
+    <Owners>zleao</Owners>
+    <RepositoryUrl>https://github.com/zleao/zoft.MauiExtensions.AutoCompleteEntry</RepositoryUrl>
+    <RepositoryType>git</RepositoryType>
+    <PublishRepositoryUrl>true</PublishRepositoryUrl>
+    <PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
+    <PackageProjectUrl>https://github.com/zleao/zoft.MauiExtensions.AutoCompleteEntry</PackageProjectUrl>
+    <Product>$(AssemblyName) ($(TargetFramework))</Product>
+    <NeutralLanguage>en</NeutralLanguage>
+    <Version>1.0.0-RC1</Version>
+    <Description>.Net MAUI Entry control that provides a list of suggestions as the user types.</Description>
+    <PackageTags>net6 maui zoft AutoCompleteEntry AutoCompleteBox AutoCompleteView AutoComplete</PackageTags>
+    <PackageReleaseNotes>First version of the AutoCompleteEntry</PackageReleaseNotes>
+    
+    <LangVersion>latest</LangVersion>
+    <Platform>AnyCPU</Platform>
+    <DebugType>full</DebugType>
+    <LangVersion>10.0</LangVersion>
+
+    <RootNamespace>zoft.MauiExtensions.Controls</RootNamespace>
+  </PropertyGroup>
+
+  <PropertyGroup Condition=" '$(Configuration)' == 'Release' ">
+	  <GenerateDocumentationFile>true</GenerateDocumentationFile>
+    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+    <SymbolPackageFormat>snupkg</SymbolPackageFormat>
+    <IncludeSymbols>true</IncludeSymbols>
+    <AllowedOutputExtensionsInPackageBuildOutputFolder>$(AllowedOutputExtensionsInPackageBuildOutputFolder);.pdb</AllowedOutputExtensionsInPackageBuildOutputFolder>
+    <EmbedUntrackedSources>true</EmbedUntrackedSources>
+    <DebugType>portable</DebugType>
+    <DebugSymbols>true</DebugSymbols>
+  </PropertyGroup>
+</Project>
