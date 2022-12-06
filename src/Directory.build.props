@@ -15,7 +15,8 @@
     <Description>.Net MAUI Entry control that provides a list of suggestions as the user types.</Description>
     <PackageTags>net6 maui zoft AutoCompleteEntry AutoCompleteBox AutoCompleteView AutoComplete</PackageTags>
     <PackageReleaseNotes>First version of the AutoCompleteEntry</PackageReleaseNotes>
-    
+    <PackageReadmeFile>readme.md</PackageReadmeFile>
+
     <LangVersion>latest</LangVersion>
     <Platform>AnyCPU</Platform>
     <DebugType>full</DebugType>
@@ -34,4 +35,16 @@
     <DebugType>portable</DebugType>
     <DebugSymbols>true</DebugSymbols>
   </PropertyGroup>
+
+  <!-- Nuget package included files -->
+  <ItemGroup>
+    <None Include="..\..\LICENSE.md">
+      <Pack>True</Pack>
+      <PackagePath></PackagePath>
+    </None>
+    <None Include="..\..\README.md">
+      <Pack>True</Pack>
+      <PackagePath></PackagePath>
+    </None>
+  </ItemGroup>
 </Project>
