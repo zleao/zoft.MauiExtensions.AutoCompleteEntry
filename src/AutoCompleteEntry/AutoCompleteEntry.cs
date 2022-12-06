@@ -1,7 +1,4 @@
-﻿using System.Windows.Input;
-using zoft.MauiExtensions.Core.Commands;
-
-namespace zoft.MauiExtensions.Controls
+﻿namespace zoft.MauiExtensions.Controls
 {
     /// <summary>
     /// Represents a text control that makes suggestions to users as they type. The app is notified when text 
@@ -114,7 +111,8 @@ namespace zoft.MauiExtensions.Controls
             
             TextChanged?.Invoke(this, new AutoCompleteEntryTextChangedEventArgs(reason));
 
-            if (reason == AutoCompleteEntryTextChangeReason.UserInput)
+            if (reason == AutoCompleteEntryTextChangeReason.UserInput && 
+                TextChangedCommand?.CanExecute(Text) == true)
             {
                 TextChangedCommand?.Execute(Text);
             }
