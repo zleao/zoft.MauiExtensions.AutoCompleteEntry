@@ -21,7 +21,7 @@
 
   <!-- Referenced Nuget Packages -->
   <ItemGroup>
-    <PackageReference Include="zoft.MauiExtensions.Core" Version="1.0.8" />
+    <PackageReference Include="zoft.MauiExtensions.Core" Version="1.1.0" />
   </ItemGroup>
 
   <!-- Platform Specific Files-->
