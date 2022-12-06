@@ -1,0 +1,77 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:zoft="http://zoft.MauiExtensions/Controls"
+             xmlns:ctkm="http://schemas.microsoft.com/dotnet/2022/maui/toolkit"
+             x:Class="AutoCompleteEntry.Sample.Views.WithBindingsPage">
+
+    <ContentPage.Resources>
+        <ctkm:IsNotNullConverter x:Key="IsNotNullConverter"/>
+    </ContentPage.Resources>
+
+    <Grid>
+        <Image Source="dotnet_bot.png"
+               HeightRequest="200"
+               HorizontalOptions="Center" />
+
+        <VerticalStackLayout Spacing="10" Margin="10">
+            <zoft:AutoCompleteEntry Placeholder="Search for a country or group"
+                                    ItemsSource="{Binding FilteredList}"
+                                    TextMemberPath="Country"
+                                    DisplayMemberPath="Country"
+                                    TextChangedCommand="{Binding TextChangedCommand}"
+                                    SelectedSuggestion="{Binding SelectedItem}"/>
+
+            <Frame BorderColor="Gray" 
+                   BackgroundColor="LightGray" 
+                   HorizontalOptions="Start"
+                   IsVisible="{Binding SelectedItem, Converter={StaticResource IsNotNullConverter}}">
+                <VerticalStackLayout>
+                    <HorizontalStackLayout Spacing="5">
+                        <Label Text="Group:"/>
+                        <Label Text="{Binding SelectedItem.Group}" FontAttributes="Bold"/>
+                    </HorizontalStackLayout>
+                    <HorizontalStackLayout Spacing="5">
+                        <Label Text="Country:"/>
+                        <Label Text="{Binding SelectedItem.Country}" FontAttributes="Bold"/>
+                    </HorizontalStackLayout>
+                </VerticalStackLayout>
+            </Frame>
+        </VerticalStackLayout>
+    </Grid>
+    <!--<ScrollView>
+        <VerticalStackLayout
+            Spacing="25"
+            Padding="30,0"
+            VerticalOptions="Center">
+
+            <Image
+                Source="dotnet_bot.png"
+                SemanticProperties.Description="Cute dot net bot waving hi to you!"
+                HeightRequest="200"
+                HorizontalOptions="Center" />
+
+            <Label
+                Text="Hello, World!"
+                SemanticProperties.HeadingLevel="Level1"
+                FontSize="32"
+                HorizontalOptions="Center" />
+
+            <Label
+                Text="Welcome to .NET Multi-platform App UI"
+                SemanticProperties.HeadingLevel="Level2"
+                SemanticProperties.Description="Welcome to dot net Multi platform App U I"
+                FontSize="18"
+                HorizontalOptions="Center" />
+
+            <Button
+                x:Name="CounterBtn"
+                Text="Click me"
+                SemanticProperties.Hint="Counts the number of times you click"
+                Clicked="OnCounterClicked"
+                HorizontalOptions="Center" />
+
+        </VerticalStackLayout>
+    </ScrollView>-->
+
+</ContentPage>
