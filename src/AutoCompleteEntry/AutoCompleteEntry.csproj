@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
 	<PropertyGroup>
     <TargetFrameworks>net6.0;net6.0-android;net6.0-ios;net6.0-maccatalyst</TargetFrameworks>
@@ -23,7 +23,11 @@
   <ItemGroup>
     <PackageReference Include="zoft.MauiExtensions.Core" Version="1.2.0" />
   </ItemGroup>
-
+  
+  <ItemGroup Condition="$(TargetFramework.StartsWith('net6.0-maccatalyst')) == true">
+    <PackageReference Include="Microsoft.Maui.Graphics" Version="6.0.501" />
+  </ItemGroup>
+  
   <!-- Platform Specific Files-->
   <ItemGroup Condition="$(TargetFramework.StartsWith('net6.0-ios')) == true OR $(TargetFramework.StartsWith('net6.0-maccatalyst')) == true OR $(TargetFramework.StartsWith('net6.0-android')) == true OR $(TargetFramework.Contains('-windows')) == true">
     <Compile Remove="**\*.Standard.cs" />
