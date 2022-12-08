@@ -1,7 +1,6 @@
 ﻿using Microsoft.Maui.Controls.Platform;
 using Microsoft.Maui.Handlers;
 using Microsoft.Maui.Platform;
-using UIKit;
 using zoft.MauiExtensions.Controls.Platforms.Extensions;
 using zoft.MauiExtensions.Controls.Platforms.iOS;
 

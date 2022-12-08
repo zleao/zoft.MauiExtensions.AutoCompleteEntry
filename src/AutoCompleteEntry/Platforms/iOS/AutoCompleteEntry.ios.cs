@@ -1,14 +1,11 @@
 ﻿using CoreGraphics;
 using Foundation;
-using Microsoft.Maui.Platform;
 using ObjCRuntime;
 using System.Collections;
 using System.Collections.Specialized;
 using System.Drawing;
 using System.Runtime.InteropServices;
 using UIKit;
-using zoft.MauiExtensions.Controls.Platforms.Extensions;
-using static System.Collections.Specialized.BitVector32;
 
 namespace zoft.MauiExtensions.Controls.Platforms.iOS
 {
@@ -113,7 +110,7 @@ namespace zoft.MauiExtensions.Controls.Platforms.iOS
                 BorderStyle = UITextBorderStyle.None,
                 ReturnKeyType = UIReturnKeyType.Search,
                 AutocorrectionType = UITextAutocorrectionType.No,
-                ShouldReturn = InputText_OnShouldReturn
+                ShouldReturn = InputText_OnShouldReturn,
             };
             InputTextField.EditingDidBegin += InputText_OnEditingDidBegin;
             InputTextField.EditingDidEnd += InputText_OnEditingDidEnd;

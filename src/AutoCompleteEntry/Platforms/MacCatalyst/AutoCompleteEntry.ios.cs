@@ -1,14 +1,11 @@
 ﻿using CoreGraphics;
 using Foundation;
-using Microsoft.Maui.Platform;
 using ObjCRuntime;
 using System.Collections;
 using System.Collections.Specialized;
 using System.Drawing;
 using System.Runtime.InteropServices;
 using UIKit;
-using zoft.MauiExtensions.Controls.Platforms.Extensions;
-using static System.Collections.Specialized.BitVector32;
 
 namespace zoft.MauiExtensions.Controls.Platforms.iOS
 {

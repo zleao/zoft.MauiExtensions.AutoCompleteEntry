@@ -10,7 +10,7 @@ namespace zoft.MauiExtensions.Controls.Handlers
         protected override AutoSuggestBox CreatePlatformView() => new()
         {
             AutoMaximizeSuggestionArea = false,
-            QueryIcon = new SymbolIcon(Symbol.Find),
+            //QueryIcon = new SymbolIcon(Symbol.Find),
         };
 
         protected override void ConnectHandler(AutoSuggestBox platformView)
