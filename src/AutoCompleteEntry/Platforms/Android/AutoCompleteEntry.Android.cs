@@ -120,7 +120,10 @@ namespace zoft.MauiExtensions.Controls.Platforms.Android
         protected override void OnTextChanged(ICharSequence text, int start, int lengthBefore, int lengthAfter)
         {
             if (!_suppressTextChangedEvent)
-                this.TextChanged?.Invoke(this, new AutoCompleteEntryTextChangedEventArgs(AutoCompleteEntryTextChangeReason.UserInput));
+            {
+                TextChanged?.Invoke(this, new AutoCompleteEntryTextChangedEventArgs(AutoCompleteEntryTextChangeReason.UserInput));
+            }
+
             base.OnTextChanged(text, start, lengthBefore, lengthAfter);
         }
 
