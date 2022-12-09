@@ -1,7 +1,5 @@
-﻿#if __IOS__
+﻿#if __IOS__ || MACCATALYST
 using PlatformView = zoft.MauiExtensions.Controls.Platforms.iOS.IOSAutoCompleteEntry;
-#elif MACCATALYST
-using PlatformView = Microsoft.Maui.Platform.MauiSearchBar;
 #elif ANDROID
 using PlatformView = zoft.MauiExtensions.Controls.Platforms.Android.AndroidAutoCompleteEntry;
 #elif WINDOWS
