@@ -1,10 +1,9 @@
 ﻿using Foundation;
 using Microsoft.Maui.Platform;
 using UIKit;
-using zoft.MauiExtensions.Controls.Platforms.iOS;
 using zoft.MauiExtensions.Core.Extensions;
 
-namespace zoft.MauiExtensions.Controls.Platforms.Extensions
+namespace zoft.MauiExtensions.Controls.Platform
 {
     public static class AutoCompleteEntryExtensions
     {

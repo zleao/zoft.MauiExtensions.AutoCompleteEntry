@@ -1,7 +1,7 @@
 ﻿using Microsoft.Maui.Handlers;
 using Microsoft.Maui.Platform;
 using Microsoft.UI.Xaml.Controls;
-using zoft.MauiExtensions.Controls.Platforms.Extensions;
+using zoft.MauiExtensions.Controls.Platform;
 
 namespace zoft.MauiExtensions.Controls.Handlers
 {

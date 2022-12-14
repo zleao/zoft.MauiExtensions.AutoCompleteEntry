@@ -1,6 +1,6 @@
 ﻿using UIKit;
 
-namespace zoft.MauiExtensions.Controls.Platforms.Extensions
+namespace zoft.MauiExtensions.Controls.Platform
 {
     public static class SearchBarExtensions
     {

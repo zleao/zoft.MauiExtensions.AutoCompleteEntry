@@ -1,7 +1,7 @@
-﻿#if __IOS__ || MACCATALYST
-using PlatformView = zoft.MauiExtensions.Controls.Platforms.iOS.IOSAutoCompleteEntry;
+#if __IOS__ || MACCATALYST
+using PlatformView = zoft.MauiExtensions.Controls.Platform.IOSAutoCompleteEntry;
 #elif ANDROID
-using PlatformView = zoft.MauiExtensions.Controls.Platforms.Android.AndroidAutoCompleteEntry;
+using PlatformView = zoft.MauiExtensions.Controls.Platform.AndroidAutoCompleteEntry;
 #elif WINDOWS
 using PlatformView = Microsoft.UI.Xaml.Controls.AutoSuggestBox;
 #elif TIZEN

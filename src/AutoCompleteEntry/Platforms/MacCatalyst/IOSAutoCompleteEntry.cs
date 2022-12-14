@@ -7,7 +7,7 @@ using System.Drawing;
 using System.Runtime.InteropServices;
 using UIKit;
 
-namespace zoft.MauiExtensions.Controls.Platforms.iOS
+namespace zoft.MauiExtensions.Controls.Platform
 {
     /// <summary>
     ///  Creates a UIView with dropdown with a similar API and behavior to UWP's AutoSuggestBox
@@ -110,7 +110,7 @@ namespace zoft.MauiExtensions.Controls.Platforms.iOS
                 BorderStyle = UITextBorderStyle.None,
                 ReturnKeyType = UIReturnKeyType.Search,
                 AutocorrectionType = UITextAutocorrectionType.No,
-                ShouldReturn = InputText_OnShouldReturn,
+                ShouldReturn = InputText_OnShouldReturn
             };
             InputTextField.EditingDidBegin += InputText_OnEditingDidBegin;
             InputTextField.EditingDidEnd += InputText_OnEditingDidEnd;

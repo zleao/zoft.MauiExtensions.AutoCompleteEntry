@@ -15,7 +15,7 @@
 		<ApplicationTitle>AutoCompleteEntry.Sample</ApplicationTitle>
 
 		<!-- App Identifier -->
-		<ApplicationId>com.companyname.autocompleteentry.sample</ApplicationId>
+		<ApplicationId>com.zoft.autocompleteentry.sample</ApplicationId>
 		<ApplicationIdGuid>d6a3d708-05ce-408d-aeb8-b40efa7d372f</ApplicationIdGuid>
 
 		<!-- Versions -->

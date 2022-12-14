@@ -1,8 +1,7 @@
 ﻿using Microsoft.Maui.Controls.Platform;
 using Microsoft.Maui.Handlers;
 using Microsoft.Maui.Platform;
-using zoft.MauiExtensions.Controls.Platforms.Android;
-using zoft.MauiExtensions.Controls.Platforms.Extensions;
+using zoft.MauiExtensions.Controls.Platform;
 
 namespace zoft.MauiExtensions.Controls.Handlers
 {
