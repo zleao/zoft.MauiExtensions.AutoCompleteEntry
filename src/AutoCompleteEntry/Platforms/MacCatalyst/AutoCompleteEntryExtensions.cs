@@ -7,12 +7,12 @@ namespace zoft.MauiExtensions.Controls.Platform
 {
     public static class AutoCompleteEntryExtensions
     {
-        public static void UpdateText(this IOSAutoCompleteEntry iosAutoCompleteEntry, IAutoCompleteEntry autoCompleteEntry)
+        public static void UpdateText(this IOSAutoCompleteEntry iosAutoCompleteEntry, AutoCompleteEntry autoCompleteEntry)
         {
             iosAutoCompleteEntry.Text = autoCompleteEntry.Text;
         }
 
-        public static void UpdatePlaceholder(this IOSAutoCompleteEntry iosAutoCompleteEntry, IAutoCompleteEntry autoCompleteEntry, Color defaultPlaceholderColor = null)
+        public static void UpdatePlaceholder(this IOSAutoCompleteEntry iosAutoCompleteEntry, AutoCompleteEntry autoCompleteEntry, Color defaultPlaceholderColor = null)
         {
             var placeholder = autoCompleteEntry.Placeholder;
             if (placeholder == null)
@@ -31,7 +31,7 @@ namespace zoft.MauiExtensions.Controls.Platform
             iosAutoCompleteEntry.InputTextField.AttributedPlaceholder.WithCharacterSpacing(autoCompleteEntry.CharacterSpacing);
         }
 
-        public static void UpdateIsTextPredictionEnabled(this IOSAutoCompleteEntry iosAutoCompleteEntry, IAutoCompleteEntry autoCompleteEntry)
+        public static void UpdateIsTextPredictionEnabled(this IOSAutoCompleteEntry iosAutoCompleteEntry, AutoCompleteEntry autoCompleteEntry)
         {
             if (autoCompleteEntry.IsTextPredictionEnabled)
             {
@@ -43,7 +43,7 @@ namespace zoft.MauiExtensions.Controls.Platform
             }
         }
 
-        public static void UpdateMaxLength(this IOSAutoCompleteEntry iosAutoCompleteEntry, IAutoCompleteEntry autoCompleteEntry)
+        public static void UpdateMaxLength(this IOSAutoCompleteEntry iosAutoCompleteEntry, AutoCompleteEntry autoCompleteEntry)
         {
             var newText = iosAutoCompleteEntry.InputTextField.AttributedText.TrimToMaxLength(autoCompleteEntry.MaxLength);
             if (newText != null && iosAutoCompleteEntry.InputTextField.AttributedText != newText)
@@ -52,36 +52,36 @@ namespace zoft.MauiExtensions.Controls.Platform
             }
         }
 
-        public static void UpdateIsReadOnly(this IOSAutoCompleteEntry iosAutoCompleteEntry, IAutoCompleteEntry autoCompleteEntry)
+        public static void UpdateIsReadOnly(this IOSAutoCompleteEntry iosAutoCompleteEntry, AutoCompleteEntry autoCompleteEntry)
         {
             iosAutoCompleteEntry.InputTextField.UserInteractionEnabled = !(autoCompleteEntry.IsReadOnly || autoCompleteEntry.InputTransparent);
         }
 
-        public static void UpdateDisplayMemberPath(this IOSAutoCompleteEntry iosAutoCompleteEntry, IAutoCompleteEntry autoCompleteEntry)
+        public static void UpdateDisplayMemberPath(this IOSAutoCompleteEntry iosAutoCompleteEntry, AutoCompleteEntry autoCompleteEntry)
         {
             iosAutoCompleteEntry.SetItems(autoCompleteEntry.ItemsSource,
                                           (o) => o.GetPropertyValueAsString(autoCompleteEntry?.DisplayMemberPath),
                                           (o) => o.GetPropertyValueAsString(autoCompleteEntry?.TextMemberPath));
         }
 
-        public static void UpdateIsSuggestionListOpen(this IOSAutoCompleteEntry iosAutoCompleteEntry, IAutoCompleteEntry autoCompleteEntry)
+        public static void UpdateIsSuggestionListOpen(this IOSAutoCompleteEntry iosAutoCompleteEntry, AutoCompleteEntry autoCompleteEntry)
         {
             iosAutoCompleteEntry.IsSuggestionListOpen = autoCompleteEntry.IsSuggestionListOpen;
         }
 
-        public static void UpdateUpdateTextOnSelect(this IOSAutoCompleteEntry iosAutoCompleteEntry, IAutoCompleteEntry autoCompleteEntry)
+        public static void UpdateUpdateTextOnSelect(this IOSAutoCompleteEntry iosAutoCompleteEntry, AutoCompleteEntry autoCompleteEntry)
         {
             iosAutoCompleteEntry.UpdateTextOnSelect = autoCompleteEntry.UpdateTextOnSelect;
         }
 
-        public static void UpdateItemsSource(this IOSAutoCompleteEntry iosAutoCompleteEntry, IAutoCompleteEntry autoCompleteEntry)
+        public static void UpdateItemsSource(this IOSAutoCompleteEntry iosAutoCompleteEntry, AutoCompleteEntry autoCompleteEntry)
         {
-            iosAutoCompleteEntry.SetItems(autoCompleteEntry?.ItemsSource, 
-                                          (o) => o.GetPropertyValueAsString(autoCompleteEntry?.DisplayMemberPath), 
+            iosAutoCompleteEntry.SetItems(autoCompleteEntry?.ItemsSource,
+                                          (o) => o.GetPropertyValueAsString(autoCompleteEntry?.DisplayMemberPath),
                                           (o) => o.GetPropertyValueAsString(autoCompleteEntry?.TextMemberPath));
         }
 
-        public static void UpdateSelectedSuggestion(this IOSAutoCompleteEntry iosAutoCompleteEntry, IAutoCompleteEntry autoCompleteEntry)
+        public static void UpdateSelectedSuggestion(this IOSAutoCompleteEntry iosAutoCompleteEntry, AutoCompleteEntry autoCompleteEntry)
         {
             iosAutoCompleteEntry.Text = autoCompleteEntry.SelectedSuggestion.GetPropertyValueAsString(autoCompleteEntry.TextMemberPath);
         }

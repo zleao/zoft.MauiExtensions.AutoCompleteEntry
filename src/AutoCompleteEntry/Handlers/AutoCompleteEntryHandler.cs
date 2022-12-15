@@ -15,34 +15,33 @@ namespace zoft.MauiExtensions.Controls.Handlers
 {
 	public partial class AutoCompleteEntryHandler : IAutoCompleteEntryHandler
 	{
-		public static IPropertyMapper<IAutoCompleteEntry, IAutoCompleteEntryHandler> Mapper =
-			new PropertyMapper<IAutoCompleteEntry, IAutoCompleteEntryHandler>(ViewMapper)
+		public static IPropertyMapper<AutoCompleteEntry, IAutoCompleteEntryHandler> Mapper =
+			new PropertyMapper<AutoCompleteEntry, IAutoCompleteEntryHandler>(ViewMapper)
 			{
 #if __IOS__
-				[nameof(ISearchBar.IsEnabled)] = MapIsEnabled,
+				[nameof(IEntry.IsEnabled)] = MapIsEnabled,
 #endif
-				[nameof(ISearchBar.Background)] = MapBackground,
-				[nameof(ISearchBar.CharacterSpacing)] = MapCharacterSpacing,
-				[nameof(ISearchBar.Font)] = MapFont,
+                [nameof(IEntry.Background)] = MapBackground,
+				[nameof(IEntry.CharacterSpacing)] = MapCharacterSpacing,
+				[nameof(IEntry.Font)] = MapFont,
 				[nameof(ITextAlignment.HorizontalTextAlignment)] = MapHorizontalTextAlignment,
 				[nameof(ITextAlignment.VerticalTextAlignment)] = MapVerticalTextAlignment,
-				[nameof(ISearchBar.IsReadOnly)] = MapIsReadOnly,
-				[nameof(ISearchBar.IsTextPredictionEnabled)] = MapIsTextPredictionEnabled,
-				[nameof(ISearchBar.MaxLength)] = MapMaxLength,
-				[nameof(ISearchBar.Placeholder)] = MapPlaceholder,
-				[nameof(ISearchBar.PlaceholderColor)] = MapPlaceholderColor,
-				[nameof(ISearchBar.Text)] = MapText,
-				[nameof(ISearchBar.TextColor)] = MapTextColor,
-				[nameof(ISearchBar.CancelButtonColor)] = MapCancelButtonColor,
-				[nameof(IAutoCompleteEntry.TextMemberPath)] = MapTextMemberPath,
-				[nameof(IAutoCompleteEntry.DisplayMemberPath)] = MapDisplayMemberPath,
-				[nameof(IAutoCompleteEntry.IsSuggestionListOpen)] = MapIsSuggestionListOpen,
-				[nameof(IAutoCompleteEntry.UpdateTextOnSelect)] = MapUpdateTextOnSelect,
-				[nameof(IAutoCompleteEntry.ItemsSource)] = MapItemsSource,
-				[nameof(IAutoCompleteEntry.SelectedSuggestion)] = MapSelectedSuggestion,
+				[nameof(IEntry.IsReadOnly)] = MapIsReadOnly,
+				[nameof(IEntry.IsTextPredictionEnabled)] = MapIsTextPredictionEnabled,
+				[nameof(IEntry.MaxLength)] = MapMaxLength,
+				[nameof(IEntry.Placeholder)] = MapPlaceholder,
+				[nameof(IEntry.PlaceholderColor)] = MapPlaceholderColor,
+				[nameof(IEntry.Text)] = MapText,
+				[nameof(IEntry.TextColor)] = MapTextColor,
+				[nameof(AutoCompleteEntry.TextMemberPath)] = MapTextMemberPath,
+				[nameof(AutoCompleteEntry.DisplayMemberPath)] = MapDisplayMemberPath,
+				[nameof(AutoCompleteEntry.IsSuggestionListOpen)] = MapIsSuggestionListOpen,
+				[nameof(AutoCompleteEntry.UpdateTextOnSelect)] = MapUpdateTextOnSelect,
+				[nameof(AutoCompleteEntry.ItemsSource)] = MapItemsSource,
+				[nameof(AutoCompleteEntry.SelectedSuggestion)] = MapSelectedSuggestion,
 			};
 
-		public static CommandMapper<ISearchBar, ISearchBarHandler> CommandMapper = new(ViewCommandMapper)
+		public static CommandMapper<AutoCompleteEntry, IAutoCompleteEntryHandler> CommandMapper = new(ViewCommandMapper)
 		{
 		};
 
@@ -60,7 +59,7 @@ namespace zoft.MauiExtensions.Controls.Handlers
 		{
 		}
 
-		IAutoCompleteEntry IAutoCompleteEntryHandler.VirtualView => VirtualView;
+		AutoCompleteEntry IAutoCompleteEntryHandler.VirtualView => VirtualView;
 
 		PlatformView IAutoCompleteEntryHandler.PlatformView => PlatformView;
 	}

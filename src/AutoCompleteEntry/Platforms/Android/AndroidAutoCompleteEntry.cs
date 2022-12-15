@@ -145,7 +145,6 @@ namespace zoft.MauiExtensions.Controls.Platform
                 TextChanged?.Invoke(this, new AutoCompleteEntryTextChangedEventArgs(AutoCompleteEntryTextChangeReason.SuggestionChosen));
             }
             SuggestionChosen?.Invoke(this, new AutoCompleteEntrySuggestionChosenEventArgs(obj));
-            QuerySubmitted?.Invoke(this, new AutoCompleteEntryQuerySubmittedEventArgs(Text, obj));
         }
 
         /// <inheritdoc />
@@ -155,7 +154,6 @@ namespace zoft.MauiExtensions.Controls.Platform
             {
                 DismissDropDown();
                 DismissKeyboard();
-                QuerySubmitted?.Invoke(this, new AutoCompleteEntryQuerySubmittedEventArgs(Text, null));
             }
             else
                 base.OnEditorAction(actionCode);
@@ -171,11 +169,6 @@ namespace zoft.MauiExtensions.Controls.Platform
         /// Raised after the text content of the editable control component is updated.
         /// </summary>
         public new event EventHandler<AutoCompleteEntryTextChangedEventArgs> TextChanged;
-
-        /// <summary>
-        /// Occurs when the user submits a search query.
-        /// </summary>
-        public event EventHandler<AutoCompleteEntryQuerySubmittedEventArgs> QuerySubmitted;
 
         /// <summary>
         /// Raised before the text content of the editable control component is updated.
