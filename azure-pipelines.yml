@@ -1,74 +1,72 @@
+variables:
+  
+  TOOLKIT_NET_VERSION: '7.0.x'
+  PathToProjectFolder: 'src\AutoCompleteEntry'
+  PathToProjectFile: '$(PathToProjectFolder)\AutoCompleteEntry.csproj'
+  BuildConfiguration: Release
+
 trigger:
 - main
 
-variables:
-  BuildConfiguration: Release
-  DotNetVersion: 6.0.403
-  VSVERSION: 17.4.0
+jobs:
+  - job: build_library
+    displayName: Build Library
+    pool:
+      vmImage: windows-latest
+    steps:
 
-pool:
-  vmImage: 'windows-2022'
-  demands:
-  - MSBuild
+      - task: UseDotNet@2
+        displayName: Install .NET $(TOOLKIT_NET_VERSION)
+        inputs:
+          packageType: 'sdk'
+          version: '$(TOOLKIT_NET_VERSION)'
 
-stages:
-  - stage: Build
-    displayName: 'Build Stage'
+      - task: CmdLine@2
+        displayName: 'Install .NET MAUI Workload $(TOOLKIT_NET_VERSION)'
+        inputs:
+          script: dotnet workload restore $(PathToProjectFile)
+
+      - task: NuGetToolInstaller@1
+        displayName: 'Install Latest Nuget Package Manager'
+        inputs:
+          versionSpec: 
+          checkLatest: true
+
+      - task: CmdLine@2
+        displayName: 'Build $(PathToProjectFile)'
+        inputs:
+          script: 'dotnet build -c $(BuildConfiguration) $(PathToProjectFile)'
+
+      - task: CopyFiles@2
+        displayName: 'Copy nuget packages to staging directoy'
+        inputs:
+          Contents: '$(PathToProjectFolder)/bin/$(BuildConfiguration)/*.*nupkg'
+          TargetFolder: '$(Build.ArtifactStagingDirectory)/nugets'
+
+      - task: PublishBuildArtifacts@1
+        displayName: 'Publish build output'
+        inputs:
+          PathtoPublish: $(Build.ArtifactStagingDirectory)/nugets
+          ArtifactName: 'drop'
+          publishLocation: 'Container'
+
+  - job: 'publish_nuget_package'
+    displayName: 'Publish NuGet Package'
     condition: ne(variables['Build.Reason'], 'PullRequest')
-    jobs:
-      - job: BuildMauiProject
-        displayName: 'Build AutoCompleteEntry'
-        steps:
-          - task: UseDotNet@2
-            displayName: .NET Version
-            inputs:
-              packageType: 'sdk'
-              version: '$(DotNetVersion)'
-          - task: CmdLine@2
-            inputs:
-              script: 'dotnet workload restore src\AutoCompleteEntry\AutoCompleteEntry.csproj'
-          - task: NuGetToolInstaller@1
-            inputs:
-              versionSpec: 
-              checkLatest: true
-          - task: CmdLine@2
-            inputs:
-              script: 'dotnet restore src\AutoCompleteEntry\AutoCompleteEntry.csproj'
-          - task: DotNetCoreCLI@2
-            displayName: 'Build AutoCompleteEntry project'
-            inputs:
-              command: 'build'
-              projects: |
-                src/AutoCompleteEntry/AutoCompleteEntry.csproj
-              arguments: --output $(Build.ArtifactStagingDirectory)/publish --configuration Release --no-restore
-          - task: PublishBuildArtifacts@1
-            displayName: 'Publish build output'
-            inputs:
-              PathtoPublish: $(Build.ArtifactStagingDirectory)/publish
-              ArtifactName: 'drop'
-              publishLocation: 'Container'
-  - stage: 'publish'
-    displayName: 'Publish to feed'
-    condition: ne(variables['Build.Reason'], 'PullRequest')
-    dependsOn: Build
-    jobs:
-      - job: 'publish'
-        displayName: 'Publish NuGet package'
-        steps:
-          - task: NuGetToolInstaller@1
-            inputs:
-              versionSpec: 
-              checkLatest: true
-          - task: DownloadBuildArtifacts@0
-            displayName: 'Download the published artifact'
-            inputs:
-              buildType: 'current'
-              downloadType: 'specific'
-              downloadPath: '$(System.ArtifactsDirectory)'
-          - task: NuGetCommand@2
-            displayName: 'Push the artifact to NuGet feed'
-            inputs:
-              command: 'push'
-              packagesToPush: '$(Build.ArtifactStagingDirectory)/**/*.nupkg;!$(Build.ArtifactStagingDirectory)/**/*.symbols.nupkg'
-              nuGetFeedType: 'external'
-              publishFeedCredentials: 'NuGet'
+    dependsOn: build_library
+    steps:
+
+      - task: DownloadBuildArtifacts@0
+        displayName: 'Download the published artifact'
+        inputs:
+          buildType: 'current'
+          downloadType: 'specific'
+          downloadPath:  '$(Build.ArtifactStagingDirectory)/nugets'
+
+      - task: NuGetCommand@2
+        displayName: 'Push the artifact to NuGet feed'
+        inputs:
+          command: 'push'
+          packagesToPush: '$(Build.ArtifactStagingDirectory)/nugets/**/*.nupkg;$(Build.ArtifactStagingDirectory)/nugets/**/*.snupkg'
+          nuGetFeedType: 'external'
+          publishFeedCredentials: 'NuGet'

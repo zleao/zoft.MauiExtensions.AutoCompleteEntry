@@ -1,10 +1,9 @@
 ﻿using Android.Text;
 using Android.Widget;
 using Microsoft.Maui.Platform;
-using zoft.MauiExtensions.Controls.Platforms.Android;
 using zoft.MauiExtensions.Core.Extensions;
 
-namespace zoft.MauiExtensions.Controls.Platforms.Extensions
+namespace zoft.MauiExtensions.Controls.Platform
 {
     public static class AutoCompleteEntryExtensions
     {

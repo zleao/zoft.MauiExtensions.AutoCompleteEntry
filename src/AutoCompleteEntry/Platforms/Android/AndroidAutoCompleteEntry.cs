@@ -7,7 +7,7 @@ using Java.Lang;
 using Microsoft.Maui.Controls.Compatibility.Platform.Android;
 using Color = Microsoft.Maui.Graphics.Color;
 
-namespace zoft.MauiExtensions.Controls.Platforms.Android
+namespace zoft.MauiExtensions.Controls.Platform
 {
     /// <summary>
     ///  Extends AutoCompleteTextView to have similar APIs and behavior to UWP's AutoSuggestBox, which greatly simplifies wrapping it
@@ -120,7 +120,10 @@ namespace zoft.MauiExtensions.Controls.Platforms.Android
         protected override void OnTextChanged(ICharSequence text, int start, int lengthBefore, int lengthAfter)
         {
             if (!_suppressTextChangedEvent)
-                this.TextChanged?.Invoke(this, new AutoCompleteEntryTextChangedEventArgs(AutoCompleteEntryTextChangeReason.UserInput));
+            {
+                TextChanged?.Invoke(this, new AutoCompleteEntryTextChangedEventArgs(AutoCompleteEntryTextChangeReason.UserInput));
+            }
+
             base.OnTextChanged(text, start, lengthBefore, lengthAfter);
         }
 

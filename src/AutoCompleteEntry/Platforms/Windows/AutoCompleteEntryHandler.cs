@@ -1,7 +1,7 @@
 ﻿using Microsoft.Maui.Handlers;
 using Microsoft.Maui.Platform;
 using Microsoft.UI.Xaml.Controls;
-using zoft.MauiExtensions.Controls.Platforms.Extensions;
+using zoft.MauiExtensions.Controls.Platform;
 
 namespace zoft.MauiExtensions.Controls.Handlers
 {
@@ -10,7 +10,7 @@ namespace zoft.MauiExtensions.Controls.Handlers
         protected override AutoSuggestBox CreatePlatformView() => new()
         {
             AutoMaximizeSuggestionArea = false,
-            QueryIcon = new SymbolIcon(Symbol.Find),
+            //QueryIcon = new SymbolIcon(Symbol.Find),
         };
 
         protected override void ConnectHandler(AutoSuggestBox platformView)

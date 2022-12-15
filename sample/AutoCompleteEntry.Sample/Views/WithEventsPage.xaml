@@ -1,0 +1,44 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:zoft="http://zoft.MauiExtensions/Controls"
+             xmlns:ctkm="http://schemas.microsoft.com/dotnet/2022/maui/toolkit"
+             x:Class="AutoCompleteEntry.Sample.Views.WithEventsPage">
+
+    <ContentPage.Resources>
+        <ctkm:IsNotNullConverter x:Key="IsNotNullConverter"/>
+    </ContentPage.Resources>
+
+    <Grid>
+        <Image Source="dotnet_bot.png"
+               HeightRequest="200"
+               HorizontalOptions="Center" />
+
+        <VerticalStackLayout Spacing="10" Margin="10">
+            <zoft:AutoCompleteEntry Placeholder="Search for a country or group"
+                                    ItemsSource="{Binding FilteredList}"
+                                    TextMemberPath="Country"
+                                    DisplayMemberPath="Country"
+                                    TextChanged="AutoCompleteEntry_TextChanged"
+                                    SuggestionChosen="AutoCompleteEntry_SuggestionChosen"
+                                    QuerySubmitted="AutoCompleteEntry_QuerySubmitted"/>
+        
+            <Frame BorderColor="Gray" 
+                   BackgroundColor="LightGray" 
+                   HorizontalOptions="Start"
+                   IsVisible="{Binding SelectedItem, Converter={StaticResource IsNotNullConverter}}">
+                <VerticalStackLayout>
+                    <HorizontalStackLayout Spacing="5">
+                        <Label Text="Group:"/>
+                        <Label Text="{Binding SelectedItem.Group}" FontAttributes="Bold"/>
+                    </HorizontalStackLayout>
+                    <HorizontalStackLayout Spacing="5">
+                        <Label Text="Country:"/>
+                        <Label Text="{Binding SelectedItem.Country}" FontAttributes="Bold"/>
+                    </HorizontalStackLayout>
+                </VerticalStackLayout>
+            </Frame>
+        </VerticalStackLayout>
+    </Grid>
+
+</ContentPage>

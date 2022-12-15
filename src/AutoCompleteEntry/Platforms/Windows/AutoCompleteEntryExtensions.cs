@@ -1,6 +1,6 @@
 ﻿using zoft.MauiExtensions.Core.Extensions;
 
-namespace zoft.MauiExtensions.Controls.Platforms.Extensions
+namespace zoft.MauiExtensions.Controls.Platform
 {
     public static class AutoCompleteEntryExtensions
     {

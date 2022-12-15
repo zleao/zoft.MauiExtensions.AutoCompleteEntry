@@ -1,13 +1,12 @@
 ﻿using System.Collections;
-using zoft.MauiExtensions.Core.Commands;
 
 namespace zoft.MauiExtensions.Controls
 {
-	/// <summary>
-	/// Represents a text control that makes suggestions to users as they type. The app is notified when text 
-	/// has been changed by the user and is responsible for providing relevant suggestions for this control to display.
-	/// </summary>
-	public interface IAutoCompleteEntry : ISearchBar
+    /// <summary>
+    /// Represents a text control that makes suggestions to users as they type. The app is notified when text 
+    /// has been changed by the user and is responsible for providing relevant suggestions for this control to display.
+    /// </summary>
+    public interface IAutoCompleteEntry : ISearchBar
 	{
         /// <summary>
         /// Gets or sets the property path that is used to get the value for display in the
