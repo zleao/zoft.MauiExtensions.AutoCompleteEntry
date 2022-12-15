@@ -24,7 +24,7 @@ jobs:
       - task: CmdLine@2
         displayName: 'Install .NET MAUI Workload $(TOOLKIT_NET_VERSION)'
         inputs:
-          script: dotnet workload restore $(PathToProjectFile)
+          script: dotnet workload install maui
 
       - task: NuGetToolInstaller@1
         displayName: 'Install Latest Nuget Package Manager'
