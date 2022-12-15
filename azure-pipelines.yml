@@ -67,6 +67,6 @@ jobs:
         displayName: 'Push the artifact to NuGet feed'
         inputs:
           command: 'push'
-          packagesToPush: '$(Build.ArtifactStagingDirectory)/nugets/**/*.nupkg;$(Build.ArtifactStagingDirectory)/nugets/**/*.snupkg'
+          packagesToPush: '$(Build.ArtifactStagingDirectory)/nugets/**/*.nupkg'
           nuGetFeedType: 'external'
           publishFeedCredentials: 'NuGet'
