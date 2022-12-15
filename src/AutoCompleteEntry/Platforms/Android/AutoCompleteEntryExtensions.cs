@@ -21,7 +21,7 @@ namespace zoft.MauiExtensions.Controls.Platform
         
         public static void UpdateDisplayMemberPath(this AndroidAutoCompleteEntry androidAutoCompleteEntry, AutoCompleteEntry autoCompleteEntry)
         {
-            androidAutoCompleteEntry.SetItems(autoCompleteEntry.ItemsSource?.OfType<object>(),
+            androidAutoCompleteEntry.SetItems(autoCompleteEntry.ItemsSource,
                                               (o) => o.GetPropertyValueAsString(autoCompleteEntry?.DisplayMemberPath),
                                               (o) => o.GetPropertyValueAsString(autoCompleteEntry?.TextMemberPath));
         }
@@ -38,7 +38,7 @@ namespace zoft.MauiExtensions.Controls.Platform
 
         public static void UpdateItemsSource(this AndroidAutoCompleteEntry androidAutoCompleteEntry, AutoCompleteEntry autoCompleteEntry)
         {
-            androidAutoCompleteEntry.SetItems(autoCompleteEntry?.ItemsSource?.OfType<object>(), 
+            androidAutoCompleteEntry.SetItems(autoCompleteEntry?.ItemsSource, 
                                               (o) => o.GetPropertyValueAsString(autoCompleteEntry?.DisplayMemberPath), 
                                               (o) => o.GetPropertyValueAsString(autoCompleteEntry?.TextMemberPath));
         }

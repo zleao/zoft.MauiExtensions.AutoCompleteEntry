@@ -5,6 +5,8 @@ using Android.Views.InputMethods;
 using Android.Widget;
 using Java.Lang;
 using Microsoft.Maui.Controls.Compatibility.Platform.Android;
+using System.Collections;
+using System.Collections.Specialized;
 using Color = Microsoft.Maui.Graphics.Color;
 
 namespace zoft.MauiExtensions.Controls.Platform
@@ -47,13 +49,13 @@ namespace zoft.MauiExtensions.Controls.Platform
             base.OnFocusChanged(gainFocus, direction, previouslyFocusedRect);
         }
 
-        internal void SetItems(IEnumerable<object> items, Func<object, string> labelFunc, Func<object, string> textFunc)
+        internal void SetItems(IList items, Func<object, string> labelFunc, Func<object, string> textFunc)
         {
             this._textFunc = textFunc;
             if (items == null)
-                _adapter.UpdateList(Enumerable.Empty<string>(), labelFunc);
+                _adapter.UpdateList(new List<object>(), labelFunc);
             else
-                _adapter.UpdateList(items.OfType<object>(), labelFunc);
+                _adapter.UpdateList(items, labelFunc);
         }
 
         /// <summary>
@@ -177,42 +179,82 @@ namespace zoft.MauiExtensions.Controls.Platform
 
         private class SuggestCompleteAdapter : ArrayAdapter, IFilterable
         {
-            private SuggestFilter filter = new SuggestFilter();
-            private List<object> resultList;
-            private Func<object, string> labelFunc;
+            private readonly SuggestFilter _filter = new();
+            private IList _items;
+            private Func<object, string> _labelFunc;
 
-            public SuggestCompleteAdapter(Context context, int textViewResourceId) : base(context, textViewResourceId)
+            public SuggestCompleteAdapter(Context context, int textViewResourceId) 
+                : base(context, textViewResourceId)
             {
-                resultList = new List<object>();
+                _items = new List<object>();
                 SetNotifyOnChange(true);
             }
 
-            public void UpdateList(IEnumerable<object> list, Func<object, string> labelFunc)
+            public void UpdateList(IList list, Func<object, string> labelFunc)
             {
-                this.labelFunc = labelFunc;
-                resultList = list.ToList();
-                filter.SetFilter(resultList.Select(s => labelFunc(s)));
+                _labelFunc = labelFunc;
+                _items = list;
+                
+                CollectionChanged();
+
+                CheckIfItemsSourceIsNotifiable();
+            }
+
+            private void CheckIfItemsSourceIsNotifiable()
+            {
+                if (_items is INotifyCollectionChanged notifiableItems)
+                {
+                    notifiableItems.CollectionChanged += NotifiableItems_CollectionChanged;
+                }
+            }
+
+            private void NotifiableItems_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
+            {
+                if (!MainThread.IsMainThread)
+                {
+                    MainThread.BeginInvokeOnMainThread(CollectionChanged);
+                }
+                else
+                {
+                    CollectionChanged();
+                }
+            }
+
+            private void CollectionChanged()
+            {
+                _filter.SetFilter(_items.OfType<object>().Select(s => _labelFunc(s)));
+
                 NotifyDataSetChanged();
+            }
+
+            protected override void Dispose(bool disposing)
+            {
+                base.Dispose(disposing);
+
+                if (disposing && _items is INotifyCollectionChanged notifiableItems)
+                {
+                    notifiableItems.CollectionChanged -= NotifiableItems_CollectionChanged;
+                }
             }
 
             public override int Count
             {
                 get
                 {
-                    return resultList.Count;
+                    return _items.Count;
                 }
             }
 
-            public override Filter Filter => filter;
+            public override Filter Filter => _filter;
 
             public override Java.Lang.Object GetItem(int position)
             {
-                return labelFunc(GetObject(position));
+                return _labelFunc(GetObject(position));
             }
 
             public object GetObject(int position)
             {
-                return resultList[position];
+                return _items[position];
             }
 
             public override long GetItemId(int position)
@@ -222,22 +264,25 @@ namespace zoft.MauiExtensions.Controls.Platform
 
             private class SuggestFilter : Filter
             {
-                private IEnumerable<string> resultList;
+                private IEnumerable<string> _resultList;
 
                 public SuggestFilter()
                 {
                 }
+
                 public void SetFilter(IEnumerable<string> list)
                 {
-                    resultList = list;
+                    _resultList = list;
                 }
+                
                 protected override FilterResults PerformFiltering(ICharSequence constraint)
                 {
-                    if (resultList == null)
+                    if (_resultList == null)
                         return new FilterResults() { Count = 0, Values = null };
-                    var arr = resultList.ToArray();
+                    var arr = _resultList.ToArray();
                     return new FilterResults() { Count = arr.Length, Values = arr };
                 }
+                
                 protected override void PublishResults(ICharSequence constraint, FilterResults results)
                 {
                 }
