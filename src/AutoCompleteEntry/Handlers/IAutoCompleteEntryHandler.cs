@@ -14,7 +14,7 @@ namespace zoft.MauiExtensions.Controls.Handlers
 {
     public interface IAutoCompleteEntryHandler : IViewHandler
     {
-        new IAutoCompleteEntry VirtualView { get; }
+        new AutoCompleteEntry VirtualView { get; }
         new PlatformView PlatformView { get; }
     }
 }

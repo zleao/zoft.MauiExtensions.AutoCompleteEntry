@@ -20,11 +20,6 @@ namespace zoft.MauiExtensions.Controls.Platform
         public event EventHandler<AutoCompleteEntryTextChangedEventArgs> TextChanged;
 
         /// <summary>
-        /// Occurs when the user submits a search query.
-        /// </summary>
-        public event EventHandler<AutoCompleteEntryQuerySubmittedEventArgs> QuerySubmitted;
-
-        /// <summary>
         /// Raised before the text content of the editable control component is updated.
         /// </summary>
         public event EventHandler<AutoCompleteEntrySuggestionChosenEventArgs> SuggestionChosen;
@@ -103,14 +98,13 @@ namespace zoft.MauiExtensions.Controls.Platform
         /// Initializes a new instance of the <see cref="IOSAutoCompleteEntry"/>.
         /// </summary>
         public IOSAutoCompleteEntry() : this(RectangleF.Empty)
-        {            
+        {
             InputTextField = new UITextField
             {
                 TranslatesAutoresizingMaskIntoConstraints = false,
                 BorderStyle = UITextBorderStyle.None,
-                ReturnKeyType = UIReturnKeyType.Search,
+                ReturnKeyType = UIReturnKeyType.Done,
                 AutocorrectionType = UITextAutocorrectionType.No,
-                ShouldReturn = InputText_OnShouldReturn,
             };
             InputTextField.EditingDidBegin += InputText_OnEditingDidBegin;
             InputTextField.EditingDidEnd += InputText_OnEditingDidEnd;
@@ -122,7 +116,7 @@ namespace zoft.MauiExtensions.Controls.Platform
             InputTextField.LeftAnchor.ConstraintEqualTo(LeftAnchor).Active = true;
             InputTextField.WidthAnchor.ConstraintEqualTo(WidthAnchor).Active = true;
             InputTextField.HeightAnchor.ConstraintEqualTo(HeightAnchor).Active = true;
-            
+
             SelectionList = new UITableView() { TranslatesAutoresizingMaskIntoConstraints = false };
 
             UIKeyboard.Notifications.ObserveWillShow(OnKeyboardShow);
@@ -153,20 +147,6 @@ namespace zoft.MauiExtensions.Controls.Platform
             OnLoaded?.Invoke(this, EventArgs.Empty);
 
             UpdateSuggestionListOpenState();
-        }
-
-        private bool InputText_OnShouldReturn(UITextField field)
-        {
-            if (string.IsNullOrWhiteSpace(field.Text)) 
-            { 
-                return false; 
-            }
-
-            field.ResignFirstResponder();
-            
-            QuerySubmitted?.Invoke(this, new AutoCompleteEntryQuerySubmittedEventArgs(InputTextField.Text, null));
-            
-            return true;
         }
 
         private void InputText_OnEditingDidBegin(object sender, EventArgs e)
@@ -205,11 +185,11 @@ namespace zoft.MauiExtensions.Controls.Platform
             Layer.AddSublayer(border);
             Layer.MasksToBounds = true;
         }
-       
+
         internal void SetItems(IList items, Func<object, string> labelFunc, Func<object, string> textFunc)
         {
             this.textFunc = textFunc;
-            
+
             if (SelectionList.Source is TableSource oldSource)
             {
                 oldSource.TableRowSelected -= SuggestionTableSource_TableRowSelected;
@@ -230,7 +210,7 @@ namespace zoft.MauiExtensions.Controls.Platform
                 IsSuggestionListOpen = false;
             }
         }
-       
+
         private void UpdateSuggestionListOpenState()
         {
             if (_isSuggestionListOpen && SelectionList.Source != null && SelectionList.Source.RowsInSection(SelectionList, 0) > 0)
@@ -305,7 +285,6 @@ namespace zoft.MauiExtensions.Controls.Platform
                 TextChanged?.Invoke(this, new AutoCompleteEntryTextChangedEventArgs(AutoCompleteEntryTextChangeReason.SuggestionChosen));
             }
             SuggestionChosen?.Invoke(this, new AutoCompleteEntrySuggestionChosenEventArgs(selection));
-            QuerySubmitted?.Invoke(this, new AutoCompleteEntryQuerySubmittedEventArgs(Text, selection));
             IsSuggestionListOpen = false;
         }
 
@@ -328,7 +307,7 @@ namespace zoft.MauiExtensions.Controls.Platform
 
             private void CheckIfItemsSourceIsNotifiable()
             {
-                if(_items is INotifyCollectionChanged notifiableItems)
+                if (_items is INotifyCollectionChanged notifiableItems)
                 {
                     notifiableItems.CollectionChanged += NotifiableItems_CollectionChanged;
                 }
@@ -354,8 +333,8 @@ namespace zoft.MauiExtensions.Controls.Platform
             protected override void Dispose(bool disposing)
             {
                 base.Dispose(disposing);
-                
-                if(disposing && _items is INotifyCollectionChanged notifiableItems)
+
+                if (disposing && _items is INotifyCollectionChanged notifiableItems)
                 {
                     notifiableItems.CollectionChanged -= NotifiableItems_CollectionChanged;
                 }

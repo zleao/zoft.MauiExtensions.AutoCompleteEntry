@@ -30,17 +30,5 @@ namespace AutoCompleteEntry.Sample.Views
             // Set sender.Text. You can use args.SelectedItem to build your text string.
             ViewModel.SelectedItem = e.SelectedItem as ListItem;
         }
-
-        private void AutoCompleteEntry_QuerySubmitted(object sender, zoft.MauiExtensions.Controls.AutoCompleteEntryQuerySubmittedEventArgs e)
-        {
-            if (e.ChosenSuggestion != null)
-            {
-                // User selected an item from the suggestion list, take an action on it here.
-            }
-            else
-            {
-                // User hit Enter from the search box. Use args.QueryText to determine what to do.
-            }
-        }
     }
 }

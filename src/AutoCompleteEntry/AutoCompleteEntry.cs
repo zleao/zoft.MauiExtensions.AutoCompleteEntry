@@ -4,7 +4,7 @@
     /// Represents a text control that makes suggestions to users as they type. The app is notified when text 
     /// has been changed by the user and is responsible for providing relevant suggestions for this control to display.
     /// </summary>
-    public partial class AutoCompleteEntry : SearchBar, IAutoCompleteEntry
+    public class AutoCompleteEntry : Entry
     {
         private bool _suppressTextChangedEvent;
 
@@ -15,7 +15,14 @@
         {
         }
 
-        /// <inheritdoc/>
+        /// <summary>
+        /// Gets or sets the property path that is used to get the value for display in the
+        /// text box portion of the <see cref="AutoCompleteEntry"/> control, when an item is selected.
+        /// </summary>
+        /// <value>
+        /// The property path that is used to get the value for display in the text box portion
+        /// of the <see cref="AutoCompleteEntry"/> control, when an item is selected.
+        /// </value>
         public string TextMemberPath
         {
             get { return (string)GetValue(TextMemberPathProperty); }
@@ -29,7 +36,13 @@
             BindableProperty.Create(nameof(TextMemberPath), typeof(string), typeof(AutoCompleteEntry), string.Empty, BindingMode.OneWay, null, null);
 
 
-        /// <inheritdoc/>
+        /// <summary>
+        /// Gets or sets the name or path of the property that is displayed for each data item.
+        /// </summary>
+        /// <value>
+        /// The name or path of the property that is displayed for each the data item in
+        /// the control. The default is an empty string ("").
+        /// </value>
         public string DisplayMemberPath
         {
             get { return (string)GetValue(DisplayMemberPathProperty); }
@@ -43,7 +56,10 @@
             BindableProperty.Create(nameof(DisplayMemberPath), typeof(string), typeof(AutoCompleteEntry), string.Empty, BindingMode.OneWay, null, null);
 
 
-        /// <inheritdoc/>
+        /// <summary>
+        /// Gets or sets a Boolean value indicating whether the drop-down portion of the <see cref="AutoCompleteEntry"/> is open.
+        /// </summary>
+        /// <value>A Boolean value indicating whether the drop-down portion of the <see cref="AutoCompleteEntry"/> is open.</value>
         public bool IsSuggestionListOpen
         {
             get { return (bool)GetValue(IsSuggestionListOpenProperty); }
@@ -57,7 +73,11 @@
             BindableProperty.Create(nameof(IsSuggestionListOpen), typeof(bool), typeof(AutoCompleteEntry), false, BindingMode.OneWay, null, null);
 
 
-        /// <inheritdoc/>
+        /// <summary>
+        /// Used in conjunction with <see cref="TextMemberPath"/>, gets or sets a value indicating whether items in the view will trigger an update 
+        /// of the editable text part of the <see cref="AutoCompleteEntry"/> when clicked.
+        /// </summary>
+        /// <value>A value indicating whether items in the view will trigger an update of the editable text part of the <see cref="AutoCompleteEntry"/> when clicked.</value>
         public bool UpdateTextOnSelect
         {
             get { return (bool)GetValue(UpdateTextOnSelectProperty); }
@@ -71,7 +91,10 @@
             BindableProperty.Create(nameof(UpdateTextOnSelect), typeof(bool), typeof(AutoCompleteEntry), true, BindingMode.OneWay, null, null);
 
 
-        /// <inheritdoc/>
+        /// <summary>
+        /// Gets or sets the ItemsSource list with the suggestions to diplay.
+        /// </summary>
+        /// <value>The header object for the text box portion of this control.</value>
         public System.Collections.IList ItemsSource
         {
             get { return GetValue(ItemsSourceProperty) as System.Collections.IList; }
@@ -85,22 +108,29 @@
             BindableProperty.Create(nameof(ItemsSource), typeof(System.Collections.IList), typeof(AutoCompleteEntry), null, BindingMode.OneWay, null, null);
 
 
-        /// <inheritdoc/>
-        public Microsoft.Maui.Controls.Command<string> TextChangedCommand
+        /// <summary>
+        /// Gets or Sets the TextChangedCommand, that is trigered everytime the text changes.
+        /// The command receives as parameter the changed text.
+        /// </summary>
+        public Command<string> TextChangedCommand
         {
-            get { return (Microsoft.Maui.Controls.Command<string>)GetValue(TextChangedCommandProperty); }
+            get { return (Command<string>)GetValue(TextChangedCommandProperty); }
             set { SetValue(TextChangedCommandProperty, value); }
         }
 
         /// <summary>
         /// Identifies the <see cref="TextChangedCommand"/> bindable property.
         /// </summary>
-        public static readonly BindableProperty TextChangedCommandProperty = 
-            BindableProperty.Create(nameof(TextChangedCommand), 
-                                    typeof(Command<string>), 
+        public static readonly BindableProperty TextChangedCommandProperty =
+            BindableProperty.Create(nameof(TextChangedCommand),
+                                    typeof(Command<string>),
                                     typeof(AutoCompleteEntry), null, BindingMode.OneWay, null, null);
-        
-        /// <inheritdoc/>
+
+        /// <summary>
+        /// Method used to signal the platform control, that the text changed
+        /// </summary>
+        /// <param name="text"></param>
+        /// <param name="reason"></param>
         public void OnTextChanged(string text, AutoCompleteEntryTextChangeReason reason)
         {
             // Called by the native control when users enter text
@@ -108,20 +138,21 @@
             _suppressTextChangedEvent = true; //prevent loop of events raising, as setting this property will make it back into the native control
             Text = text;
             _suppressTextChangedEvent = false;
-            
+
             TextChanged?.Invoke(this, new AutoCompleteEntryTextChangedEventArgs(reason));
 
-            if (reason == AutoCompleteEntryTextChangeReason.UserInput && 
+            if (reason == AutoCompleteEntryTextChangeReason.UserInput &&
                 TextChangedCommand?.CanExecute(Text) == true)
             {
                 TextChangedCommand?.Execute(Text);
             }
         }
 
-        /// <inheritdoc/>
+        /// <summary>
+        /// Raised after the text content of the editable control component is updated.
+        /// </summary>
         public new event EventHandler<AutoCompleteEntryTextChangedEventArgs> TextChanged;
 
-        /// <inheritdoc/>
         protected override void OnTextChanged(string oldValue, string newValue)
         {
             if (!_suppressTextChangedEvent) //Ensure this property changed didn't get call because we were updating it from the native text property
@@ -131,7 +162,9 @@
         }
 
 
-        /// <inheritdoc/>
+        /// <summary>
+        /// Get or Set the currently selected suggestion, from the items source list
+        /// </summary>
         public object SelectedSuggestion
         {
             get { return (object)GetValue(SelectedSuggestionProperty); }
@@ -146,7 +179,10 @@
                                     typeof(object),
                                     typeof(AutoCompleteEntry), null, BindingMode.TwoWay, null, null);
 
-        /// <inheritdoc/>
+        /// <summary>
+        /// Method used to signal the platform control, that a suggestion was selected.
+        /// </summary>
+        /// <param name="selectedItem">Item selected</param>
         public void OnSuggestionSelected(object selectedItem)
         {
             SelectedSuggestion = selectedItem;
@@ -154,17 +190,9 @@
             SuggestionChosen?.Invoke(this, new AutoCompleteEntrySuggestionChosenEventArgs(selectedItem));
         }
 
-        /// <inheritdoc/>
+        /// <summary>
+        /// Raised before the text content of the editable control component is updated.
+        /// </summary>
         public event EventHandler<AutoCompleteEntrySuggestionChosenEventArgs> SuggestionChosen;
-
-
-        /// <inheritdoc/>
-        public void OnQuerySubmitted(string queryText, object chosenSuggestion)
-        {
-            QuerySubmitted?.Invoke(this, new AutoCompleteEntryQuerySubmittedEventArgs(queryText, chosenSuggestion));
-        }
-
-        /// <inheritdoc/>
-        public event EventHandler<AutoCompleteEntryQuerySubmittedEventArgs> QuerySubmitted;
     }
 }

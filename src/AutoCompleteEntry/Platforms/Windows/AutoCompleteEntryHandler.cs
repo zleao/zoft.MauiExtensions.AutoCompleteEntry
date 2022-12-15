@@ -5,7 +5,7 @@ using zoft.MauiExtensions.Controls.Platform;
 
 namespace zoft.MauiExtensions.Controls.Handlers
 {
-    public partial class AutoCompleteEntryHandler : ViewHandler<IAutoCompleteEntry, AutoSuggestBox>
+    public partial class AutoCompleteEntryHandler : ViewHandler<AutoCompleteEntry, AutoSuggestBox>
     {
         protected override AutoSuggestBox CreatePlatformView() => new()
         {
@@ -16,7 +16,6 @@ namespace zoft.MauiExtensions.Controls.Handlers
         protected override void ConnectHandler(AutoSuggestBox platformView)
         {
             PlatformView.Loaded += OnLoaded;
-            PlatformView.QuerySubmitted += AutoSuggestBox_QuerySubmitted;
             PlatformView.TextChanged += AutoSuggestBox_TextChanged;
             PlatformView.SuggestionChosen += AutoSuggestBox_SuggestionChosen;
             PlatformView.GotFocus += Control_GotFocus;
@@ -26,7 +25,6 @@ namespace zoft.MauiExtensions.Controls.Handlers
         protected override void DisconnectHandler(AutoSuggestBox platformView)
         {
             PlatformView.Loaded -= OnLoaded;
-            PlatformView.QuerySubmitted -= AutoSuggestBox_QuerySubmitted;
             PlatformView.TextChanged -= AutoSuggestBox_TextChanged;
             PlatformView.SuggestionChosen -= AutoSuggestBox_SuggestionChosen;
             PlatformView.GotFocus -= Control_GotFocus;
@@ -53,11 +51,6 @@ namespace zoft.MauiExtensions.Controls.Handlers
             }
         }
 
-        private void AutoSuggestBox_QuerySubmitted(object sender, AutoSuggestBoxQuerySubmittedEventArgs e)
-        {
-            VirtualView?.OnQuerySubmitted(e.QueryText, e.ChosenSuggestion);
-        }
-
         private void AutoSuggestBox_TextChanged(object sender, AutoSuggestBoxTextChangedEventArgs e)
         {
             VirtualView?.OnTextChanged(PlatformView.Text, (AutoCompleteEntryTextChangeReason)e.Reason);
@@ -76,42 +69,42 @@ namespace zoft.MauiExtensions.Controls.Handlers
             }
         }
 
-        public static void MapBackground(IAutoCompleteEntryHandler handler, ISearchBar searchBar)
+        public static void MapBackground(IAutoCompleteEntryHandler handler, IEntry entry)
         {
-            handler.PlatformView?.UpdateBackground(searchBar);
+            handler.PlatformView?.UpdateBackground(entry);
         }
 
-        public static void MapIsEnabled(IAutoCompleteEntryHandler handler, ISearchBar searchBar)
+        public static void MapIsEnabled(IAutoCompleteEntryHandler handler, IEntry entry)
         {
-            handler.PlatformView?.UpdateIsEnabled(searchBar);
+            handler.PlatformView?.UpdateIsEnabled(entry);
         }
 
-        public static void MapText(IAutoCompleteEntryHandler handler, ISearchBar searchBar)
+        public static void MapText(IAutoCompleteEntryHandler handler, AutoCompleteEntry autoCompleteEntry)
         {
-            handler.PlatformView?.UpdateText(searchBar);
+            handler.PlatformView?.UpdateText(autoCompleteEntry);
         }
 
-        public static void MapPlaceholder(IAutoCompleteEntryHandler handler, ISearchBar searchBar)
+        public static void MapPlaceholder(IAutoCompleteEntryHandler handler, AutoCompleteEntry autoCompleteEntry)
         {
-            handler.PlatformView?.UpdatePlaceholder(searchBar);
+            handler.PlatformView?.UpdatePlaceholder(autoCompleteEntry);
         }
 
-        public static void MapVerticalTextAlignment(IAutoCompleteEntryHandler handler, ISearchBar searchBar)
+        public static void MapVerticalTextAlignment(IAutoCompleteEntryHandler handler, AutoCompleteEntry autoCompleteEntry)
         {
-            handler.PlatformView?.UpdateVerticalTextAlignment(searchBar);
+            handler.PlatformView?.UpdateVerticalTextAlignment(autoCompleteEntry);
         }
 
-        public static void MapPlaceholderColor(IAutoCompleteEntryHandler handler, ISearchBar searchBar)
+        public static void MapPlaceholderColor(IAutoCompleteEntryHandler handler, AutoCompleteEntry autoCompleteEntry)
         {
-            handler.PlatformView?.UpdatePlaceholderColor(searchBar);
+            handler.PlatformView?.UpdatePlaceholderColor(autoCompleteEntry);
         }
 
-        public static void MapHorizontalTextAlignment(IAutoCompleteEntryHandler handler, ISearchBar searchBar)
+        public static void MapHorizontalTextAlignment(IAutoCompleteEntryHandler handler, AutoCompleteEntry autoCompleteEntry)
         {
-            handler.PlatformView?.UpdateHorizontalTextAlignment(searchBar);
+            handler.PlatformView?.UpdateHorizontalTextAlignment(autoCompleteEntry);
         }
 
-        public static void MapFont(IAutoCompleteEntryHandler handler, ISearchBar searchBar)
+        public static void MapFont(IAutoCompleteEntryHandler handler, IEntry entry)
         {
             var context = handler.MauiContext ??
                 throw new InvalidOperationException($"Unable to find the context. The {nameof(MauiContext)} property should have been set by the host.");
@@ -121,65 +114,60 @@ namespace zoft.MauiExtensions.Controls.Handlers
 
             var fontManager = services.GetRequiredService<IFontManager>();
 
-            handler.PlatformView?.UpdateFont(searchBar, fontManager);
+            handler.PlatformView?.UpdateFont(entry, fontManager);
         }
 
-        public static void MapCharacterSpacing(IAutoCompleteEntryHandler handler, ISearchBar searchBar)
+        public static void MapCharacterSpacing(IAutoCompleteEntryHandler handler, IEntry entry)
         {
-            handler.PlatformView?.UpdateCharacterSpacing(searchBar);
+            handler.PlatformView?.UpdateCharacterSpacing(entry);
         }
 
-        public static void MapTextColor(IAutoCompleteEntryHandler handler, ISearchBar searchBar)
+        public static void MapTextColor(IAutoCompleteEntryHandler handler, IEntry entry)
         {
-            handler?.PlatformView?.UpdateTextColor(searchBar);
+            handler?.PlatformView?.UpdateTextColor(entry);
         }
 
-        public static void MapIsTextPredictionEnabled(IAutoCompleteEntryHandler handler, ISearchBar searchBar)
-        {
-            handler.PlatformView?.UpdateIsTextPredictionEnabled(searchBar);
-        }
-
-        public static void MapMaxLength(IAutoCompleteEntryHandler handler, ISearchBar searchBar)
-        {
-            handler.PlatformView?.UpdateMaxLength(searchBar);
-        }
-
-        public static void MapIsReadOnly(IAutoCompleteEntryHandler handler, ISearchBar searchBar)
-        {
-            handler.PlatformView?.UpdateIsReadOnly(searchBar);
-        }
-
-        public static void MapCancelButtonColor(IAutoCompleteEntryHandler handler, ISearchBar searchBar)
+        public static void MapIsTextPredictionEnabled(IAutoCompleteEntryHandler handler, AutoCompleteEntry autoCompleteEntry)
         {
             // AutoSuggestBox does not support this property
         }
 
-        public static void MapTextMemberPath(IAutoCompleteEntryHandler handler, IAutoCompleteEntry autoCompleteEntry)
+        public static void MapMaxLength(IAutoCompleteEntryHandler handler, AutoCompleteEntry autoCompleteEntry)
+        {
+            handler.PlatformView?.UpdateMaxLength(autoCompleteEntry);
+        }
+
+        public static void MapIsReadOnly(IAutoCompleteEntryHandler handler, AutoCompleteEntry autoCompleteEntry)
+        {
+            handler.PlatformView?.UpdateIsReadOnly(autoCompleteEntry);
+        }
+
+        public static void MapTextMemberPath(IAutoCompleteEntryHandler handler, AutoCompleteEntry autoCompleteEntry)
         {
             handler?.PlatformView?.UpdateTextMemberPath(autoCompleteEntry);
         }
 
-        public static void MapDisplayMemberPath(IAutoCompleteEntryHandler handler, IAutoCompleteEntry autoCompleteEntry)
+        public static void MapDisplayMemberPath(IAutoCompleteEntryHandler handler, AutoCompleteEntry autoCompleteEntry)
         {
             handler?.PlatformView?.UpdateDisplayMemberPath(autoCompleteEntry);
         }
 
-        public static void MapIsSuggestionListOpen(IAutoCompleteEntryHandler handler, IAutoCompleteEntry autoCompleteEntry)
+        public static void MapIsSuggestionListOpen(IAutoCompleteEntryHandler handler, AutoCompleteEntry autoCompleteEntry)
         {
             handler?.PlatformView?.UpdateIsSuggestionListOpen(autoCompleteEntry);
         }
 
-        public static void MapUpdateTextOnSelect(IAutoCompleteEntryHandler handler, IAutoCompleteEntry autoCompleteEntry)
+        public static void MapUpdateTextOnSelect(IAutoCompleteEntryHandler handler, AutoCompleteEntry autoCompleteEntry)
         {
             handler?.PlatformView?.UpdateUpdateTextOnSelect(autoCompleteEntry);
         }
 
-        public static void MapItemsSource(IAutoCompleteEntryHandler handler, IAutoCompleteEntry autoCompleteEntry)
+        public static void MapItemsSource(IAutoCompleteEntryHandler handler, AutoCompleteEntry autoCompleteEntry)
         {
             handler?.PlatformView?.UpdateItemsSource(autoCompleteEntry);
         }
 
-        public static void MapSelectedSuggestion(IAutoCompleteEntryHandler handler, IAutoCompleteEntry autoCompleteEntry)
+        public static void MapSelectedSuggestion(IAutoCompleteEntryHandler handler, AutoCompleteEntry autoCompleteEntry)
         {
             handler?.PlatformView.UpdateSelectedSuggestion(autoCompleteEntry);
         }
