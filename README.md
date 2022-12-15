@@ -4,10 +4,7 @@ Entry control that makes suggestions to users as they type.
 
 **NOTE:** This control is based on the awesome [dotMortem/XamarinFormsControls/AutoSuggestBox](https://github.com/dotMorten/XamarinFormsControls/tree/main/AutoSuggestBox). with some simplifications and modifications of my own.
 
-Nuget Package | Current Version
---- | ---
-| zoft.MauiExtensions.Controls.AutoCompleteEntry | [![NuGet](https://img.shields.io/nuget/v/zoft.MauiExtensions.Controls.AutoCompleteEntry.svg)](https://www.nuget.org/packages/zoft.MauiExtensions.Controls.AutoCompleteEntry/)
-
+**Current Version:** [![NuGet](https://img.shields.io/nuget/v/zoft.MauiExtensions.Controls.AutoCompleteEntry.svg)](https://www.nuget.org/packages/zoft.MauiExtensions.Controls.AutoCompleteEntry/)
 
 ## Getting Started
 
