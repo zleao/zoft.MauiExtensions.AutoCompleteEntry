@@ -6,10 +6,7 @@ Entry control that makes suggestions to users as they type.
 
 Nuget Package | Current Version
 --- | ---
-| zoft.MauiExtensions.Controls.AutoCompleteEntry
- | [![NuGet](https://img.shields.io/nuget/v/zoft.MauiExtensions.Controls.AutoCompleteEntry
-.svg)](https://www.nuget.org/packages/zoft.MauiExtensions.Controls.AutoCompleteEntry
-/)
+| zoft.MauiExtensions.Controls.AutoCompleteEntry | [![NuGet](https://img.shields.io/nuget/v/zoft.MauiExtensions.Controls.AutoCompleteEntry.svg)](https://www.nuget.org/packages/zoft.MauiExtensions.Controls.AutoCompleteEntry/)
 
 
 ## Getting Started
