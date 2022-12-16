@@ -123,18 +123,34 @@ namespace zoft.MauiExtensions.Controls.Platform
             UIKeyboard.Notifications.ObserveWillHide(OnKeyboardHide);
         }
 
+        /// <summary>
+        /// Create instance of <see cref="IOSAutoCompleteEntry"/>
+        /// </summary>
+        /// <param name="coder"></param>
         public IOSAutoCompleteEntry(NSCoder coder) : base(coder)
         {
         }
 
+        /// <summary>
+        /// Create instance of <see cref="IOSAutoCompleteEntry"/>
+        /// </summary>
+        /// <param name="t"></param>
         protected IOSAutoCompleteEntry(NSObjectFlag t) : base(t)
         {
         }
 
+        /// <summary>
+        /// Create instance of <see cref="IOSAutoCompleteEntry"/>
+        /// </summary>
+        /// <param name="handle"></param>
         protected internal IOSAutoCompleteEntry(NativeHandle handle) : base(handle)
         {
         }
 
+        /// <summary>
+        /// Create instance of <see cref="IOSAutoCompleteEntry"/>
+        /// </summary>
+        /// <param name="frame"></param>
         public IOSAutoCompleteEntry(CGRect frame) : base(frame)
         {
         }
