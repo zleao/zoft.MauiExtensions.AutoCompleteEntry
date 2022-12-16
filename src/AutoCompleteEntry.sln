@@ -13,7 +13,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "SolutionItems", "SolutionIt
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Sample", "Sample", "{994A39DE-0C69-48B0-885F-1967D8CA4EC5}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AutoCompleteEntry.Sample", "..\sample\AutoCompleteEntry.Sample\AutoCompleteEntry.Sample.csproj", "{EB1F0CEB-7461-4321-AB19-DCE825B0D19A}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AutoCompleteEntry.Sample", "..\sample\AutoCompleteEntry.Sample\AutoCompleteEntry.Sample.csproj", "{EB1F0CEB-7461-4321-AB19-DCE825B0D19A}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -29,8 +29,6 @@ Global
 		{EB1F0CEB-7461-4321-AB19-DCE825B0D19A}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{EB1F0CEB-7461-4321-AB19-DCE825B0D19A}.Debug|Any CPU.Deploy.0 = Debug|Any CPU
 		{EB1F0CEB-7461-4321-AB19-DCE825B0D19A}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{EB1F0CEB-7461-4321-AB19-DCE825B0D19A}.Release|Any CPU.Build.0 = Release|Any CPU
-		{EB1F0CEB-7461-4321-AB19-DCE825B0D19A}.Release|Any CPU.Deploy.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

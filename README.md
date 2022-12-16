@@ -4,13 +4,7 @@ Entry control that makes suggestions to users as they type.
 
 **NOTE:** This control is based on the awesome [dotMortem/XamarinFormsControls/AutoSuggestBox](https://github.com/dotMorten/XamarinFormsControls/tree/main/AutoSuggestBox). with some simplifications and modifications of my own.
 
-Nuget Package | Current Version
---- | ---
-| zoft.MauiExtensions.Controls.AutoCompleteEntry
- | [![NuGet](https://img.shields.io/nuget/v/zoft.MauiExtensions.Controls.AutoCompleteEntry
-.svg)](https://www.nuget.org/packages/zoft.MauiExtensions.Controls.AutoCompleteEntry
-/)
-
+[![NuGet](https://img.shields.io/nuget/v/zoft.MauiExtensions.Controls.AutoCompleteEntry.svg)](https://www.nuget.org/packages/zoft.MauiExtensions.Controls.AutoCompleteEntry/)
 
 ## Getting Started
 
@@ -130,3 +124,26 @@ private void AutoCompleteEntry_SuggestionChosen(object sender, zoft.MauiExtensio
     ViewModel.SelectedItem = e.SelectedItem as ListItem;
 }
 ```
+
+<br/>
+<br/>
+
+#### Windows
+
+|![](docs/Windows_1.png)|![](docs/Windows_2.png)|![](docs/Windows_3.png)|![](docs/Windows_4.png)|
+|:---:|:---:|:---:|:---:|
+
+#### Android
+
+|![](docs/Android_1.png)|![](docs/Android_2.png)|![](docs/Android_3.png)|![](docs/Android_4.png)|
+|:---:|:---:|:---:|:---:|
+
+#### iOS
+
+|![](docs/iOS_1.png)|![](docs/iOS_2.png)|![](docs/iOS_3.png)|![](docs/iOS_4.png)|
+|:---:|:---:|:---:|:---:|
+
+#### MacCatalyst
+
+|![](docs/MacCatalyst_1.png)|![](docs/MacCatalyst_2.png)|![](docs/MacCatalyst_3.png)|![](docs/MacCatalyst_4.png)|
+|:---:|:---:|:---:|:---:|

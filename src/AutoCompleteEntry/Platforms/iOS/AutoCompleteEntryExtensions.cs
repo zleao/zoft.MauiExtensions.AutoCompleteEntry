@@ -5,13 +5,27 @@ using zoft.MauiExtensions.Core.Extensions;
 
 namespace zoft.MauiExtensions.Controls.Platform
 {
+    /// <summary>
+    /// Extensions for <see cref="AutoCompleteEntry"/>
+    /// </summary>
     public static class AutoCompleteEntryExtensions
     {
+        /// <summary>
+        /// Update the Text
+        /// </summary>
+        /// <param name="iosAutoCompleteEntry"></param>
+        /// <param name="autoCompleteEntry"></param>
         public static void UpdateText(this IOSAutoCompleteEntry iosAutoCompleteEntry, AutoCompleteEntry autoCompleteEntry)
         {
             iosAutoCompleteEntry.Text = autoCompleteEntry.Text;
         }
 
+        /// <summary>
+        /// Update the Placeholder
+        /// </summary>
+        /// <param name="iosAutoCompleteEntry"></param>
+        /// <param name="autoCompleteEntry"></param>
+        /// <param name="defaultPlaceholderColor"></param>
         public static void UpdatePlaceholder(this IOSAutoCompleteEntry iosAutoCompleteEntry, AutoCompleteEntry autoCompleteEntry, Color defaultPlaceholderColor = null)
         {
             var placeholder = autoCompleteEntry.Placeholder;
@@ -31,6 +45,11 @@ namespace zoft.MauiExtensions.Controls.Platform
             iosAutoCompleteEntry.InputTextField.AttributedPlaceholder.WithCharacterSpacing(autoCompleteEntry.CharacterSpacing);
         }
 
+        /// <summary>
+        /// Update the IsTextPredictionEnabled
+        /// </summary>
+        /// <param name="iosAutoCompleteEntry"></param>
+        /// <param name="autoCompleteEntry"></param>
         public static void UpdateIsTextPredictionEnabled(this IOSAutoCompleteEntry iosAutoCompleteEntry, AutoCompleteEntry autoCompleteEntry)
         {
             if (autoCompleteEntry.IsTextPredictionEnabled)
@@ -43,6 +62,11 @@ namespace zoft.MauiExtensions.Controls.Platform
             }
         }
 
+        /// <summary>
+        /// Update the MaxLength
+        /// </summary>
+        /// <param name="iosAutoCompleteEntry"></param>
+        /// <param name="autoCompleteEntry"></param>
         public static void UpdateMaxLength(this IOSAutoCompleteEntry iosAutoCompleteEntry, AutoCompleteEntry autoCompleteEntry)
         {
             var newText = iosAutoCompleteEntry.InputTextField.AttributedText.TrimToMaxLength(autoCompleteEntry.MaxLength);
@@ -52,11 +76,21 @@ namespace zoft.MauiExtensions.Controls.Platform
             }
         }
 
+        /// <summary>
+        /// Update the IsReadOnly
+        /// </summary>
+        /// <param name="iosAutoCompleteEntry"></param>
+        /// <param name="autoCompleteEntry"></param>
         public static void UpdateIsReadOnly(this IOSAutoCompleteEntry iosAutoCompleteEntry, AutoCompleteEntry autoCompleteEntry)
         {
             iosAutoCompleteEntry.InputTextField.UserInteractionEnabled = !(autoCompleteEntry.IsReadOnly || autoCompleteEntry.InputTransparent);
         }
 
+        /// <summary>
+        /// Update the DisplayCompleteEntry
+        /// </summary>
+        /// <param name="iosAutoCompleteEntry"></param>
+        /// <param name="autoCompleteEntry"></param>
         public static void UpdateDisplayMemberPath(this IOSAutoCompleteEntry iosAutoCompleteEntry, AutoCompleteEntry autoCompleteEntry)
         {
             iosAutoCompleteEntry.SetItems(autoCompleteEntry.ItemsSource,
@@ -64,16 +98,31 @@ namespace zoft.MauiExtensions.Controls.Platform
                                           (o) => o.GetPropertyValueAsString(autoCompleteEntry?.TextMemberPath));
         }
 
+        /// <summary>
+        /// Update the IsSuggestionListOpen
+        /// </summary>
+        /// <param name="iosAutoCompleteEntry"></param>
+        /// <param name="autoCompleteEntry"></param>
         public static void UpdateIsSuggestionListOpen(this IOSAutoCompleteEntry iosAutoCompleteEntry, AutoCompleteEntry autoCompleteEntry)
         {
             iosAutoCompleteEntry.IsSuggestionListOpen = autoCompleteEntry.IsSuggestionListOpen;
         }
 
+        /// <summary>
+        /// Update the UpdateTextOnSelect
+        /// </summary>
+        /// <param name="iosAutoCompleteEntry"></param>
+        /// <param name="autoCompleteEntry"></param>
         public static void UpdateUpdateTextOnSelect(this IOSAutoCompleteEntry iosAutoCompleteEntry, AutoCompleteEntry autoCompleteEntry)
         {
             iosAutoCompleteEntry.UpdateTextOnSelect = autoCompleteEntry.UpdateTextOnSelect;
         }
 
+        /// <summary>
+        /// Update the ItemsSource
+        /// </summary>
+        /// <param name="iosAutoCompleteEntry"></param>
+        /// <param name="autoCompleteEntry"></param>
         public static void UpdateItemsSource(this IOSAutoCompleteEntry iosAutoCompleteEntry, AutoCompleteEntry autoCompleteEntry)
         {
             iosAutoCompleteEntry.SetItems(autoCompleteEntry?.ItemsSource,
@@ -81,6 +130,11 @@ namespace zoft.MauiExtensions.Controls.Platform
                                           (o) => o.GetPropertyValueAsString(autoCompleteEntry?.TextMemberPath));
         }
 
+        /// <summary>
+        /// Update the SelectedSuggestion
+        /// </summary>
+        /// <param name="iosAutoCompleteEntry"></param>
+        /// <param name="autoCompleteEntry"></param>
         public static void UpdateSelectedSuggestion(this IOSAutoCompleteEntry iosAutoCompleteEntry, AutoCompleteEntry autoCompleteEntry)
         {
             iosAutoCompleteEntry.Text = autoCompleteEntry.SelectedSuggestion.GetPropertyValueAsString(autoCompleteEntry.TextMemberPath);

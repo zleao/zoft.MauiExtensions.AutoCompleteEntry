@@ -153,6 +153,7 @@
         /// </summary>
         public new event EventHandler<AutoCompleteEntryTextChangedEventArgs> TextChanged;
 
+        /// <inheritdoc/>
         protected override void OnTextChanged(string oldValue, string newValue)
         {
             if (!_suppressTextChangedEvent) //Ensure this property changed didn't get call because we were updating it from the native text property

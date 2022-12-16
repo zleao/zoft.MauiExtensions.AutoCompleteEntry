@@ -12,9 +12,19 @@ using PlatformView = System.Object;
 
 namespace zoft.MauiExtensions.Controls.Handlers
 {
+    /// <summary>
+    /// Handler interface for the <see cref="AutoCompleteEntry"/>
+    /// </summary>
     public interface IAutoCompleteEntryHandler : IViewHandler
     {
+        /// <summary>
+        /// Maui view
+        /// </summary>
         new AutoCompleteEntry VirtualView { get; }
+
+        /// <summary>
+        /// Platform specific implementation
+        /// </summary>
         new PlatformView PlatformView { get; }
     }
 }

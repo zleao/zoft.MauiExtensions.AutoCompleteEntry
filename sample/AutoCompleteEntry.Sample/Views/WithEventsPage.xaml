@@ -20,7 +20,8 @@
                                     TextMemberPath="Country"
                                     DisplayMemberPath="Country"
                                     TextChanged="AutoCompleteEntry_TextChanged"
-                                    SuggestionChosen="AutoCompleteEntry_SuggestionChosen"/>
+                                    SuggestionChosen="AutoCompleteEntry_SuggestionChosen"
+                                    HeightRequest="50"/>
         
             <Frame BorderColor="Gray" 
                    BackgroundColor="LightGray" 
