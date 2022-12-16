@@ -154,8 +154,7 @@ namespace zoft.MauiExtensions.Controls.Platform
         private void OnItemClick(object sender, AdapterView.ItemClickEventArgs e)
         {
             DismissKeyboard();
-            //var obj = _adapter.GetObject(e.Position);
-            var obj = MyAdapter?.GetItem(e.Position);
+            var obj = MyAdapter?.GetObject(e.Position);
             if (UpdateTextOnSelect)
             {
                 _suppressTextChangedEvent = true;
@@ -196,7 +195,7 @@ namespace zoft.MauiExtensions.Controls.Platform
 
         private class AutoCompleteAdapter : ArrayAdapter
         {
-            //private readonly SuggestFilter _filter = new();
+            private readonly AutoCompleteFilter _autoCompleteFilter;
             protected IList Items;
             protected Func<object, string> DisplayMemberPathFunc { get; private set; }
 
@@ -205,21 +204,10 @@ namespace zoft.MauiExtensions.Controls.Platform
             {
                 Items = items;
                 DisplayMemberPathFunc = displayMemberPathFunc;
+                _autoCompleteFilter = new(this);
 
-                SetNotifyOnChange(false);
-
-                //CheckIfItemsSourceIsNotifiable();
+                CheckIfItemsSourceIsNotifiable();
             }
-
-            //public void UpdateList(IList list, Func<object, string> labelFunc)
-            //{
-            //    _labelFunc = labelFunc;
-            //    _items = list;
-
-            //    CollectionChanged();
-
-                
-            //}
 
             private void CheckIfItemsSourceIsNotifiable()
             {
@@ -243,8 +231,6 @@ namespace zoft.MauiExtensions.Controls.Platform
 
             private void CollectionChanged()
             {
-                //_filter.SetFilter(_items.OfType<object>().Select(s => _labelFunc(s)));
-
                 NotifyDataSetChanged();
             }
 
@@ -258,66 +244,47 @@ namespace zoft.MauiExtensions.Controls.Platform
                 }
             }
 
-            public override Android.Views.View GetView(int position, Android.Views.View convertView, ViewGroup parent)
+            public override int Count => Items.Count;
+
+            public override Filter Filter => _autoCompleteFilter;
+
+            public override Java.Lang.Object GetItem(int position)
             {
-                var view = base.GetView(position, convertView, parent);
-
-
-                return view;
+                return DisplayMemberPathFunc(GetObject(position));
             }
 
-            //public override int Count
-            //{
-            //    get
-            //    {
-            //        return _items.Count;
-            //    }
-            //}
+            public object GetObject(int position)
+            {
+                return Items[position];
+            }
 
-            //public override Filter Filter => _filter;
+            private class AutoCompleteFilter : Filter
+            {
+                private readonly AutoCompleteAdapter _autoCompleteAdapter;
 
-            //public override Java.Lang.Object GetItem(int position)
-            //{
-            //    return _labelFunc(GetObject(position));
-            //}
+                public AutoCompleteFilter(AutoCompleteAdapter autoCompleteAdapter)
+                {
+                    _autoCompleteAdapter = autoCompleteAdapter;
+                }
 
-            //public object GetObject(int position)
-            //{
-            //    return _items[position];
-            //}
+                protected override FilterResults PerformFiltering(ICharSequence constraint)
+                {
+                    if (_autoCompleteAdapter.Items == null)
+                    {
+                        return new FilterResults() { Count = 0, Values = null };
+                    }
 
-            //public override long GetItemId(int position)
-            //{
-            //    return base.GetItemId(position);
-            //}
+                    return new FilterResults()
+                    {
+                        Count = _autoCompleteAdapter.Items.Count,
+                        Values = _autoCompleteAdapter.Items.OfType<object>().Select(_autoCompleteAdapter.DisplayMemberPathFunc).ToArray()
+                    };
+                }
 
-            //private class AutoCompleteFilter : Filter
-            //{
-            //    private readonly AutoCompleteAdapter _autoCompleteAdapter;
-
-            //    public AutoCompleteFilter(AutoCompleteAdapter autoCompleteAdapter)
-            //    {
-            //        _autoCompleteAdapter = autoCompleteAdapter;
-            //    }
-               
-            //    protected override FilterResults PerformFiltering(ICharSequence constraint)
-            //    {
-            //        if(_autoCompleteAdapter.Items == null)
-            //        {
-            //            return new FilterResults() { Count = 0, Values = null };
-            //        }
-
-            //        return new FilterResults()
-            //        {
-            //            Count = _autoCompleteAdapter.Items.Count,
-            //            Values = _autoCompleteAdapter.Items.OfType<object>().Select(_autoCompleteAdapter.DisplayMemberPathFunc).ToArray()
-            //        };
-            //    }
-                
-            //    protected override void PublishResults(ICharSequence constraint, FilterResults results)
-            //    {
-            //    }
-            //}
+                protected override void PublishResults(ICharSequence constraint, FilterResults results)
+                {
+                }
+            }
         }
     }
 }
