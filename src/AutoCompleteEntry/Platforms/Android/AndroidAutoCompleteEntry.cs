@@ -1,5 +1,6 @@
 ﻿using Android.Content;
 using Android.Runtime;
+using Android.Text;
 using Android.Views;
 using Android.Views.InputMethods;
 using Android.Widget;
@@ -7,6 +8,7 @@ using Java.Lang;
 using Microsoft.Maui.Controls.Compatibility.Platform.Android;
 using System.Collections;
 using System.Collections.Specialized;
+using zoft.MauiExtensions.Core.Extensions;
 using Color = Microsoft.Maui.Graphics.Color;
 
 namespace zoft.MauiExtensions.Controls.Platform
@@ -17,8 +19,8 @@ namespace zoft.MauiExtensions.Controls.Platform
     public class AndroidAutoCompleteEntry : AutoCompleteTextView
     {
         private bool _suppressTextChangedEvent;
-        private Func<object, string> _textFunc;
-        private readonly SuggestCompleteAdapter _adapter;
+        private Func<object, string> _textMemberPathFunc;
+        private AutoCompleteAdapter MyAdapter => Adapter as AutoCompleteAdapter;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="AndroidAutoCompleteEntry"/>.
@@ -26,10 +28,17 @@ namespace zoft.MauiExtensions.Controls.Platform
         public AndroidAutoCompleteEntry(Context context) : base(context)
         {
             SetMaxLines(1);
+            
+            //Search should be triggered even with empty text field
             Threshold = 0;
-            InputType = global::Android.Text.InputTypes.TextFlagNoSuggestions | global::Android.Text.InputTypes.TextVariationVisiblePassword; //Disables text suggestions as the auto-complete view is there to do that
+
+            //Disables text suggestions
+            InputType = InputTypes.TextFlagNoSuggestions | InputTypes.TextVariationVisiblePassword;
+            
+            //Listen to when a suggestion is selected
             ItemClick += OnItemClick;
-            Adapter = _adapter = new SuggestCompleteAdapter(Context, global::Android.Resource.Layout.SimpleDropDownItem1Line);
+
+            //Adapter = new SuggestCompleteAdapter(Context, global::Android.Resource.Layout.SimpleDropDownItem1Line);
         }
 
         /// <inheritdoc />
@@ -46,16 +55,23 @@ namespace zoft.MauiExtensions.Controls.Platform
         protected override void OnFocusChanged(bool gainFocus, [GeneratedEnum] FocusSearchDirection direction, global::Android.Graphics.Rect previouslyFocusedRect)
         {
             IsSuggestionListOpen = gainFocus;
+
             base.OnFocusChanged(gainFocus, direction, previouslyFocusedRect);
         }
 
-        internal void SetItems(IList items, Func<object, string> labelFunc, Func<object, string> textFunc)
+        internal void SetItems(IList items, Func<object, string> displayMemberPathFunc, Func<object, string> textMemberPathFunc)
         {
-            this._textFunc = textFunc;
-            if (items == null)
-                _adapter.UpdateList(new List<object>(), labelFunc);
-            else
-                _adapter.UpdateList(items, labelFunc);
+            _textMemberPathFunc = textMemberPathFunc;
+
+            //Make sure to dispose any previously created adapter
+            Adapter?.Dispose();
+            Adapter= null;
+
+            //Create new adpter with current items list
+            Adapter = new AutoCompleteAdapter(Context, 
+                                              Android.Resource.Layout.SimpleDropDownItem1Line, 
+                                              items ?? new List<object>(),
+                                              displayMemberPathFunc);
         }
 
         /// <summary>
@@ -138,11 +154,12 @@ namespace zoft.MauiExtensions.Controls.Platform
         private void OnItemClick(object sender, AdapterView.ItemClickEventArgs e)
         {
             DismissKeyboard();
-            var obj = _adapter.GetObject(e.Position);
+            //var obj = _adapter.GetObject(e.Position);
+            var obj = MyAdapter?.GetItem(e.Position);
             if (UpdateTextOnSelect)
             {
                 _suppressTextChangedEvent = true;
-                base.Text = _textFunc(obj);
+                base.Text = _textMemberPathFunc(obj);
                 _suppressTextChangedEvent = false;
                 TextChanged?.Invoke(this, new AutoCompleteEntryTextChangedEventArgs(AutoCompleteEntryTextChangeReason.SuggestionChosen));
             }
@@ -177,32 +194,36 @@ namespace zoft.MauiExtensions.Controls.Platform
         /// </summary>
         public event EventHandler<AutoCompleteEntrySuggestionChosenEventArgs> SuggestionChosen;
 
-        private class SuggestCompleteAdapter : ArrayAdapter, IFilterable
+        private class AutoCompleteAdapter : ArrayAdapter
         {
-            private readonly SuggestFilter _filter = new();
-            private IList _items;
-            private Func<object, string> _labelFunc;
+            //private readonly SuggestFilter _filter = new();
+            protected IList Items;
+            protected Func<object, string> DisplayMemberPathFunc { get; private set; }
 
-            public SuggestCompleteAdapter(Context context, int textViewResourceId) 
-                : base(context, textViewResourceId)
+            public AutoCompleteAdapter(Context context, int textViewResourceId, IList items, Func<object, string> displayMemberPathFunc) 
+                : base(context, textViewResourceId, items)
             {
-                _items = new List<object>();
-                SetNotifyOnChange(true);
+                Items = items;
+                DisplayMemberPathFunc = displayMemberPathFunc;
+
+                SetNotifyOnChange(false);
+
+                //CheckIfItemsSourceIsNotifiable();
             }
 
-            public void UpdateList(IList list, Func<object, string> labelFunc)
-            {
-                _labelFunc = labelFunc;
-                _items = list;
+            //public void UpdateList(IList list, Func<object, string> labelFunc)
+            //{
+            //    _labelFunc = labelFunc;
+            //    _items = list;
+
+            //    CollectionChanged();
+
                 
-                CollectionChanged();
-
-                CheckIfItemsSourceIsNotifiable();
-            }
+            //}
 
             private void CheckIfItemsSourceIsNotifiable()
             {
-                if (_items is INotifyCollectionChanged notifiableItems)
+                if (Items is INotifyCollectionChanged notifiableItems)
                 {
                     notifiableItems.CollectionChanged += NotifiableItems_CollectionChanged;
                 }
@@ -222,7 +243,7 @@ namespace zoft.MauiExtensions.Controls.Platform
 
             private void CollectionChanged()
             {
-                _filter.SetFilter(_items.OfType<object>().Select(s => _labelFunc(s)));
+                //_filter.SetFilter(_items.OfType<object>().Select(s => _labelFunc(s)));
 
                 NotifyDataSetChanged();
             }
@@ -231,62 +252,72 @@ namespace zoft.MauiExtensions.Controls.Platform
             {
                 base.Dispose(disposing);
 
-                if (disposing && _items is INotifyCollectionChanged notifiableItems)
+                if (disposing && Items is INotifyCollectionChanged notifiableItems)
                 {
                     notifiableItems.CollectionChanged -= NotifiableItems_CollectionChanged;
                 }
             }
 
-            public override int Count
+            public override Android.Views.View GetView(int position, Android.Views.View convertView, ViewGroup parent)
             {
-                get
-                {
-                    return _items.Count;
-                }
+                var view = base.GetView(position, convertView, parent);
+
+
+                return view;
             }
 
-            public override Filter Filter => _filter;
+            //public override int Count
+            //{
+            //    get
+            //    {
+            //        return _items.Count;
+            //    }
+            //}
 
-            public override Java.Lang.Object GetItem(int position)
-            {
-                return _labelFunc(GetObject(position));
-            }
+            //public override Filter Filter => _filter;
 
-            public object GetObject(int position)
-            {
-                return _items[position];
-            }
+            //public override Java.Lang.Object GetItem(int position)
+            //{
+            //    return _labelFunc(GetObject(position));
+            //}
 
-            public override long GetItemId(int position)
-            {
-                return base.GetItemId(position);
-            }
+            //public object GetObject(int position)
+            //{
+            //    return _items[position];
+            //}
 
-            private class SuggestFilter : Filter
-            {
-                private IEnumerable<string> _resultList;
+            //public override long GetItemId(int position)
+            //{
+            //    return base.GetItemId(position);
+            //}
 
-                public SuggestFilter()
-                {
-                }
+            //private class AutoCompleteFilter : Filter
+            //{
+            //    private readonly AutoCompleteAdapter _autoCompleteAdapter;
 
-                public void SetFilter(IEnumerable<string> list)
-                {
-                    _resultList = list;
-                }
+            //    public AutoCompleteFilter(AutoCompleteAdapter autoCompleteAdapter)
+            //    {
+            //        _autoCompleteAdapter = autoCompleteAdapter;
+            //    }
+               
+            //    protected override FilterResults PerformFiltering(ICharSequence constraint)
+            //    {
+            //        if(_autoCompleteAdapter.Items == null)
+            //        {
+            //            return new FilterResults() { Count = 0, Values = null };
+            //        }
+
+            //        return new FilterResults()
+            //        {
+            //            Count = _autoCompleteAdapter.Items.Count,
+            //            Values = _autoCompleteAdapter.Items.OfType<object>().Select(_autoCompleteAdapter.DisplayMemberPathFunc).ToArray()
+            //        };
+            //    }
                 
-                protected override FilterResults PerformFiltering(ICharSequence constraint)
-                {
-                    if (_resultList == null)
-                        return new FilterResults() { Count = 0, Values = null };
-                    var arr = _resultList.ToArray();
-                    return new FilterResults() { Count = arr.Length, Values = arr };
-                }
-                
-                protected override void PublishResults(ICharSequence constraint, FilterResults results)
-                {
-                }
-            }
+            //    protected override void PublishResults(ICharSequence constraint, FilterResults results)
+            //    {
+            //    }
+            //}
         }
     }
 }
