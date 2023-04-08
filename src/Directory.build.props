@@ -11,7 +11,7 @@
     <PackageProjectUrl>https://github.com/zleao/zoft.MauiExtensions.AutoCompleteEntry</PackageProjectUrl>
     <Product>$(AssemblyName) ($(TargetFramework))</Product>
     <NeutralLanguage>en</NeutralLanguage>
-    <Version>1.0.0</Version>
+    <Version>2.0.0</Version>
     <Description>.Net MAUI Entry control that provides a list of suggestions as the user types.</Description>
     <PackageTags>net6 net7 maui zoft AutoCompleteEntry AutoCompleteBox AutoCompleteView AutoComplete</PackageTags>
     <PackageReleaseNotes>Added support to .Net 7 </PackageReleaseNotes>
