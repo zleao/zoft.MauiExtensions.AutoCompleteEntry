@@ -18,6 +18,37 @@ You can find the nuget package here [zoft.MauiExtensions.Controls.AutoCompleteEn
 
 <br/>
 
+Initialize the library in your `MauiProgram.cs` file:
+
+```csharp
+using CommunityToolkit.Maui;
+using zoft.MauiExtensions.Controls;
+
+namespace AutoCompleteEntry.Sample
+{
+    public static class MauiProgram
+    {
+        public static MauiApp CreateMauiApp()
+        {
+            var builder = MauiApp.CreateBuilder();
+            builder
+                .UseMauiApp<App>()
+                .UseMauiCommunityToolkit()
+                .UseZoftAutoCompleteEntry()
+                .ConfigureFonts(fonts =>
+                {
+                    fonts.AddFont("OpenSans-Regular.ttf", "OpenSansRegular");
+                    fonts.AddFont("OpenSans-Semibold.ttf", "OpenSansSemibold");
+                });
+
+            return builder.Build();
+        }
+    }
+}
+```
+
+<br/>
+
 ### How to Use
 
 The filtering of results, happens as the user types and you'll only need to respond to 2 actions:
@@ -29,6 +60,15 @@ The filtering of results, happens as the user types and you'll only need to resp
 **Event based**
 - `TextChanged`: Event raised every time the user changes the text. The current text is part of the event arguments;
 - `SuggestionChosen`: Event raised every time a suggestion is chosen. The selected option is part of the event arguments;
+
+<br/>
+
+### XAML Usage
+In order to make use of the control within XAML you can use this namespace:
+
+```xml
+xmlns:zoft="http://zoft.MauiExtensions/Controls"
+```
 
 <br/>
 
