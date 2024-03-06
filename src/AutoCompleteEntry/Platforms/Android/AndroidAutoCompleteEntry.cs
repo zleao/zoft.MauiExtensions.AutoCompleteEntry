@@ -1,3 +1,4 @@
+﻿using System.Collections;
 using Android.Content;
 using Android.Runtime;
 using Android.Text;
@@ -7,9 +8,7 @@ using Android.Widget;
 using AndroidX.AppCompat.Widget;
 using Java.Lang;
 using Microsoft.Maui.Controls.Compatibility.Platform.Android;
-using System.Collections;
-using System.Collections.Specialized;
-using zoft.MauiExtensions.Core.Extensions;
+using Microsoft.Maui.Platform;
 using Color = Microsoft.Maui.Graphics.Color;
 
 namespace zoft.MauiExtensions.Controls.Platform
@@ -21,7 +20,7 @@ namespace zoft.MauiExtensions.Controls.Platform
     {
         private bool _suppressTextChangedEvent;
         private Func<object, string> _textMemberPathFunc;
-        private AutoCompleteAdapter MyAdapter => Adapter as AutoCompleteAdapter;
+        private AutoCompleteAdapter adapter;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="AndroidAutoCompleteEntry"/>.
@@ -39,18 +38,14 @@ namespace zoft.MauiExtensions.Controls.Platform
             //Listen to when a suggestion is selected
             ItemClick += OnItemClick;
 
-            //Adapter = new SuggestCompleteAdapter(Context, global::Android.Resource.Layout.SimpleDropDownItem1Line);
+            Adapter = adapter = new AutoCompleteAdapter(Context, global::Android.Resource.Layout.SimpleDropDownItem1Line);
         }
 
-        /// <inheritdoc />
-        public override bool EnoughToFilter()
-        {
-            // Setting Threshold = 0 in the constructor does not allow the control to display suggestions when the Text property is null or empty.
-            // This is by design by Android.
-            // See https://stackoverflow.com/questions/2126717/android-autocompletetextview-show-suggestions-when-no-text-entered for details
-            // Overriding this method to always returns true changes this behaviour.
-            return true;
-        }
+        // Setting Threshold = 0 in the constructor does not allow the control to display suggestions when the Text property is null or empty.
+        // This is by design by Android.
+        // See https://stackoverflow.com/questions/2126717/android-autocompletetextview-show-suggestions-when-no-text-entered for details
+        // Overriding this method to always returns true changes this behaviour.
+        public override bool EnoughToFilter() => true;
 
         /// <inheritdoc />
         protected override void OnFocusChanged(bool gainFocus, [GeneratedEnum] FocusSearchDirection direction, global::Android.Graphics.Rect previouslyFocusedRect)
@@ -63,16 +58,14 @@ namespace zoft.MauiExtensions.Controls.Platform
         internal void SetItems(IList items, Func<object, string> displayMemberPathFunc, Func<object, string> textMemberPathFunc)
         {
             _textMemberPathFunc = textMemberPathFunc;
-
-            //Make sure to dispose any previously created adapter
-            Adapter?.Dispose();
-            Adapter= null;
-
-            //Create new adpter with current items list
-            Adapter = new AutoCompleteAdapter(Context, 
-                                              Android.Resource.Layout.SimpleDropDownItem1Line, 
-                                              items ?? new List<object>(),
-                                              displayMemberPathFunc);
+            if (items is null)
+            {
+                adapter.UpdateList(Enumerable.Empty<string>(), displayMemberPathFunc);
+            }
+            else
+            {
+                adapter.UpdateList(items.OfType<object>(), displayMemberPathFunc);
+            }
         }
 
         /// <summary>
@@ -96,7 +89,7 @@ namespace zoft.MauiExtensions.Controls.Platform
         /// <param name="color"></param>
         public virtual void SetTextColor(Color color)
         {
-            this.SetTextColor(color.ToAndroid(color));
+            this.SetTextColor(color.ToPlatform());
         }
 
         /// <summary>
@@ -113,7 +106,7 @@ namespace zoft.MauiExtensions.Controls.Platform
         /// <param name="color">color</param>
         public virtual void SetPlaceholderTextColor(Color color)
         {
-            this.SetHintTextColor(color.ToAndroid(color));
+            this.SetHintTextColor(color.ToPlatform());
         }
 
         /// <summary>
@@ -124,9 +117,13 @@ namespace zoft.MauiExtensions.Controls.Platform
             set
             {
                 if (value)
+                {
                     ShowDropDown();
+                }
                 else
+                {
                     DismissDropDown();
+                }
             }
         }
 
@@ -148,14 +145,14 @@ namespace zoft.MauiExtensions.Controls.Platform
 
         private void DismissKeyboard()
         {
-            var imm = (global::Android.Views.InputMethods.InputMethodManager)Context.GetSystemService(Context.InputMethodService);
+            var imm = (InputMethodManager)Context.GetSystemService(Context.InputMethodService);
             imm.HideSoftInputFromWindow(WindowToken, 0);
         }
 
         private void OnItemClick(object sender, AdapterView.ItemClickEventArgs e)
         {
             DismissKeyboard();
-            var obj = MyAdapter?.GetObject(e.Position);
+            var obj = adapter.GetObject(e.Position);
             if (UpdateTextOnSelect)
             {
                 _suppressTextChangedEvent = true;
@@ -194,92 +191,60 @@ namespace zoft.MauiExtensions.Controls.Platform
         /// </summary>
         public event EventHandler<AutoCompleteEntrySuggestionChosenEventArgs> SuggestionChosen;
 
-        private class AutoCompleteAdapter : ArrayAdapter
+        private class AutoCompleteAdapter : ArrayAdapter, IFilterable
         {
-            private readonly AutoCompleteFilter _autoCompleteFilter;
-            protected IList Items;
-            protected Func<object, string> DisplayMemberPathFunc { get; private set; }
+            private AutoCompleteFilter filter = new();
+            private List<object> resultList;
+            private Func<object, string> displayMemberPathFunc;
 
-            public AutoCompleteAdapter(Context context, int textViewResourceId, IList items, Func<object, string> displayMemberPathFunc) 
-                : base(context, textViewResourceId, items)
+            public AutoCompleteAdapter(Context context, int textViewResourceId) : base(context, textViewResourceId)
             {
-                Items = items;
-                DisplayMemberPathFunc = displayMemberPathFunc;
-                _autoCompleteFilter = new(this);
-
-                CheckIfItemsSourceIsNotifiable();
+                resultList = new List<object>();
+                SetNotifyOnChange(true);
             }
 
-            private void CheckIfItemsSourceIsNotifiable()
+            public void UpdateList(IEnumerable<object> list, Func<object, string> displayMemberPathFunc)
             {
-                if (Items is INotifyCollectionChanged notifiableItems)
-                {
-                    notifiableItems.CollectionChanged += NotifiableItems_CollectionChanged;
-                }
-            }
-
-            private void NotifiableItems_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
-            {
-                if (!MainThread.IsMainThread)
-                {
-                    MainThread.BeginInvokeOnMainThread(CollectionChanged);
-                }
-                else
-                {
-                    CollectionChanged();
-                }
-            }
-
-            private void CollectionChanged()
-            {
+                this.displayMemberPathFunc = displayMemberPathFunc;
+                resultList = list.ToList();
+                filter.SetFilter(resultList.Select(s => displayMemberPathFunc(s)));
                 NotifyDataSetChanged();
             }
 
-            protected override void Dispose(bool disposing)
+            public override int Count
             {
-                base.Dispose(disposing);
-
-                if (disposing && Items is INotifyCollectionChanged notifiableItems)
-                {
-                    notifiableItems.CollectionChanged -= NotifiableItems_CollectionChanged;
-                }
+                get => resultList.Count;
             }
 
-            public override int Count => Items.Count;
+            public override Filter Filter => filter;
 
-            public override Filter Filter => _autoCompleteFilter;
+            public override Java.Lang.Object GetItem(int position) => displayMemberPathFunc(GetObject(position));
+            
+            public object GetObject(int position) => resultList[position];
 
-            public override Java.Lang.Object GetItem(int position)
-            {
-                return DisplayMemberPathFunc(GetObject(position));
-            }
-
-            public object GetObject(int position)
-            {
-                return Items[position];
-            }
-
+            public override long GetItemId(int position) => base.GetItemId(position);
+            
             private class AutoCompleteFilter : Filter
             {
-                private readonly AutoCompleteAdapter _autoCompleteAdapter;
+                private IEnumerable<string> resultList;
 
-                public AutoCompleteFilter(AutoCompleteAdapter autoCompleteAdapter)
+                public AutoCompleteFilter()
                 {
-                    _autoCompleteAdapter = autoCompleteAdapter;
+                }
+
+                public void SetFilter(IEnumerable<string> list)
+                {
+                    resultList = list;
                 }
 
                 protected override FilterResults PerformFiltering(ICharSequence constraint)
                 {
-                    if (_autoCompleteAdapter.Items == null)
+                    if (resultList is null)
                     {
                         return new FilterResults() { Count = 0, Values = null };
                     }
-
-                    return new FilterResults()
-                    {
-                        Count = _autoCompleteAdapter.Items.Count,
-                        Values = _autoCompleteAdapter.Items.OfType<object>().Select(_autoCompleteAdapter.DisplayMemberPathFunc).ToArray()
-                    };
+                    var arr = resultList.ToArray();
+                    return new FilterResults() { Count = arr.Length, Values = arr };
                 }
 
                 protected override void PublishResults(ICharSequence constraint, FilterResults results)
