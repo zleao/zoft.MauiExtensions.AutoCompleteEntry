@@ -27,6 +27,12 @@
   <ItemGroup Condition="$(TargetFramework.StartsWith('net7.0-maccatalyst')) == true">
     <PackageReference Include="Microsoft.Maui.Graphics" Version="7.0.59" />
   </ItemGroup>
+
+  <ItemGroup Condition="$(TargetFramework.StartsWith('net7.0-android')) == true">
+    <PackageReference Include="Xamarin.AndroidX.AppCompat" Version="1.6.1.4" />
+    <!-- workaround: https://github.com/xamarin/AndroidX/issues/764 -->
+    <PackageReference Include="Xamarin.AndroidX.Activity.Ktx" Version="1.7.2.1" />
+  </ItemGroup>
   
   <!-- Platform Specific Files-->
   <ItemGroup Condition="$(TargetFramework.StartsWith('net7.0-ios')) == true OR $(TargetFramework.StartsWith('net7.0-maccatalyst')) == true OR $(TargetFramework.StartsWith('net7.0-android')) == true OR $(TargetFramework.Contains('-windows')) == true">
