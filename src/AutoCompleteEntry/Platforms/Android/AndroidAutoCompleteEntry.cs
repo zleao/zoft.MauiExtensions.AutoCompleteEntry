@@ -1,9 +1,10 @@
-﻿using Android.Content;
+using Android.Content;
 using Android.Runtime;
 using Android.Text;
 using Android.Views;
 using Android.Views.InputMethods;
 using Android.Widget;
+using AndroidX.AppCompat.Widget;
 using Java.Lang;
 using Microsoft.Maui.Controls.Compatibility.Platform.Android;
 using System.Collections;
@@ -14,9 +15,9 @@ using Color = Microsoft.Maui.Graphics.Color;
 namespace zoft.MauiExtensions.Controls.Platform
 {
     /// <summary>
-    ///  Extends AutoCompleteTextView to have similar APIs and behavior to UWP's AutoSuggestBox, which greatly simplifies wrapping it
+    ///  Extends AppCompatAutoCompleteTextView to have similar APIs and behavior to WinUI's AutoSuggestBox, which greatly simplifies wrapping it
     /// </summary>
-    public class AndroidAutoCompleteEntry : AutoCompleteTextView
+    public class AndroidAutoCompleteEntry : AppCompatAutoCompleteTextView
     {
         private bool _suppressTextChangedEvent;
         private Func<object, string> _textMemberPathFunc;
@@ -99,7 +100,7 @@ namespace zoft.MauiExtensions.Controls.Platform
         }
 
         /// <summary>
-        /// Gets or sets the placeholder text to be displayed in the <see cref="AutoCompleteTextView"/>
+        /// Gets or sets the placeholder text to be displayed in the <see cref="AppCompatAutoCompleteTextView"/>
         /// </summary>
         public virtual string PlaceholderText
         {
