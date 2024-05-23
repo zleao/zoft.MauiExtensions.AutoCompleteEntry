@@ -1,6 +1,6 @@
 variables:
   
-  TOOLKIT_NET_VERSION: '7.0.x'
+  TOOLKIT_NET_VERSION: '8.0.x'
   PathToProjectFolder: 'src\AutoCompleteEntry'
   PathToProjectFile: '$(PathToProjectFolder)\AutoCompleteEntry.csproj'
   BuildConfiguration: Release
@@ -52,7 +52,7 @@ jobs:
 
   - job: 'publish_nuget_package'
     displayName: 'Publish NuGet Package'
-    condition: ne(variables['Build.Reason'], 'PullRequest')
+    condition: and(succeeded(), ne(variables['Build.Reason'], 'PullRequest'))
     dependsOn: build_library
     steps:
 

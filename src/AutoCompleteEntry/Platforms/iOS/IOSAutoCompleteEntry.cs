@@ -233,13 +233,20 @@ namespace zoft.MauiExtensions.Controls.Platform
             {
                 var viewController = InputTextField.Window?.RootViewController;
                 if (viewController == null)
+                {
                     return;
-                if (viewController.ModalViewController != null)
-                    viewController = viewController.ModalViewController;
+                }
+
+                if (viewController.PresentedViewController != null)
+                {
+                    viewController = viewController.PresentedViewController;
+                }
+
                 if (SelectionList.Superview == null)
                 {
                     viewController.Add(SelectionList);
                 }
+
                 SelectionList.TopAnchor.ConstraintEqualTo(InputTextField.BottomAnchor).Active = true;
                 SelectionList.LeftAnchor.ConstraintEqualTo(InputTextField.LeftAnchor).Active = true;
                 SelectionList.WidthAnchor.ConstraintEqualTo(InputTextField.WidthAnchor).Active = true;
@@ -359,12 +366,15 @@ namespace zoft.MauiExtensions.Controls.Platform
             public override UITableViewCell GetCell(UITableView tableView, NSIndexPath indexPath)
             {
                 var cell = tableView.DequeueReusableCell(_cellIdentifier);
-                if (cell == null)
-                    cell = new UITableViewCell(UITableViewCellStyle.Default, _cellIdentifier);
+
+                cell ??= new UITableViewCell(UITableViewCellStyle.Default, _cellIdentifier);
 
                 var item = _items[indexPath.Row];
 
-                cell.TextLabel.Text = _labelFunc(item);
+                if (cell.ContentConfiguration is UIListContentConfiguration config)
+                {
+                    config.Text = _labelFunc(item);
+                }
 
                 return cell;
             }

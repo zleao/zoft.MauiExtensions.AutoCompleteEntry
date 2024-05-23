@@ -233,13 +233,27 @@ namespace zoft.MauiExtensions.Controls.Platform
             {
                 var viewController = InputTextField.Window?.RootViewController;
                 if (viewController == null)
+                {
                     return;
+                }
+
+#if MACCATALYST14_2_OR_GREATER
+                if (viewController.PresentedViewController != null)
+                {
+                    viewController = viewController.PresentedViewController;
+                }
+#else
                 if (viewController.ModalViewController != null)
+                {
                     viewController = viewController.ModalViewController;
+                }
+#endif
+
                 if (SelectionList.Superview == null)
                 {
                     viewController.Add(SelectionList);
                 }
+
                 SelectionList.TopAnchor.ConstraintEqualTo(InputTextField.BottomAnchor).Active = true;
                 SelectionList.LeftAnchor.ConstraintEqualTo(InputTextField.LeftAnchor).Active = true;
                 SelectionList.WidthAnchor.ConstraintEqualTo(InputTextField.WidthAnchor).Active = true;
@@ -250,7 +264,9 @@ namespace zoft.MauiExtensions.Controls.Platform
             else
             {
                 if (SelectionList.Superview != null)
+                {
                     SelectionList.RemoveFromSuperview();
+                }
             }
         }
 
@@ -333,15 +349,15 @@ namespace zoft.MauiExtensions.Controls.Platform
             {
                 if (!MainThread.IsMainThread)
                 {
-                    MainThread.BeginInvokeOnMainThread(() => CollectionChanged(e));
+                    MainThread.BeginInvokeOnMainThread(() => CollectionChanged());
                 }
                 else
                 {
-                    CollectionChanged(e);
+                    CollectionChanged();
                 }
             }
 
-            private void CollectionChanged(NotifyCollectionChangedEventArgs args)
+            private void CollectionChanged()
             {
                 _view.ReloadData();
             }
@@ -359,12 +375,15 @@ namespace zoft.MauiExtensions.Controls.Platform
             public override UITableViewCell GetCell(UITableView tableView, NSIndexPath indexPath)
             {
                 var cell = tableView.DequeueReusableCell(_cellIdentifier);
-                if (cell == null)
-                    cell = new UITableViewCell(UITableViewCellStyle.Default, _cellIdentifier);
+                
+                cell ??= new UITableViewCell(UITableViewCellStyle.Default, _cellIdentifier);
 
                 var item = _items[indexPath.Row];
 
-                cell.TextLabel.Text = _labelFunc(item);
+                if (cell.ContentConfiguration is UIListContentConfiguration config)
+                {
+                    config.Text = _labelFunc(item);
+                }
 
                 return cell;
             }
