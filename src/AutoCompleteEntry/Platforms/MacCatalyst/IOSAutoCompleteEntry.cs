@@ -105,6 +105,11 @@ namespace zoft.MauiExtensions.Controls.Platform
                 BorderStyle = UITextBorderStyle.None,
                 ReturnKeyType = UIReturnKeyType.Done,
                 AutocorrectionType = UITextAutocorrectionType.No,
+                ShouldReturn = field =>
+                {
+                    field.ResignFirstResponder();
+                    return false;
+                }
             };
             InputTextField.EditingDidBegin += InputText_OnEditingDidBegin;
             InputTextField.EditingDidEnd += InputText_OnEditingDidEnd;
@@ -119,7 +124,7 @@ namespace zoft.MauiExtensions.Controls.Platform
 
             SelectionList = new UITableView() { TranslatesAutoresizingMaskIntoConstraints = false };
 
-            UIKeyboard.Notifications.ObserveWillShow(OnKeyboardShow);
+            UIKeyboard.Notifications.ObserveDidShow(OnKeyboardShow);
             UIKeyboard.Notifications.ObserveWillHide(OnKeyboardHide);
         }
 
@@ -282,9 +287,7 @@ namespace zoft.MauiExtensions.Controls.Platform
 
         private void OnKeyboardShow(object sender, UIKeyboardEventArgs e)
         {
-            NSValue nsKeyboardBounds = (NSValue)e.Notification.UserInfo.ObjectForKey(UIKeyboard.FrameBeginUserInfoKey);
-            var keyboardBounds = nsKeyboardBounds.RectangleFValue;
-            keyboardHeight = keyboardBounds.Height;
+            keyboardHeight = e.FrameEnd.Height;
             if (bottomConstraint != null)
             {
                 bottomConstraint.Constant = -keyboardHeight;
@@ -318,6 +321,7 @@ namespace zoft.MauiExtensions.Controls.Platform
             }
             SuggestionChosen?.Invoke(this, new AutoCompleteEntrySuggestionChosenEventArgs(selection));
             IsSuggestionListOpen = false;
+            ResignFirstResponder();
         }
 
         private class TableSource : UITableViewSource
@@ -380,10 +384,7 @@ namespace zoft.MauiExtensions.Controls.Platform
 
                 var item = _items[indexPath.Row];
 
-                if (cell.ContentConfiguration is UIListContentConfiguration config)
-                {
-                    config.Text = _labelFunc(item);
-                }
+                cell.TextLabel.Text = _labelFunc(item);
 
                 return cell;
             }
