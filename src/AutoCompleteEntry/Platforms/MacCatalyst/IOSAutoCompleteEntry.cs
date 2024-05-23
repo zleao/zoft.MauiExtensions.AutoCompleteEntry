@@ -105,6 +105,11 @@ namespace zoft.MauiExtensions.Controls.Platform
                 BorderStyle = UITextBorderStyle.None,
                 ReturnKeyType = UIReturnKeyType.Done,
                 AutocorrectionType = UITextAutocorrectionType.No,
+                ShouldReturn = field =>
+                {
+                    field.ResignFirstResponder();
+                    return false;
+                }
             };
             InputTextField.EditingDidBegin += InputText_OnEditingDidBegin;
             InputTextField.EditingDidEnd += InputText_OnEditingDidEnd;
