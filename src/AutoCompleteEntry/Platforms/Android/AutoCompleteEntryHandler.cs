@@ -15,17 +15,17 @@ namespace zoft.MauiExtensions.Controls.Handlers
         {
             base.ConnectHandler(platformView);
 
-            PlatformView.ViewAttachedToWindow += OnLoaded;
-            PlatformView.TextChanged += AutoCompleteEntry_TextChanged;
-            PlatformView.SuggestionChosen += AutoCompleteEntry_SuggestionChosen;
+            platformView.ViewAttachedToWindow += OnLoaded;
+            platformView.TextChanged += AutoCompleteEntry_TextChanged;
+            platformView.SuggestionChosen += AutoCompleteEntry_SuggestionChosen;
         }
 
         /// <inheritdoc/>
         protected override void DisconnectHandler(AndroidAutoCompleteEntry platformView)
         {
-            PlatformView.ViewAttachedToWindow -= OnLoaded;
-            PlatformView.TextChanged -= AutoCompleteEntry_TextChanged;
-            PlatformView.SuggestionChosen -= AutoCompleteEntry_SuggestionChosen;
+            platformView.ViewAttachedToWindow -= OnLoaded;
+            platformView.TextChanged -= AutoCompleteEntry_TextChanged;
+            platformView.SuggestionChosen -= AutoCompleteEntry_SuggestionChosen;
 
             base.DisconnectHandler(platformView);
         }

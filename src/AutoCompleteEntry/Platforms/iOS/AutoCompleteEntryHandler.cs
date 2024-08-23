@@ -27,21 +27,21 @@ namespace zoft.MauiExtensions.Controls.Handlers
         {
             base.ConnectHandler(platformView);
 
-            PlatformView.OnLoaded += AutoCompleteEntry_OnLoaded;
-            PlatformView.TextChanged += AutoCompleteEntry_TextChanged;
-            PlatformView.SuggestionChosen += AutoCompleteEntry_SuggestionChosen;
-            PlatformView.EditingDidBegin += AutoCompleteEntry_EditingDidBegin;
-            PlatformView.EditingDidEnd += AutoCompleteEntry_EditingDidEnd;
+            platformView.OnLoaded += AutoCompleteEntry_OnLoaded;
+            platformView.TextChanged += AutoCompleteEntry_TextChanged;
+            platformView.SuggestionChosen += AutoCompleteEntry_SuggestionChosen;
+            platformView.EditingDidBegin += AutoCompleteEntry_EditingDidBegin;
+            platformView.EditingDidEnd += AutoCompleteEntry_EditingDidEnd;
         }
 
         /// <inheritdoc/>
         protected override void DisconnectHandler(IOSAutoCompleteEntry platformView)
         {
-            PlatformView.OnLoaded -= AutoCompleteEntry_OnLoaded;
-            PlatformView.TextChanged -= AutoCompleteEntry_TextChanged;
-            PlatformView.SuggestionChosen -= AutoCompleteEntry_SuggestionChosen;
-            PlatformView.EditingDidBegin -= AutoCompleteEntry_EditingDidBegin;
-            PlatformView.EditingDidEnd -= AutoCompleteEntry_EditingDidEnd;
+            platformView.OnLoaded -= AutoCompleteEntry_OnLoaded;
+            platformView.TextChanged -= AutoCompleteEntry_TextChanged;
+            platformView.SuggestionChosen -= AutoCompleteEntry_SuggestionChosen;
+            platformView.EditingDidBegin -= AutoCompleteEntry_EditingDidBegin;
+            platformView.EditingDidEnd -= AutoCompleteEntry_EditingDidEnd;
 
             base.DisconnectHandler(platformView);
         }
