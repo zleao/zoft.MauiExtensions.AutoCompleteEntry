@@ -1,4 +1,5 @@
-﻿using CommunityToolkit.Mvvm.ComponentModel;
+﻿using AndroidX.AppCompat.View.Menu;
+using CommunityToolkit.Mvvm.ComponentModel;
 using System.Collections.ObjectModel;
 using zoft.MauiExtensions.Core.Extensions;
 using zoft.MauiExtensions.Core.ViewModels;
@@ -71,10 +72,12 @@ namespace AutoCompleteEntry.Sample.ViewModels
         public void FilterList(string filter)
         {
             SelectedItem = null;
+            
             FilteredList.Clear();
-
-            FilteredList.AddRange(Teams.Where(t => t.Group.Contains(filter, StringComparison.CurrentCultureIgnoreCase) ||
-                                                   t.Country.Contains(filter, StringComparison.CurrentCultureIgnoreCase)));
+            FilteredList = null;
+            FilteredList = new ObservableCollection<ListItem>(
+                Teams.Where(t => t.Group.Contains(filter, StringComparison.CurrentCultureIgnoreCase) ||
+                                 t.Country.Contains(filter, StringComparison.CurrentCultureIgnoreCase)));
         }
 
         private void OnTextChanged(string text)

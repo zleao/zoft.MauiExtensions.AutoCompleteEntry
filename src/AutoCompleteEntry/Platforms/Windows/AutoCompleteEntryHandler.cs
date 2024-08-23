@@ -17,20 +17,20 @@ namespace zoft.MauiExtensions.Controls.Handlers
         /// <inheritdoc/>
         protected override void ConnectHandler(AutoSuggestBox platformView)
         {
-            PlatformView.Loaded += OnLoaded;
-            PlatformView.TextChanged += AutoSuggestBox_TextChanged;
-            PlatformView.SuggestionChosen += AutoSuggestBox_SuggestionChosen;
-            PlatformView.GotFocus += Control_GotFocus;
+            platformView.Loaded += OnLoaded;
+            platformView.TextChanged += AutoSuggestBox_TextChanged;
+            platformView.SuggestionChosen += AutoSuggestBox_SuggestionChosen;
+            platformView.GotFocus += Control_GotFocus;
 
         }
 
         /// <inheritdoc/>
         protected override void DisconnectHandler(AutoSuggestBox platformView)
         {
-            PlatformView.Loaded -= OnLoaded;
-            PlatformView.TextChanged -= AutoSuggestBox_TextChanged;
-            PlatformView.SuggestionChosen -= AutoSuggestBox_SuggestionChosen;
-            PlatformView.GotFocus -= Control_GotFocus;
+            platformView.Loaded -= OnLoaded;
+            platformView.TextChanged -= AutoSuggestBox_TextChanged;
+            platformView.SuggestionChosen -= AutoSuggestBox_SuggestionChosen;
+            platformView.GotFocus -= Control_GotFocus;
 
             base.DisconnectHandler(platformView);
         }
