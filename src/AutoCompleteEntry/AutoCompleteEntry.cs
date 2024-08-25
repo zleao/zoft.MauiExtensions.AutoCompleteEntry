@@ -22,6 +22,7 @@
         /// <value>
         /// The property path that is used to get the value for display in the text box portion
         /// of the <see cref="AutoCompleteEntry"/> control, when an item is selected.
+        /// The default is an empty string (""), which will use the item's ToString() method.
         /// </value>
         public string TextMemberPath
         {
@@ -40,8 +41,8 @@
         /// Gets or sets the name or path of the property that is displayed for each data item.
         /// </summary>
         /// <value>
-        /// The name or path of the property that is displayed for each the data item in
-        /// the control. The default is an empty string ("").
+        /// The name or path of the property that is displayed for each the data item in the control.
+        /// The default is an empty string (""), which will use the item's ToString() method.
         /// </value>
         public string DisplayMemberPath
         {
