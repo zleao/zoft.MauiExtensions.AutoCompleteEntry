@@ -1,7 +1,6 @@
-﻿using AndroidX.AppCompat.View.Menu;
-using CommunityToolkit.Mvvm.ComponentModel;
+﻿using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.Input;
 using System.Collections.ObjectModel;
-using zoft.MauiExtensions.Core.Extensions;
 using zoft.MauiExtensions.Core.ViewModels;
 
 namespace AutoCompleteEntry.Sample.ViewModels
@@ -17,8 +16,8 @@ namespace AutoCompleteEntry.Sample.ViewModels
 
     internal partial class SampleViewModel : CoreViewModel
     {
-        private readonly List<ListItem> Teams  = new List<ListItem>()
-        {
+        private readonly List<ListItem> Teams =
+        [
             new ListItem() { Group = "Group A", Country = "Ecuador" },
             new ListItem() { Group = "Group A", Country = "Netherlands" },
             new ListItem() { Group = "Group A", Country = "Qatar" },
@@ -51,13 +50,19 @@ namespace AutoCompleteEntry.Sample.ViewModels
             new ListItem() { Group = "Group H", Country = "Portugal" },
             new ListItem() { Group = "Group H", Country = "South Korea" },
             new ListItem() { Group = "Group H", Country = "Uruguai" }
-        };
+        ];
 
         [ObservableProperty]
         private ObservableCollection<ListItem> _filteredList;
 
         [ObservableProperty]
         private ListItem _selectedItem;
+
+        [ObservableProperty]
+        private int _cursorPosition;
+
+        [ObservableProperty]
+        private int _newCursorPosition;
 
         public Command<string> TextChangedCommand { get; }
 
@@ -76,13 +81,19 @@ namespace AutoCompleteEntry.Sample.ViewModels
             FilteredList.Clear();
             FilteredList = null;
             FilteredList = new ObservableCollection<ListItem>(
-                Teams.Where(t => t.Group.Contains(filter, StringComparison.CurrentCultureIgnoreCase) ||
-                                 t.Country.Contains(filter, StringComparison.CurrentCultureIgnoreCase)));
+                Teams.Where(t => t.Group.Contains(filter ?? "", StringComparison.CurrentCultureIgnoreCase) ||
+                                 t.Country.Contains(filter ?? "", StringComparison.CurrentCultureIgnoreCase)));
         }
 
         private void OnTextChanged(string text)
         {
             FilterList(text);
+        }
+
+        [RelayCommand]
+        public void SetCursorPosition()
+        {
+            CursorPosition = NewCursorPosition;
         }
     }
 }

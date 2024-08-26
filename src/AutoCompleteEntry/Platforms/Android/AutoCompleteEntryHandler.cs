@@ -1,4 +1,4 @@
-﻿using Microsoft.Maui.Controls.Platform;
+using Microsoft.Maui.Controls.Platform;
 using Microsoft.Maui.Handlers;
 using Microsoft.Maui.Platform;
 using zoft.MauiExtensions.Controls.Platform;
@@ -66,6 +66,16 @@ namespace zoft.MauiExtensions.Controls.Handlers
         public static void MapBackground(IAutoCompleteEntryHandler handler, IEntry entry)
         {
             handler.PlatformView?.UpdateBackground(entry);
+        }
+
+        /// <summary>
+        /// Map the CursorPosition value
+        /// </summary>
+        /// <param name="handler"></param>
+        /// <param name="entry"></param>
+        public static void MapCursorPosition(IAutoCompleteEntryHandler handler, IEntry entry)
+        {
+            handler.PlatformView?.UpdateCursorPosition(entry);
         }
 
         /// <summary>

@@ -164,6 +164,26 @@
 
 
         /// <summary>
+        /// Raised after the cursor position changes
+        /// </summary>
+        public event EventHandler<AutoCompleteEntryCursorPositionChangedEventArgs> CursorPositionChanged;
+
+        /// <summary>
+        /// Method used to signal the platform control, that the cursor position changed
+        /// </summary>
+        /// <param name="cursorPosition"></param>
+        public void OnCursorPositionChanged(int cursorPosition)
+        {
+            if(CursorPosition != cursorPosition)
+            {
+                CursorPosition = cursorPosition;
+
+                CursorPositionChanged?.Invoke(this, new AutoCompleteEntryCursorPositionChangedEventArgs(cursorPosition));
+            }
+        }
+
+
+        /// <summary>
         /// Get or Set the currently selected suggestion, from the items source list
         /// </summary>
         public object SelectedSuggestion

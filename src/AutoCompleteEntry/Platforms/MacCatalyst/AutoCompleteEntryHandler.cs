@@ -101,6 +101,16 @@ namespace zoft.MauiExtensions.Controls.Handlers
         }
 
         /// <summary>
+        /// Map the CursorPosition value
+        /// </summary>
+        /// <param name="handler"></param>
+        /// <param name="entry"></param>
+        public static void MapCursorPosition(IAutoCompleteEntryHandler handler, IEntry entry)
+        {
+            handler.PlatformView?.InputTextField.UpdateCursorPosition(entry);
+        }
+
+        /// <summary>
 		/// Map the IsEnabled value
 		/// </summary>
 		/// <param name="handler"></param>

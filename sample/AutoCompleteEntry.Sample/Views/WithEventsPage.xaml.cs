@@ -30,5 +30,10 @@ namespace AutoCompleteEntry.Sample.Views
             // Set sender.Text. You can use args.SelectedItem to build your text string.
             ViewModel.SelectedItem = e.SelectedItem as ListItem;
         }
+
+        private void AutoCompleteEntry_CursorPositionChanged(object sender, zoft.MauiExtensions.Controls.AutoCompleteEntryCursorPositionChangedEventArgs e)
+        {
+            ViewModel.CursorPosition = e.CursorPosition;
+        }
     }
 }

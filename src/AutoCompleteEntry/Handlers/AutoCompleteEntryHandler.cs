@@ -28,7 +28,8 @@ namespace zoft.MauiExtensions.Controls.Handlers
 				[nameof(IEntry.IsEnabled)] = MapIsEnabled,
 #endif
                 [nameof(IEntry.Background)] = MapBackground,
-				[nameof(IEntry.CharacterSpacing)] = MapCharacterSpacing,
+                [nameof(IEntry.CursorPosition)] = MapCursorPosition,
+                [nameof(IEntry.CharacterSpacing)] = MapCharacterSpacing,
 				[nameof(IEntry.Font)] = MapFont,
 				[nameof(ITextAlignment.HorizontalTextAlignment)] = MapHorizontalTextAlignment,
 				[nameof(ITextAlignment.VerticalTextAlignment)] = MapVerticalTextAlignment,

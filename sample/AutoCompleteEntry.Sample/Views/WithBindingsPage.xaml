@@ -3,7 +3,9 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              xmlns:zoft="http://zoft.MauiExtensions/Controls"
              xmlns:ctkm="http://schemas.microsoft.com/dotnet/2022/maui/toolkit"
-             x:Class="AutoCompleteEntry.Sample.Views.WithBindingsPage">
+             xmlns:vm="clr-namespace:AutoCompleteEntry.Sample.ViewModels"
+             x:Class="AutoCompleteEntry.Sample.Views.WithBindingsPage"
+             x:DataType="vm:SampleViewModel">
 
     <ContentPage.Resources>
         <ctkm:IsNotNullConverter x:Key="IsNotNullConverter"/>
@@ -15,11 +17,27 @@
                HorizontalOptions="Center" />
 
         <VerticalStackLayout Spacing="10" Margin="10">
+
+            <Label>
+                <Label.FormattedText>
+                    <FormattedString>
+                        <Span Text="CursorPosition: " />
+                        <Span Text="{Binding CursorPosition}"/>
+                    </FormattedString>
+                </Label.FormattedText>
+            </Label>
+
+            <HorizontalStackLayout>
+                <Button Text="Set CursorPosition" Command="{Binding SetCursorPositionCommand}"/>
+                <Entry Text="{Binding NewCursorPosition, Mode=TwoWay}" Keyboard="Numeric"/>
+            </HorizontalStackLayout>
+            
             <zoft:AutoCompleteEntry Placeholder="Search for a country or group"
                                     ItemsSource="{Binding FilteredList}"
                                     TextMemberPath="Country"
                                     DisplayMemberPath="Country"
                                     TextChangedCommand="{Binding TextChangedCommand}"
+                                    CursorPosition="{Binding CursorPosition, Mode=TwoWay}"
                                     SelectedSuggestion="{Binding SelectedItem}"/>
 
             <Frame BorderColor="Gray" 
@@ -37,6 +55,7 @@
                     </HorizontalStackLayout>
                 </VerticalStackLayout>
             </Frame>
+            
         </VerticalStackLayout>
     </Grid>
 
