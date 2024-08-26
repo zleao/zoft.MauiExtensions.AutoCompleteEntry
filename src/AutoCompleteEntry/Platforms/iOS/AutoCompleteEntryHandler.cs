@@ -1,4 +1,5 @@
-﻿using Microsoft.Maui.Controls.Platform;
+﻿using Microsoft.Maui.Controls;
+using Microsoft.Maui.Controls.Platform;
 using Microsoft.Maui.Handlers;
 using Microsoft.Maui.Platform;
 using zoft.MauiExtensions.Controls.Platform;
@@ -32,6 +33,7 @@ namespace zoft.MauiExtensions.Controls.Handlers
             platformView.SuggestionChosen += AutoCompleteEntry_SuggestionChosen;
             platformView.EditingDidBegin += AutoCompleteEntry_EditingDidBegin;
             platformView.EditingDidEnd += AutoCompleteEntry_EditingDidEnd;
+            platformView.ShouldReturn += AutoCompleteEntry_ShouldReturn;
         }
 
         /// <inheritdoc/>
@@ -42,6 +44,7 @@ namespace zoft.MauiExtensions.Controls.Handlers
             platformView.SuggestionChosen -= AutoCompleteEntry_SuggestionChosen;
             platformView.EditingDidBegin -= AutoCompleteEntry_EditingDidBegin;
             platformView.EditingDidEnd -= AutoCompleteEntry_EditingDidEnd;
+            platformView.ShouldReturn -= AutoCompleteEntry_ShouldReturn;
 
             base.DisconnectHandler(platformView);
         }
@@ -88,6 +91,11 @@ namespace zoft.MauiExtensions.Controls.Handlers
             {
                 VirtualView.Unfocus();
             }
+        }
+
+        private void AutoCompleteEntry_ShouldReturn(object sender, EventArgs e)
+        {
+            VirtualView?.SendCompleted();
         }
 
         /// <summary>

@@ -10,5 +10,14 @@ namespace AutoCompleteEntry.Sample.Views
 
             InitializeComponent();
         }
+
+        private void AutoCompleteEntry_Completed(object sender, EventArgs e)
+        {
+            if (sender is zoft.MauiExtensions.Controls.AutoCompleteEntry autoCompleteEntry &&
+                BindingContext is SampleViewModel viewModel)
+            {
+                viewModel.SelectedItem = viewModel.GetExactMatch(autoCompleteEntry.Text);
+            }
+        }
     }
 }

@@ -20,7 +20,8 @@
                                     TextMemberPath="Country"
                                     DisplayMemberPath="Country"
                                     TextChangedCommand="{Binding TextChangedCommand}"
-                                    SelectedSuggestion="{Binding SelectedItem}"/>
+                                    SelectedSuggestion="{Binding SelectedItem}"
+                                    Completed="AutoCompleteEntry_Completed"/>
 
             <Frame BorderColor="Gray" 
                    BackgroundColor="LightGray" 

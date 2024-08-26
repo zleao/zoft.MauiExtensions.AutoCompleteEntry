@@ -30,5 +30,13 @@ namespace AutoCompleteEntry.Sample.Views
             // Set sender.Text. You can use args.SelectedItem to build your text string.
             ViewModel.SelectedItem = e.SelectedItem as ListItem;
         }
+
+        private void AutoCompleteEntry_Completed(object sender, EventArgs e)
+        {
+            if (sender is zoft.MauiExtensions.Controls.AutoCompleteEntry autoCompleteEntry)
+            {
+                ViewModel.SelectedItem = ViewModel.GetExactMatch(autoCompleteEntry.Text);
+            }
+        }
     }
 }

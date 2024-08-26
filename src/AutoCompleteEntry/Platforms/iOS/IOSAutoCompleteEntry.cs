@@ -30,6 +30,8 @@ namespace zoft.MauiExtensions.Controls.Platform
 
         internal EventHandler EditingDidEnd;
 
+        internal EventHandler ShouldReturn;
+
         private NFloat keyboardHeight;
         private NSLayoutConstraint bottomConstraint;
         private Func<object, string> textFunc;
@@ -114,6 +116,7 @@ namespace zoft.MauiExtensions.Controls.Platform
             InputTextField.EditingDidBegin += InputText_OnEditingDidBegin;
             InputTextField.EditingDidEnd += InputText_OnEditingDidEnd;
             InputTextField.EditingChanged += InputText_OnEditingChanged;
+            InputTextField.ShouldReturn += InputText_OnShouldReturn;
 
             AddSubview(InputTextField);
 
@@ -186,6 +189,12 @@ namespace zoft.MauiExtensions.Controls.Platform
         {
             TextChanged?.Invoke(this, new AutoCompleteEntryTextChangedEventArgs(AutoCompleteEntryTextChangeReason.UserInput));
             IsSuggestionListOpen = true;
+        }
+
+        private bool InputText_OnShouldReturn(UITextField view)
+        {
+            ShouldReturn?.Invoke(this, EventArgs.Empty);
+            return false;
         }
 
         /// <inheritdoc />
