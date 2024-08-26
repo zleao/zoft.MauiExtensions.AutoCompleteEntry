@@ -17,7 +17,10 @@ namespace zoft.MauiExtensions.Controls.Platform
         /// <param name="autoCompleteEntry"></param>
         public static void UpdateText(this IOSAutoCompleteEntry iosAutoCompleteEntry, AutoCompleteEntry autoCompleteEntry)
         {
-            iosAutoCompleteEntry.Text = autoCompleteEntry.Text;
+            if (iosAutoCompleteEntry.Text != autoCompleteEntry.Text)
+            {
+                iosAutoCompleteEntry.Text = autoCompleteEntry.Text;
+            }
         }
 
         /// <summary>

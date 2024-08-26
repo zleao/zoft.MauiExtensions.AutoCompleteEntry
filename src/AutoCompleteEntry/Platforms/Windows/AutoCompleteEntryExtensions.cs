@@ -25,7 +25,11 @@ namespace zoft.MauiExtensions.Controls.Platform
         /// <param name="autoCompleteEntry"></param>
         public static void UpdateText(this AutoSuggestBox platformControl, AutoCompleteEntry autoCompleteEntry)
         {
-            platformControl.Text = TextTransformUtilites.GetTransformedText(autoCompleteEntry.Text, autoCompleteEntry.TextTransform);
+            var text = TextTransformUtilites.GetTransformedText(autoCompleteEntry.Text, autoCompleteEntry.TextTransform);
+            if (platformControl.Text != text)
+            {
+                platformControl.Text = text;
+            }
         }
 
         /// <summary>

@@ -15,8 +15,11 @@ namespace zoft.MauiExtensions.Controls.Platform
         /// <param name="autoCompleteEntry"></param>
         public static void UpdateText(this AndroidAutoCompleteEntry androidAutoCompleteEntry, AutoCompleteEntry autoCompleteEntry)
         {
-            androidAutoCompleteEntry.Text = autoCompleteEntry.Text;
-            androidAutoCompleteEntry.SetSelection(androidAutoCompleteEntry.Text?.Length ?? 0);
+            if (androidAutoCompleteEntry.Text != autoCompleteEntry.Text)
+            {
+                androidAutoCompleteEntry.Text = autoCompleteEntry.Text;
+                androidAutoCompleteEntry.SetSelection(androidAutoCompleteEntry.Text?.Length ?? 0);
+            }
         }
 
         /// <summary>
