@@ -160,7 +160,8 @@ namespace zoft.MauiExtensions.Controls.Platform
         /// <param name="autoCompleteEntry"></param>
         public static void UpdateSelectedSuggestion(this AutoSuggestBox platformControl, AutoCompleteEntry autoCompleteEntry)
         {
-            platformControl.Text = autoCompleteEntry.SelectedSuggestion.GetPropertyValueAsString(autoCompleteEntry.TextMemberPath);
+            object o = autoCompleteEntry.SelectedSuggestion;
+            platformControl.Text = !string.IsNullOrEmpty(autoCompleteEntry.TextMemberPath) ? o.GetPropertyValueAsString(autoCompleteEntry.TextMemberPath) : o?.ToString();
         }
 
         private static void UpdateColors(Microsoft.UI.Xaml.ResourceDictionary resource, string[] keys, Microsoft.UI.Xaml.Media.Brush brush)
