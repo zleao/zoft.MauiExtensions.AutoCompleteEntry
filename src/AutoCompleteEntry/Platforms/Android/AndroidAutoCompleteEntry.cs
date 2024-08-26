@@ -143,6 +143,13 @@ namespace zoft.MauiExtensions.Controls.Platform
             base.OnTextChanged(text, start, lengthBefore, lengthAfter);
         }
 
+        protected override void OnSelectionChanged(int selStart, int selEnd)
+        {
+            base.OnSelectionChanged(selStart, selEnd);
+
+            CursorPositionChanged?.Invoke(this, new AutoCompleteEntryCursorPositionChangedEventArgs(selStart));
+        }
+
         private void DismissKeyboard()
         {
             var imm = (InputMethodManager)Context.GetSystemService(Context.InputMethodService);
@@ -185,6 +192,8 @@ namespace zoft.MauiExtensions.Controls.Platform
         /// Raised after the text content of the editable control component is updated.
         /// </summary>
         public new event EventHandler<AutoCompleteEntryTextChangedEventArgs> TextChanged;
+
+        public event EventHandler<AutoCompleteEntryCursorPositionChangedEventArgs> CursorPositionChanged;
 
         /// <summary>
         /// Raised before the text content of the editable control component is updated.

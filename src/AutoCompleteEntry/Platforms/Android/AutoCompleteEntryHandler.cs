@@ -1,4 +1,4 @@
-using Microsoft.Maui.Controls.Platform;
+﻿using Microsoft.Maui.Controls.Platform;
 using Microsoft.Maui.Handlers;
 using Microsoft.Maui.Platform;
 using zoft.MauiExtensions.Controls.Platform;
@@ -17,6 +17,7 @@ namespace zoft.MauiExtensions.Controls.Handlers
 
             platformView.ViewAttachedToWindow += OnLoaded;
             platformView.TextChanged += AutoCompleteEntry_TextChanged;
+            platformView.CursorPositionChanged += AutoCompleteEntry_CursorPositionChanged;
             platformView.SuggestionChosen += AutoCompleteEntry_SuggestionChosen;
         }
 
@@ -25,6 +26,7 @@ namespace zoft.MauiExtensions.Controls.Handlers
         {
             platformView.ViewAttachedToWindow -= OnLoaded;
             platformView.TextChanged -= AutoCompleteEntry_TextChanged;
+            platformView.CursorPositionChanged -= AutoCompleteEntry_CursorPositionChanged;
             platformView.SuggestionChosen -= AutoCompleteEntry_SuggestionChosen;
 
             base.DisconnectHandler(platformView);
@@ -33,6 +35,11 @@ namespace zoft.MauiExtensions.Controls.Handlers
         private void AutoCompleteEntry_TextChanged(object sender, AutoCompleteEntryTextChangedEventArgs e)
         {
             VirtualView?.OnTextChanged(PlatformView.Text, (AutoCompleteEntryTextChangeReason)e.Reason);
+        }
+
+        private void AutoCompleteEntry_CursorPositionChanged(object sender, AutoCompleteEntryCursorPositionChangedEventArgs e)
+        {
+            VirtualView?.OnCursorPositionChanged(e.CursorPosition);
         }
 
         private void AutoCompleteEntry_SuggestionChosen(object sender, AutoCompleteEntrySuggestionChosenEventArgs e)
