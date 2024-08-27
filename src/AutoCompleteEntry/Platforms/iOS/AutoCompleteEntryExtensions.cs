@@ -1,4 +1,4 @@
-﻿using Foundation;
+using Foundation;
 using Microsoft.Maui.Platform;
 using UIKit;
 using zoft.MauiExtensions.Core.Extensions;
@@ -82,17 +82,17 @@ public static class AutoCompleteEntryExtensions
         iosAutoCompleteEntry.InputTextField.UserInteractionEnabled = !(autoCompleteEntry.IsReadOnly || autoCompleteEntry.InputTransparent);
     }
 
-    /// <summary>
-    /// Update the DisplayCompleteEntry
-    /// </summary>
-    /// <param name="iosAutoCompleteEntry"></param>
-    /// <param name="autoCompleteEntry"></param>
-    public static void UpdateDisplayMemberPath(this IOSAutoCompleteEntry iosAutoCompleteEntry, AutoCompleteEntry autoCompleteEntry)
-    {
-        iosAutoCompleteEntry.SetItems(autoCompleteEntry.ItemsSource,
-            o => o.GetPropertyValueAsString(autoCompleteEntry.DisplayMemberPath),
-            o => o.GetPropertyValueAsString(autoCompleteEntry.TextMemberPath));
-    }
+        /// <summary>
+        /// Update the DisplayCompleteEntry
+        /// </summary>
+        /// <param name="iosAutoCompleteEntry"></param>
+        /// <param name="autoCompleteEntry"></param>
+        public static void UpdateDisplayMemberPath(this IOSAutoCompleteEntry iosAutoCompleteEntry, AutoCompleteEntry autoCompleteEntry)
+        {
+            iosAutoCompleteEntry.SetItems(autoCompleteEntry.ItemsSource,
+                                          (o) => !string.IsNullOrEmpty(autoCompleteEntry?.DisplayMemberPath) ? o.GetPropertyValueAsString(autoCompleteEntry?.DisplayMemberPath) : o?.ToString(),
+                                          (o) => !string.IsNullOrEmpty(autoCompleteEntry?.TextMemberPath) ? o.GetPropertyValueAsString(autoCompleteEntry?.TextMemberPath) : o?.ToString());
+        }
 
     /// <summary>
     /// Update the IsSuggestionListOpen
@@ -114,25 +114,27 @@ public static class AutoCompleteEntryExtensions
         iosAutoCompleteEntry.UpdateTextOnSelect = autoCompleteEntry.UpdateTextOnSelect;
     }
 
-    /// <summary>
-    /// Update the ItemsSource
-    /// </summary>
-    /// <param name="iosAutoCompleteEntry"></param>
-    /// <param name="autoCompleteEntry"></param>
-    public static void UpdateItemsSource(this IOSAutoCompleteEntry iosAutoCompleteEntry, AutoCompleteEntry autoCompleteEntry)
-    {
-        iosAutoCompleteEntry.SetItems(autoCompleteEntry?.ItemsSource,
-            o => o.GetPropertyValueAsString(autoCompleteEntry?.DisplayMemberPath),
-            o => o.GetPropertyValueAsString(autoCompleteEntry?.TextMemberPath));
-    }
+        /// <summary>
+        /// Update the ItemsSource
+        /// </summary>
+        /// <param name="iosAutoCompleteEntry"></param>
+        /// <param name="autoCompleteEntry"></param>
+        public static void UpdateItemsSource(this IOSAutoCompleteEntry iosAutoCompleteEntry, AutoCompleteEntry autoCompleteEntry)
+        {
+            iosAutoCompleteEntry.SetItems(autoCompleteEntry?.ItemsSource,
+                                          (o) => !string.IsNullOrEmpty(autoCompleteEntry?.DisplayMemberPath) ? o.GetPropertyValueAsString(autoCompleteEntry?.DisplayMemberPath) : o?.ToString(),
+                                          (o) => !string.IsNullOrEmpty(autoCompleteEntry?.TextMemberPath) ? o.GetPropertyValueAsString(autoCompleteEntry?.TextMemberPath) : o?.ToString());
+        }
 
-    /// <summary>
-    /// Update the SelectedSuggestion
-    /// </summary>
-    /// <param name="iosAutoCompleteEntry"></param>
-    /// <param name="autoCompleteEntry"></param>
-    public static void UpdateSelectedSuggestion(this IOSAutoCompleteEntry iosAutoCompleteEntry, AutoCompleteEntry autoCompleteEntry)
-    {
-        iosAutoCompleteEntry.Text = autoCompleteEntry.SelectedSuggestion.GetPropertyValueAsString(autoCompleteEntry.TextMemberPath);
+        /// <summary>
+        /// Update the SelectedSuggestion
+        /// </summary>
+        /// <param name="iosAutoCompleteEntry"></param>
+        /// <param name="autoCompleteEntry"></param>
+        public static void UpdateSelectedSuggestion(this IOSAutoCompleteEntry iosAutoCompleteEntry, AutoCompleteEntry autoCompleteEntry)
+        {
+            object o = autoCompleteEntry.SelectedSuggestion;
+            iosAutoCompleteEntry.Text = !string.IsNullOrEmpty(autoCompleteEntry.TextMemberPath) ? o.GetPropertyValueAsString(autoCompleteEntry.TextMemberPath) : o?.ToString();
+        }
     }
 }

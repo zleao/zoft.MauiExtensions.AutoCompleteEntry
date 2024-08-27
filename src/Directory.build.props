@@ -11,10 +11,10 @@
     <PackageProjectUrl>https://github.com/zleao/zoft.MauiExtensions.AutoCompleteEntry</PackageProjectUrl>
     <Product>$(AssemblyName) ($(TargetFramework))</Product>
     <NeutralLanguage>en</NeutralLanguage>
-    <Version>3.0.3</Version>
+    <Version>3.0.4</Version>
     <Description>.Net MAUI Entry control that provides a list of suggestions as the user types.</Description>
     <PackageTags>net8 maui zoft AutoCompleteEntry AutoCompleteBox AutoCompleteView AutoComplete</PackageTags>
-    <PackageReleaseNotes>Fix usage of 'platformView' in Entry Handlers</PackageReleaseNotes>
+    <PackageReleaseNotes>Fix Empty Text/DisplayMemberPaths not working in non-Windows</PackageReleaseNotes>
     <PackageReadmeFile>README.md</PackageReadmeFile>
 
     <LangVersion>latest</LangVersion>
