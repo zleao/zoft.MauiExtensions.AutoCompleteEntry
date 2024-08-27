@@ -87,7 +87,7 @@ namespace AutoCompleteEntry.Sample.ViewModels
 
         public ListItem GetExactMatch(string text)
         {
-            return Teams.FirstOrDefault(t => t.Country.Equals(text, StringComparison.CurrentCultureIgnoreCase));
+            return _teams.FirstOrDefault(t => t.Country.Equals(text, StringComparison.CurrentCultureIgnoreCase));
         }
 
         private void OnTextChanged(string text)
