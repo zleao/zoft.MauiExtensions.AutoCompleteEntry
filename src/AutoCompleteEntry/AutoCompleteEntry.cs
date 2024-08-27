@@ -14,7 +14,7 @@ public class AutoCompleteEntry : Entry
     public AutoCompleteEntry()
     {
     }
-
+    
     /// <summary>
     /// Gets or sets the property path that is used to get the value for display in the
     /// text box portion of the <see cref="AutoCompleteEntry"/> control, when an item is selected.
@@ -22,54 +22,39 @@ public class AutoCompleteEntry : Entry
     /// <value>
     /// The property path that is used to get the value for display in the text box portion
     /// of the <see cref="AutoCompleteEntry"/> control, when an item is selected.
+    /// The default is an empty string (""), which will use the item's ToString() method.
     /// </value>
     public string TextMemberPath
     {
-        get => (string)GetValue(TextMemberPathProperty);
-        set => SetValue(TextMemberPathProperty, value);
+        get { return (string)GetValue(TextMemberPathProperty); }
+        set { SetValue(TextMemberPathProperty, value); }
     }
 
-        /// <summary>
-        /// Gets or sets the property path that is used to get the value for display in the
-        /// text box portion of the <see cref="AutoCompleteEntry"/> control, when an item is selected.
-        /// </summary>
-        /// <value>
-        /// The property path that is used to get the value for display in the text box portion
-        /// of the <see cref="AutoCompleteEntry"/> control, when an item is selected.
-        /// The default is an empty string (""), which will use the item's ToString() method.
-        /// </value>
-        public string TextMemberPath
-        {
-            get { return (string)GetValue(TextMemberPathProperty); }
-            set { SetValue(TextMemberPathProperty, value); }
-        }
+    /// <summary>
+    /// Identifies the <see cref="TextMemberPath"/> bindable property.
+    /// </summary>
+    public static readonly BindableProperty TextMemberPathProperty =
+        BindableProperty.Create(nameof(TextMemberPath), typeof(string), typeof(AutoCompleteEntry), string.Empty);
 
 
     /// <summary>
     /// Gets or sets the name or path of the property that is displayed for each data item.
     /// </summary>
     /// <value>
-    /// The name or path of the property that is displayed for each the data item in
-    /// the control. The default is an empty string ("").
+    /// The name or path of the property that is displayed for each the data item in the control.
+    /// The default is an empty string (""), which will use the item's ToString() method.
     /// </value>
     public string DisplayMemberPath
     {
-        get => (string)GetValue(DisplayMemberPathProperty);
-        set => SetValue(DisplayMemberPathProperty, value);
+        get { return (string)GetValue(DisplayMemberPathProperty); }
+        set { SetValue(DisplayMemberPathProperty, value); }
     }
 
-        /// <summary>
-        /// Gets or sets the name or path of the property that is displayed for each data item.
-        /// </summary>
-        /// <value>
-        /// The name or path of the property that is displayed for each the data item in the control.
-        /// The default is an empty string (""), which will use the item's ToString() method.
-        /// </value>
-        public string DisplayMemberPath
-        {
-            get { return (string)GetValue(DisplayMemberPathProperty); }
-            set { SetValue(DisplayMemberPathProperty, value); }
-        }
+    /// <summary>
+    /// Identifies the <see cref="DisplayMemberPath"/> bindable property.
+    /// </summary>
+    public static readonly BindableProperty DisplayMemberPathProperty =
+        BindableProperty.Create(nameof(DisplayMemberPath), typeof(string), typeof(AutoCompleteEntry), string.Empty);
 
 
     /// <summary>
