@@ -21,6 +21,7 @@
                                     DisplayMemberPath="Country"
                                     TextChanged="AutoCompleteEntry_TextChanged"
                                     SuggestionChosen="AutoCompleteEntry_SuggestionChosen"
+                                    Completed="AutoCompleteEntry_Completed"
                                     HeightRequest="50"/>
         
             <Frame BorderColor="Gray" 

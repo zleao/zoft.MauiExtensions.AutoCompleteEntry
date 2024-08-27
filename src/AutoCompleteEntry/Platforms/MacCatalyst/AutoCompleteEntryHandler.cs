@@ -32,6 +32,7 @@ namespace zoft.MauiExtensions.Controls.Handlers
             platformView.SuggestionChosen += AutoCompleteEntry_SuggestionChosen;
             platformView.EditingDidBegin += AutoCompleteEntry_EditingDidBegin;
             platformView.EditingDidEnd += AutoCompleteEntry_EditingDidEnd;
+            platformView.ShouldReturn += AutoCompleteEntry_ShouldReturn;
         }
 
         /// <inheritdoc/>
@@ -42,6 +43,7 @@ namespace zoft.MauiExtensions.Controls.Handlers
             platformView.SuggestionChosen -= AutoCompleteEntry_SuggestionChosen;
             platformView.EditingDidBegin -= AutoCompleteEntry_EditingDidBegin;
             platformView.EditingDidEnd -= AutoCompleteEntry_EditingDidEnd;
+            platformView.ShouldReturn -= AutoCompleteEntry_ShouldReturn;
 
             base.DisconnectHandler(platformView);
         }
@@ -90,12 +92,17 @@ namespace zoft.MauiExtensions.Controls.Handlers
             }
         }
 
-        /// <summary>
-		/// Map the background value
-		/// </summary>
-		/// <param name="handler"></param>
-		/// <param name="entry"></param>
-        public static void MapBackground(IAutoCompleteEntryHandler handler, IEntry entry)
+        private void AutoCompleteEntry_ShouldReturn(object sender, EventArgs e)
+        {
+            VirtualView?.SendCompleted();
+        }
+
+    /// <summary>
+    /// Map the background value
+    /// </summary>
+    /// <param name="handler"></param>
+    /// <param name="entry"></param>
+    public static void MapBackground(IAutoCompleteEntryHandler handler, IEntry entry)
         {
             handler.PlatformView?.InputTextField.UpdateBackground(entry);
         }

@@ -171,8 +171,8 @@ namespace zoft.MauiExtensions.Controls.Platform
                 DismissDropDown();
                 DismissKeyboard();
             }
-            else
-                base.OnEditorAction(actionCode);
+
+            base.OnEditorAction(actionCode);
         }
 
         /// <inheritdoc />
