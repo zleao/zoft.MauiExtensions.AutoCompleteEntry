@@ -17,12 +17,19 @@ namespace zoft.MauiExtensions.Controls.Handlers
 		/// <param name="entry"></param>
 		public static void MapBackground(IAutoCompleteEntryHandler handler, IEntry entry) { }
 
-		/// <summary>
-		/// Map the IsEnabled value
-		/// </summary>
-		/// <param name="handler"></param>
-		/// <param name="entry"></param>
-		public static void MapIsEnabled(IAutoCompleteEntryHandler handler, IEntry entry) { }
+        /// <summary>
+        /// Map the CursorPosition value
+        /// </summary>
+        /// <param name="handler"></param>
+        /// <param name="entry"></param>
+        public static void MapCursorPosition(IAutoCompleteEntryHandler handler, IEntry entry) { }
+
+        /// <summary>
+        /// Map the IsEnabled value
+        /// </summary>
+        /// <param name="handler"></param>
+        /// <param name="entry"></param>
+        public static void MapIsEnabled(IAutoCompleteEntryHandler handler, IEntry entry) { }
 
         /// <summary>
         /// Map the Text value

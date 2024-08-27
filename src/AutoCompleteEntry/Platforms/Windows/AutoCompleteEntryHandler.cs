@@ -1,4 +1,4 @@
-﻿using Microsoft.Maui.Handlers;
+using Microsoft.Maui.Handlers;
 using Microsoft.Maui.Platform;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Input;
@@ -97,6 +97,11 @@ namespace zoft.MauiExtensions.Controls.Handlers
         public static void MapBackground(IAutoCompleteEntryHandler handler, IEntry entry)
         {
             handler.PlatformView?.UpdateBackground(entry);
+        }
+
+        public static void MapCursorPosition(IAutoCompleteEntryHandler handler, IEntry entry)
+        {
+            // AutoSuggestBox does not support this property
         }
 
         /// <summary>

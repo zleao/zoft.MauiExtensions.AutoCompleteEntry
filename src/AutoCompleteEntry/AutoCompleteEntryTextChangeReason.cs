@@ -1,17 +1,16 @@
-﻿namespace zoft.MauiExtensions.Controls
+﻿namespace zoft.MauiExtensions.Controls;
+
+/// <summary>
+/// Provides data for the <see cref="AutoCompleteEntry.TextChanged"/> event.
+/// </summary>
+public enum AutoCompleteEntryTextChangeReason
 {
-    /// <summary>
-    /// Provides data for the <see cref="AutoCompleteEntry.TextChanged"/> event.
-    /// </summary>
-    public enum AutoCompleteEntryTextChangeReason
-    {
-        /// <summary>The user edited the text.</summary>
-        UserInput = 0,
+    /// <summary>The user edited the text.</summary>
+    UserInput = 0,
 
-        /// <summary>The text was changed via code.</summary>
-        ProgrammaticChange = 1,
+    /// <summary>The text was changed via code.</summary>
+    ProgrammaticChange = 1,
 
-        /// <summary>The user selected one of the items in the auto-suggestion box.</summary>
-        SuggestionChosen = 2
-    }
+    /// <summary>The user selected one of the items in the auto-suggestion box.</summary>
+    SuggestionChosen = 2
 }

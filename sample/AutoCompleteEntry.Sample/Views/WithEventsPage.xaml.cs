@@ -1,4 +1,4 @@
-﻿using AutoCompleteEntry.Sample.ViewModels;
+using AutoCompleteEntry.Sample.ViewModels;
 
 namespace AutoCompleteEntry.Sample.Views
 {
@@ -29,6 +29,11 @@ namespace AutoCompleteEntry.Sample.Views
         {
             // Set sender.Text. You can use args.SelectedItem to build your text string.
             ViewModel.SelectedItem = e.SelectedItem as ListItem;
+        }
+
+        private void AutoCompleteEntry_CursorPositionChanged(object sender, zoft.MauiExtensions.Controls.AutoCompleteEntryCursorPositionChangedEventArgs e)
+        {
+            ViewModel.CursorPosition = e.CursorPosition;
         }
 
         private void AutoCompleteEntry_Completed(object sender, EventArgs e)
