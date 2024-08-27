@@ -35,17 +35,17 @@ public static class AutoCompleteEntryExtensions
             androidAutoCompleteEntry.InputType |= InputTypes.TextFlagNoSuggestions;
     }
 
-        /// <summary>
-        /// Update the DisplayMemberPath
-        /// </summary>
-        /// <param name="androidAutoCompleteEntry"></param>
-        /// <param name="autoCompleteEntry"></param>
-        public static void UpdateDisplayMemberPath(this AndroidAutoCompleteEntry androidAutoCompleteEntry, AutoCompleteEntry autoCompleteEntry)
-        {
-            androidAutoCompleteEntry.SetItems(autoCompleteEntry.ItemsSource,
-                                              (o) => !string.IsNullOrEmpty(autoCompleteEntry?.DisplayMemberPath) ? o.GetPropertyValueAsString(autoCompleteEntry?.DisplayMemberPath) : o?.ToString(),
-                                              (o) => !string.IsNullOrEmpty(autoCompleteEntry?.TextMemberPath) ? o.GetPropertyValueAsString(autoCompleteEntry?.TextMemberPath) : o?.ToString());
-        }
+    /// <summary>
+    /// Update the DisplayMemberPath
+    /// </summary>
+    /// <param name="androidAutoCompleteEntry"></param>
+    /// <param name="autoCompleteEntry"></param>
+    public static void UpdateDisplayMemberPath(this AndroidAutoCompleteEntry androidAutoCompleteEntry, AutoCompleteEntry autoCompleteEntry)
+    {
+        androidAutoCompleteEntry.SetItems(autoCompleteEntry.ItemsSource,
+                                          (o) => !string.IsNullOrEmpty(autoCompleteEntry?.DisplayMemberPath) ? o.GetPropertyValueAsString(autoCompleteEntry?.DisplayMemberPath) : o?.ToString(),
+                                          (o) => !string.IsNullOrEmpty(autoCompleteEntry?.TextMemberPath) ? o.GetPropertyValueAsString(autoCompleteEntry?.TextMemberPath) : o?.ToString());
+    }
 
     /// <summary>
     /// Update the IsSuggestionListOpen
@@ -67,28 +67,27 @@ public static class AutoCompleteEntryExtensions
         androidAutoCompleteEntry.UpdateTextOnSelect = autoCompleteEntry.UpdateTextOnSelect;
     }
 
-        /// <summary>
-        /// Update the ItemsSource
-        /// </summary>
-        /// <param name="androidAutoCompleteEntry"></param>
-        /// <param name="autoCompleteEntry"></param>
-        public static void UpdateItemsSource(this AndroidAutoCompleteEntry androidAutoCompleteEntry, AutoCompleteEntry autoCompleteEntry)
-        {
-            androidAutoCompleteEntry.SetItems(autoCompleteEntry?.ItemsSource, 
-                                              (o) => !string.IsNullOrEmpty(autoCompleteEntry?.DisplayMemberPath) ? o.GetPropertyValueAsString(autoCompleteEntry?.DisplayMemberPath) : o?.ToString(),
-                                              (o) => !string.IsNullOrEmpty(autoCompleteEntry?.TextMemberPath) ? o.GetPropertyValueAsString(autoCompleteEntry?.TextMemberPath) : o?.ToString());
-        }
+    /// <summary>
+    /// Update the ItemsSource
+    /// </summary>
+    /// <param name="androidAutoCompleteEntry"></param>
+    /// <param name="autoCompleteEntry"></param>
+    public static void UpdateItemsSource(this AndroidAutoCompleteEntry androidAutoCompleteEntry, AutoCompleteEntry autoCompleteEntry)
+    {
+        androidAutoCompleteEntry.SetItems(autoCompleteEntry?.ItemsSource, 
+                                          (o) => !string.IsNullOrEmpty(autoCompleteEntry?.DisplayMemberPath) ? o.GetPropertyValueAsString(autoCompleteEntry?.DisplayMemberPath) : o?.ToString(),
+                                          (o) => !string.IsNullOrEmpty(autoCompleteEntry?.TextMemberPath) ? o.GetPropertyValueAsString(autoCompleteEntry?.TextMemberPath) : o?.ToString());
+    }
 
-        /// <summary>
-        /// Update the SelectedSuggestion
-        /// </summary>
-        /// <param name="androidAutoCompleteEntry"></param>
-        /// <param name="autoCompleteEntry"></param>
-        public static void UpdateSelectedSuggestion(this AndroidAutoCompleteEntry androidAutoCompleteEntry, AutoCompleteEntry autoCompleteEntry)
-        {
-            object o = autoCompleteEntry.SelectedSuggestion;
-            androidAutoCompleteEntry.Text = !string.IsNullOrEmpty(autoCompleteEntry.TextMemberPath) ? o.GetPropertyValueAsString(autoCompleteEntry.TextMemberPath) : o?.ToString();
-            androidAutoCompleteEntry.SetSelection(androidAutoCompleteEntry.Text?.Length ?? 0);
-        }
+    /// <summary>
+    /// Update the SelectedSuggestion
+    /// </summary>
+    /// <param name="androidAutoCompleteEntry"></param>
+    /// <param name="autoCompleteEntry"></param>
+    public static void UpdateSelectedSuggestion(this AndroidAutoCompleteEntry androidAutoCompleteEntry, AutoCompleteEntry autoCompleteEntry)
+    {
+        object o = autoCompleteEntry.SelectedSuggestion;
+        androidAutoCompleteEntry.Text = !string.IsNullOrEmpty(autoCompleteEntry.TextMemberPath) ? o.GetPropertyValueAsString(autoCompleteEntry.TextMemberPath) : o?.ToString();
+        androidAutoCompleteEntry.SetSelection(androidAutoCompleteEntry.Text?.Length ?? 0);
     }
 }

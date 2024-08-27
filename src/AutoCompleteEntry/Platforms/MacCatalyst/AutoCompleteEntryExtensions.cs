@@ -89,10 +89,10 @@ public static class AutoCompleteEntryExtensions
     /// <param name="autoCompleteEntry"></param>
     public static void UpdateDisplayMemberPath(this IOSAutoCompleteEntry iosAutoCompleteEntry, AutoCompleteEntry autoCompleteEntry)
     {
-        iosAutoCompleteEntry.SetItems(autoCompleteEntry.ItemsSource,
+        iosAutoCompleteEntry.SetItems(autoCompleteEntry.ItemsSource, 
                                       (o) => !string.IsNullOrEmpty(autoCompleteEntry?.DisplayMemberPath) ? o.GetPropertyValueAsString(autoCompleteEntry?.DisplayMemberPath) : o?.ToString(),
                                       (o) => !string.IsNullOrEmpty(autoCompleteEntry?.TextMemberPath) ? o.GetPropertyValueAsString(autoCompleteEntry?.TextMemberPath) : o?.ToString());
-    }
+        }
 
     /// <summary>
     /// Update the IsSuggestionListOpen
@@ -133,8 +133,7 @@ public static class AutoCompleteEntryExtensions
     /// <param name="autoCompleteEntry"></param>
     public static void UpdateSelectedSuggestion(this IOSAutoCompleteEntry iosAutoCompleteEntry, AutoCompleteEntry autoCompleteEntry)
     {
-        object o = autoCompleteEntry.SelectedSuggestion;
-        iosAutoCompleteEntry.Text = !string.IsNullOrEmpty(autoCompleteEntry.TextMemberPath) ? o.GetPropertyValueAsString(autoCompleteEntry.TextMemberPath) : o?.ToString();
+        var o = autoCompleteEntry.SelectedSuggestion;
+        iosAutoCompleteEntry.Text = !string.IsNullOrEmpty(autoCompleteEntry.TextMemberPath) ? o.GetPropertyValueAsString(autoCompleteEntry.TextMemberPath) : o?.ToString(); 
     }
-}
 }
