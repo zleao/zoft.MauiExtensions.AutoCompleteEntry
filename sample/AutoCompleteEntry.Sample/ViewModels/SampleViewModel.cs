@@ -1,6 +1,6 @@
-﻿using CommunityToolkit.Mvvm.ComponentModel;
+﻿using System.Collections.ObjectModel;
+using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
-using System.Collections.ObjectModel;
 using zoft.MauiExtensions.Core.ViewModels;
 
 namespace AutoCompleteEntry.Sample.ViewModels
@@ -8,48 +8,48 @@ namespace AutoCompleteEntry.Sample.ViewModels
     internal partial class ListItem : ObservableObject
     {
         [ObservableProperty]
-        public string _group;
+        private string _group;
 
         [ObservableProperty]
-        public string _country;
+        private string _country;
     }
 
     internal partial class SampleViewModel : CoreViewModel
     {
-        private readonly List<ListItem> Teams =
+        private readonly List<ListItem> _teams =
         [
-            new ListItem() { Group = "Group A", Country = "Ecuador" },
-            new ListItem() { Group = "Group A", Country = "Netherlands" },
-            new ListItem() { Group = "Group A", Country = "Qatar" },
-            new ListItem() { Group = "Group A", Country = "Senegal" },
-            new ListItem() { Group = "Group B", Country = "England" },
-            new ListItem() { Group = "Group B", Country = "Iran" },
-            new ListItem() { Group = "Group B", Country = "Usa" },
-            new ListItem() { Group = "Group B", Country = "Wales" },
-            new ListItem() { Group = "Group C", Country = "Argentina" },
-            new ListItem() { Group = "Group C", Country = "Mexico" },
-            new ListItem() { Group = "Group C", Country = "Poland" },
-            new ListItem() { Group = "Group C", Country = "Saudi Arabia" },
-            new ListItem() { Group = "Group D", Country = "Australia" },
-            new ListItem() { Group = "Group D", Country = "Denmark" },
-            new ListItem() { Group = "Group D", Country = "France" },
-            new ListItem() { Group = "Group D", Country = "Tunisia" },
-            new ListItem() { Group = "Group E", Country = "Costa Rica" },
-            new ListItem() { Group = "Group E", Country = "Germany" },
-            new ListItem() { Group = "Group E", Country = "Japan" },
-            new ListItem() { Group = "Group E", Country = "Spain" },
-            new ListItem() { Group = "Group F", Country = "Belgium" },
-            new ListItem() { Group = "Group F", Country = "Canada" },
-            new ListItem() { Group = "Group F", Country = "Croatia" },
-            new ListItem() { Group = "Group F", Country = "Morocco" },
-            new ListItem() { Group = "Group G", Country = "Brazil" },
-            new ListItem() { Group = "Group G", Country = "Cameroon" },
-            new ListItem() { Group = "Group G", Country = "Serbia" },
-            new ListItem() { Group = "Group G", Country = "Switzerland" },
-            new ListItem() { Group = "Group H", Country = "Ghana" },
-            new ListItem() { Group = "Group H", Country = "Portugal" },
-            new ListItem() { Group = "Group H", Country = "South Korea" },
-            new ListItem() { Group = "Group H", Country = "Uruguai" }
+            new ListItem { Group = "Group A", Country = "Ecuador" },
+            new ListItem { Group = "Group A", Country = "Netherlands" },
+            new ListItem { Group = "Group A", Country = "Qatar" },
+            new ListItem { Group = "Group A", Country = "Senegal" },
+            new ListItem { Group = "Group B", Country = "England" },
+            new ListItem { Group = "Group B", Country = "Iran" },
+            new ListItem { Group = "Group B", Country = "Usa" },
+            new ListItem { Group = "Group B", Country = "Wales" },
+            new ListItem { Group = "Group C", Country = "Argentina" },
+            new ListItem { Group = "Group C", Country = "Mexico" },
+            new ListItem { Group = "Group C", Country = "Poland" },
+            new ListItem { Group = "Group C", Country = "Saudi Arabia" },
+            new ListItem { Group = "Group D", Country = "Australia" },
+            new ListItem { Group = "Group D", Country = "Denmark" },
+            new ListItem { Group = "Group D", Country = "France" },
+            new ListItem { Group = "Group D", Country = "Tunisia" },
+            new ListItem { Group = "Group E", Country = "Costa Rica" },
+            new ListItem { Group = "Group E", Country = "Germany" },
+            new ListItem { Group = "Group E", Country = "Japan" },
+            new ListItem { Group = "Group E", Country = "Spain" },
+            new ListItem { Group = "Group F", Country = "Belgium" },
+            new ListItem { Group = "Group F", Country = "Canada" },
+            new ListItem { Group = "Group F", Country = "Croatia" },
+            new ListItem { Group = "Group F", Country = "Morocco" },
+            new ListItem { Group = "Group G", Country = "Brazil" },
+            new ListItem { Group = "Group G", Country = "Cameroon" },
+            new ListItem { Group = "Group G", Country = "Serbia" },
+            new ListItem { Group = "Group G", Country = "Switzerland" },
+            new ListItem { Group = "Group H", Country = "Ghana" },
+            new ListItem { Group = "Group H", Country = "Portugal" },
+            new ListItem { Group = "Group H", Country = "South Korea" },
+            new ListItem { Group = "Group H", Country = "Uruguai" }
         ];
 
         [ObservableProperty]
@@ -68,7 +68,7 @@ namespace AutoCompleteEntry.Sample.ViewModels
 
         public SampleViewModel()
         {
-            FilteredList = new(Teams);
+            FilteredList = new(_teams);
             SelectedItem = null;
 
             TextChangedCommand = new Command<string>(OnTextChanged);
@@ -81,7 +81,7 @@ namespace AutoCompleteEntry.Sample.ViewModels
             FilteredList.Clear();
             FilteredList = null;
             FilteredList = new ObservableCollection<ListItem>(
-                Teams.Where(t => t.Group.Contains(filter ?? "", StringComparison.CurrentCultureIgnoreCase) ||
+                _teams.Where(t => t.Group.Contains(filter ?? "", StringComparison.CurrentCultureIgnoreCase) ||
                                  t.Country.Contains(filter ?? "", StringComparison.CurrentCultureIgnoreCase)));
         }
 
@@ -91,7 +91,7 @@ namespace AutoCompleteEntry.Sample.ViewModels
         }
 
         [RelayCommand]
-        public void SetCursorPosition()
+        private void SetCursorPosition()
         {
             CursorPosition = NewCursorPosition;
         }

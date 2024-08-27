@@ -37,6 +37,7 @@
                                     TextMemberPath="Country"
                                     DisplayMemberPath="Country"
                                     TextChanged="AutoCompleteEntry_TextChanged"
+                                    CursorPosition="{Binding CursorPosition, Mode=TwoWay}"
                                     CursorPositionChanged="AutoCompleteEntry_CursorPositionChanged"
                                     SuggestionChosen="AutoCompleteEntry_SuggestionChosen"
                                     HeightRequest="50"/>
