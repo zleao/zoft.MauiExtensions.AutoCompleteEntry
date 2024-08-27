@@ -171,8 +171,8 @@ public sealed class AndroidAutoCompleteEntry : AppCompatAutoCompleteTextView
             DismissDropDown();
             DismissKeyboard();
         }
-        else
-            base.OnEditorAction(actionCode);
+
+        base.OnEditorAction(actionCode);
     }
 
     /// <inheritdoc />
