@@ -20,7 +20,7 @@ public partial class AutoCompleteEntryHandler : ViewHandler<AutoCompleteEntry, A
         platformView.TextChanged += AutoCompleteEntry_TextChanged;
         platformView.CursorPositionChanged += AutoCompleteEntry_CursorPositionChanged;
         platformView.SuggestionChosen += AutoCompleteEntry_SuggestionChosen;
-        platformView.EditorAction += OnEditorAction;
+        platformView.EditorAction += AutoCompleteEntry_EditorAction;
     }
 
     /// <inheritdoc/>
@@ -30,7 +30,7 @@ public partial class AutoCompleteEntryHandler : ViewHandler<AutoCompleteEntry, A
         platformView.TextChanged -= AutoCompleteEntry_TextChanged;
         platformView.CursorPositionChanged -= AutoCompleteEntry_CursorPositionChanged;
         platformView.SuggestionChosen -= AutoCompleteEntry_SuggestionChosen;
-        platformView.EditorAction -= OnEditorAction;    
+        platformView.EditorAction -= AutoCompleteEntry_EditorAction;    
 
         base.DisconnectHandler(platformView);
     }
@@ -50,6 +50,47 @@ public partial class AutoCompleteEntryHandler : ViewHandler<AutoCompleteEntry, A
         VirtualView?.OnSuggestionSelected(e.SelectedItem);
     }
 
+    // Note: this is copied from MAUI's EntryHandler.Android.cs > OnEditorAction
+    private void AutoCompleteEntry_EditorAction(object sender, Android.Widget.TextView.EditorActionEventArgs e)
+    {
+        var returnType = VirtualView?.ReturnType;
+
+        // Inside of the android implementations that map events to listeners, the default return value for "Handled" is always true
+        // This means, just by subscribing to EditorAction/KeyPressed/etc.. you change the behavior of the control
+        // So, we are setting handled to false here in order to maintain default behavior
+        bool handled = false;
+        if (returnType != null)
+        {
+            var actionId = e.ActionId;
+            var evt = e.Event;
+            ImeAction currentInputImeFlag = PlatformView.ImeOptions;
+
+            // On API 34 it looks like they fixed the issue where the actionId is ImeAction.ImeNull when using a keyboard
+            // so I'm just setting the actionId here to the current ImeOptions so the logic can all be simplified
+            if (actionId == ImeAction.ImeNull && evt?.KeyCode == Keycode.Enter)
+            {
+                actionId = currentInputImeFlag;
+            }
+
+            // keyboard path
+            if (evt?.KeyCode == Keycode.Enter && evt?.Action == KeyEventActions.Down)
+            {
+                handled = true;
+            }
+            else if (evt?.KeyCode == Keycode.Enter && evt?.Action == KeyEventActions.Up)
+            {
+                VirtualView?.SendCompleted();
+            }
+            // InputPaneView Path
+            else if (evt?.KeyCode is null && (actionId == ImeAction.Done || actionId == currentInputImeFlag))
+            {
+                VirtualView?.SendCompleted();
+            }
+        }
+
+        e.Handled = handled;
+    }
+
     private void OnLoaded(object sender, Android.Views.View.ViewAttachedToWindowEventArgs e)
     {
         PlatformView.UpdateTextColor(VirtualView);
@@ -65,56 +106,15 @@ public partial class AutoCompleteEntryHandler : ViewHandler<AutoCompleteEntry, A
         PlatformView.UpdateItemsSource(VirtualView);
     }
 
-        // Note: this is copied from MAUI's EntryHandler.Android.cs > OnEditorAction
-        private void OnEditorAction(object sender, Android.Widget.TextView.EditorActionEventArgs e)
-        {
-            var returnType = VirtualView?.ReturnType;
-
-            // Inside of the android implementations that map events to listeners, the default return value for "Handled" is always true
-            // This means, just by subscribing to EditorAction/KeyPressed/etc.. you change the behavior of the control
-            // So, we are setting handled to false here in order to maintain default behavior
-            bool handled = false;
-            if (returnType != null)
-            {
-                var actionId = e.ActionId;
-                var evt = e.Event;
-                ImeAction currentInputImeFlag = PlatformView.ImeOptions;
-
-                // On API 34 it looks like they fixed the issue where the actionId is ImeAction.ImeNull when using a keyboard
-                // so I'm just setting the actionId here to the current ImeOptions so the logic can all be simplified
-                if (actionId == ImeAction.ImeNull && evt?.KeyCode == Keycode.Enter)
-                {
-                    actionId = currentInputImeFlag;
-                }
-
-                // keyboard path
-                if (evt?.KeyCode == Keycode.Enter && evt?.Action == KeyEventActions.Down)
-                {
-                    handled = true;
-                }
-                else if (evt?.KeyCode == Keycode.Enter && evt?.Action == KeyEventActions.Up)
-                {
-                    VirtualView?.SendCompleted();
-                }
-                // InputPaneView Path
-                else if (evt?.KeyCode is null && (actionId == ImeAction.Done || actionId == currentInputImeFlag))
-                {
-                    VirtualView?.SendCompleted();
-                }
-            }
-
-            e.Handled = handled;
-        }
-
-        /// <summary>
-        /// Map the Background value
-        /// </summary>
-        /// <param name="handler"></param>
-        /// <param name="entry"></param>
-        public static void MapBackground(IAutoCompleteEntryHandler handler, IEntry entry)
-        {
-            handler.PlatformView?.UpdateBackground(entry);
-        }
+    /// <summary>
+    /// Map the Background value
+    /// </summary>
+    /// <param name="handler"></param>
+    /// <param name="entry"></param>
+    public static void MapBackground(IAutoCompleteEntryHandler handler, IEntry entry)
+    {
+        handler.PlatformView?.UpdateBackground(entry);
+    }
 
     /// <summary>
     /// Map the CursorPosition value

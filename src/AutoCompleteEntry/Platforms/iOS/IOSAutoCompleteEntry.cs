@@ -41,6 +41,8 @@ public sealed class IOSAutoCompleteEntry : UIView
     private Func<object, string> _textFunc;
     private CoreAnimation.CALayer _border;
     private bool _showBottomBorder = true;
+    private readonly NSObject _keyboardShownObserverToken;
+    private readonly NSObject _keyboardHiddenObserverToken;
 
     /// <summary>
     /// Gets a reference to the text field in the view
@@ -133,8 +135,20 @@ public sealed class IOSAutoCompleteEntry : UIView
 
         SelectionList = new UITableView { TranslatesAutoresizingMaskIntoConstraints = false };
 
-        UIKeyboard.Notifications.ObserveDidShow(OnKeyboardShow);
-        UIKeyboard.Notifications.ObserveWillHide(OnKeyboardHide);
+        _keyboardShownObserverToken = UIKeyboard.Notifications.ObserveDidShow(OnKeyboardShow);
+        _keyboardHiddenObserverToken = UIKeyboard.Notifications.ObserveWillHide(OnKeyboardHide);
+    }
+
+    public void FreeResources()
+    {
+        InputTextField.EditingDidBegin -= InputText_OnEditingDidBegin;
+        InputTextField.EditingDidEnd -= InputText_OnEditingDidEnd;
+        InputTextField.EditingChanged -= InputText_OnEditingChanged;
+        InputTextField.SelectedTextRangeChanged -= InputText_OnTextRangeChanged;
+        InputTextField.ShouldReturn -= InputText_OnShouldReturn;
+
+        _keyboardShownObserverToken?.Dispose();
+        _keyboardHiddenObserverToken?.Dispose();
     }
 
     /// <summary>

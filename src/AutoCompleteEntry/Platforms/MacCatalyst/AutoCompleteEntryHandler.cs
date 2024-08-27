@@ -1,3 +1,4 @@
+using Microsoft.Maui.Controls.Platform;
 using Microsoft.Maui.Handlers;
 using Microsoft.Maui.Platform;
 using zoft.MauiExtensions.Controls.Platform;
@@ -28,28 +29,27 @@ public partial class AutoCompleteEntryHandler : ViewHandler<AutoCompleteEntry, I
 
         platformView.OnLoaded += AutoCompleteEntry_OnLoaded;
         platformView.TextChanged += AutoCompleteEntry_TextChanged;
-        platformView.CursorPositionChanged += InputTextFieldOnCursorPositionChanged;
+        platformView.CursorPositionChanged += AutoCompleteEntry_CursorPositionChanged;
         platformView.SuggestionChosen += AutoCompleteEntry_SuggestionChosen;
         platformView.EditingDidBegin += AutoCompleteEntry_EditingDidBegin;
         platformView.EditingDidEnd += AutoCompleteEntry_EditingDidEnd;
         platformView.ShouldReturn += AutoCompleteEntry_ShouldReturn;
     }
 
-    private void InputTextFieldOnCursorPositionChanged(object sender, AutoCompleteEntryCursorPositionChangedEventArgs e)
-    {
-        VirtualView?.OnCursorPositionChanged(e.CursorPosition);
-    }
+
 
     /// <inheritdoc/>
     protected override void DisconnectHandler(IOSAutoCompleteEntry platformView)
     {
         platformView.OnLoaded -= AutoCompleteEntry_OnLoaded;
         platformView.TextChanged -= AutoCompleteEntry_TextChanged;
-        platformView.CursorPositionChanged -= InputTextFieldOnCursorPositionChanged;
+        platformView.CursorPositionChanged -= AutoCompleteEntry_CursorPositionChanged;
         platformView.SuggestionChosen -= AutoCompleteEntry_SuggestionChosen;
         platformView.EditingDidBegin -= AutoCompleteEntry_EditingDidBegin;
         platformView.EditingDidEnd -= AutoCompleteEntry_EditingDidEnd;
         platformView.ShouldReturn -= AutoCompleteEntry_ShouldReturn;
+
+        platformView.FreeResources();
 
         base.DisconnectHandler(platformView);
     }
@@ -72,6 +72,11 @@ public partial class AutoCompleteEntryHandler : ViewHandler<AutoCompleteEntry, I
     private void AutoCompleteEntry_TextChanged(object sender, AutoCompleteEntryTextChangedEventArgs e)
     {
         VirtualView.OnTextChanged(PlatformView.Text, e.Reason);
+    }
+
+    private void AutoCompleteEntry_CursorPositionChanged(object sender, AutoCompleteEntryCursorPositionChangedEventArgs e)
+    {
+        VirtualView?.OnCursorPositionChanged(e.CursorPosition);
     }
 
     private void AutoCompleteEntry_SuggestionChosen(object sender, AutoCompleteEntrySuggestionChosenEventArgs e)
