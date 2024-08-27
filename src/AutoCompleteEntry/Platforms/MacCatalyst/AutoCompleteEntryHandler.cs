@@ -1,4 +1,4 @@
-﻿using Microsoft.Maui.Handlers;
+using Microsoft.Maui.Handlers;
 using Microsoft.Maui.Platform;
 using zoft.MauiExtensions.Controls.Platform;
 
@@ -32,6 +32,7 @@ public partial class AutoCompleteEntryHandler : ViewHandler<AutoCompleteEntry, I
         platformView.SuggestionChosen += AutoCompleteEntry_SuggestionChosen;
         platformView.EditingDidBegin += AutoCompleteEntry_EditingDidBegin;
         platformView.EditingDidEnd += AutoCompleteEntry_EditingDidEnd;
+        platformView.ShouldReturn += AutoCompleteEntry_ShouldReturn;
     }
 
     private void InputTextFieldOnCursorPositionChanged(object sender, AutoCompleteEntryCursorPositionChangedEventArgs e)
@@ -48,6 +49,7 @@ public partial class AutoCompleteEntryHandler : ViewHandler<AutoCompleteEntry, I
         platformView.SuggestionChosen -= AutoCompleteEntry_SuggestionChosen;
         platformView.EditingDidBegin -= AutoCompleteEntry_EditingDidBegin;
         platformView.EditingDidEnd -= AutoCompleteEntry_EditingDidEnd;
+        platformView.ShouldReturn -= AutoCompleteEntry_ShouldReturn;
 
         base.DisconnectHandler(platformView);
     }
@@ -85,6 +87,11 @@ public partial class AutoCompleteEntryHandler : ViewHandler<AutoCompleteEntry, I
     private void AutoCompleteEntry_EditingDidEnd(object sender, EventArgs e)
     {
         VirtualView.Unfocus();
+    }
+
+    private void AutoCompleteEntry_ShouldReturn(object sender, EventArgs e)
+    {
+        VirtualView?.SendCompleted();
     }
 
     /// <summary>

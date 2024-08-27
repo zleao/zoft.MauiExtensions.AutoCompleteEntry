@@ -1,4 +1,4 @@
-﻿using CoreGraphics;
+using CoreGraphics;
 using Foundation;
 using ObjCRuntime;
 using System.Collections;
@@ -33,6 +33,8 @@ public sealed class IOSAutoCompleteEntry : UIView
     internal EventHandler EditingDidBegin;
 
     internal EventHandler EditingDidEnd;
+
+    internal EventHandler ShouldReturn;
 
     private nfloat _keyboardHeight;
     private NSLayoutConstraint _bottomConstraint;
@@ -120,8 +122,9 @@ public sealed class IOSAutoCompleteEntry : UIView
         InputTextField.EditingDidEnd += InputText_OnEditingDidEnd;
         InputTextField.EditingChanged += InputText_OnEditingChanged;
         InputTextField.SelectedTextRangeChanged += InputText_OnTextRangeChanged;
-            
-        AddSubview(InputTextField);
+        InputTextField.ShouldReturn += InputText_OnShouldReturn;
+
+        AddSubview(InputTextField);    
 
         InputTextField.TopAnchor.ConstraintEqualTo(TopAnchor).Active = true;
         InputTextField.LeftAnchor.ConstraintEqualTo(LeftAnchor).Active = true;
@@ -202,6 +205,12 @@ public sealed class IOSAutoCompleteEntry : UIView
         var cp = InputTextField.GetOffsetFromPosition(InputTextField.BeginningOfDocument, InputTextField.SelectedTextRange?.Start ?? InputTextField.EndOfDocument).ToInt32();
             
         CursorPositionChanged?.Invoke(this, new AutoCompleteEntryCursorPositionChangedEventArgs(cp));
+    }
+
+    private bool InputText_OnShouldReturn(UITextField view)
+    {
+        ShouldReturn?.Invoke(this, EventArgs.Empty);
+        return false;
     }
         
     /// <inheritdoc />

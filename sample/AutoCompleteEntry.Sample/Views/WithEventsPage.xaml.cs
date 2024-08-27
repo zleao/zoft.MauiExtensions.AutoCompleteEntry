@@ -1,4 +1,4 @@
-﻿using AutoCompleteEntry.Sample.ViewModels;
+using AutoCompleteEntry.Sample.ViewModels;
 
 namespace AutoCompleteEntry.Sample.Views
 {
@@ -34,6 +34,14 @@ namespace AutoCompleteEntry.Sample.Views
         private void AutoCompleteEntry_CursorPositionChanged(object sender, zoft.MauiExtensions.Controls.AutoCompleteEntryCursorPositionChangedEventArgs e)
         {
             ViewModel.CursorPosition = e.CursorPosition;
+        }
+
+        private void AutoCompleteEntry_Completed(object sender, EventArgs e)
+        {
+            if (sender is zoft.MauiExtensions.Controls.AutoCompleteEntry autoCompleteEntry)
+            {
+                ViewModel.SelectedItem = ViewModel.GetExactMatch(autoCompleteEntry.Text);
+            }
         }
     }
 }

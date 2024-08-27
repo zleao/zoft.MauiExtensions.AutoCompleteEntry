@@ -40,6 +40,7 @@
                                     CursorPosition="{Binding CursorPosition, Mode=TwoWay}"
                                     CursorPositionChanged="AutoCompleteEntry_CursorPositionChanged"
                                     SuggestionChosen="AutoCompleteEntry_SuggestionChosen"
+                                    Completed="AutoCompleteEntry_Completed"
                                     HeightRequest="50"/>
         
             <Frame BorderColor="Gray" 

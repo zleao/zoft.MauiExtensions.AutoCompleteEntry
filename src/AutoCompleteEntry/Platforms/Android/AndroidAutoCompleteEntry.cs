@@ -1,4 +1,4 @@
-﻿using System.Collections;
+using System.Collections;
 using Android.Content;
 using Android.Runtime;
 using Android.Text;

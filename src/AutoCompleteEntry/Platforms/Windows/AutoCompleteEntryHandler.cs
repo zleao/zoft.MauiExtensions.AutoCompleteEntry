@@ -1,6 +1,8 @@
 using Microsoft.Maui.Handlers;
 using Microsoft.Maui.Platform;
 using Microsoft.UI.Xaml.Controls;
+using Microsoft.UI.Xaml.Input;
+using Windows.System;
 using zoft.MauiExtensions.Controls.Platform;
 
 namespace zoft.MauiExtensions.Controls.Handlers
@@ -21,7 +23,7 @@ namespace zoft.MauiExtensions.Controls.Handlers
             platformView.TextChanged += AutoSuggestBox_TextChanged;
             platformView.SuggestionChosen += AutoSuggestBox_SuggestionChosen;
             platformView.GotFocus += Control_GotFocus;
-
+            platformView.KeyUp += OnPlatformKeyUp;
         }
 
         /// <inheritdoc/>
@@ -31,6 +33,7 @@ namespace zoft.MauiExtensions.Controls.Handlers
             platformView.TextChanged -= AutoSuggestBox_TextChanged;
             platformView.SuggestionChosen -= AutoSuggestBox_SuggestionChosen;
             platformView.GotFocus -= Control_GotFocus;
+            platformView.KeyUp -= OnPlatformKeyUp;
 
             base.DisconnectHandler(platformView);
         }
@@ -70,6 +73,20 @@ namespace zoft.MauiExtensions.Controls.Handlers
             {
                 PlatformView.IsSuggestionListOpen = true;
             }
+        }
+
+        // Note: this is copied from MAUI's EntryHandler.Windows.cs > OnPlatformKeyUp
+        void OnPlatformKeyUp(object sender, KeyRoutedEventArgs args)
+        {
+            if (args?.Key != VirtualKey.Enter)
+                return;
+
+            if (VirtualView?.ReturnType == ReturnType.Next)
+            {
+                PlatformView?.TryMoveFocus(FocusNavigationDirection.Next);
+            }
+
+            VirtualView?.SendCompleted();
         }
 
         /// <summary>

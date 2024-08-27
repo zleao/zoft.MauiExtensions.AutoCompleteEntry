@@ -1,4 +1,4 @@
-﻿using System.Collections.ObjectModel;
+using System.Collections.ObjectModel;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using zoft.MauiExtensions.Core.ViewModels;
@@ -83,6 +83,11 @@ namespace AutoCompleteEntry.Sample.ViewModels
             FilteredList = new ObservableCollection<ListItem>(
                 _teams.Where(t => t.Group.Contains(filter ?? "", StringComparison.CurrentCultureIgnoreCase) ||
                                  t.Country.Contains(filter ?? "", StringComparison.CurrentCultureIgnoreCase)));
+        }
+
+        public ListItem GetExactMatch(string text)
+        {
+            return Teams.FirstOrDefault(t => t.Country.Equals(text, StringComparison.CurrentCultureIgnoreCase));
         }
 
         private void OnTextChanged(string text)
