@@ -160,6 +160,16 @@ public partial class AutoCompleteEntryHandler : ViewHandler<AutoCompleteEntry, A
     }
 
     /// <summary>
+    /// Map the HorizontalTextAlignment value
+    /// </summary>
+    /// <param name="handler"></param>
+    /// <param name="autoCompleteEntry"></param>
+    public static void MapHorizontalTextAlignment(IAutoCompleteEntryHandler handler, AutoCompleteEntry autoCompleteEntry)
+    {
+        handler.PlatformView?.UpdateHorizontalTextAlignment(autoCompleteEntry);
+    }
+
+    /// <summary>
     /// Map the IsEnabled value
     /// </summary>
     /// <param name="handler"></param>
