@@ -11,10 +11,10 @@
     <PackageProjectUrl>https://github.com/zleao/zoft.MauiExtensions.AutoCompleteEntry</PackageProjectUrl>
     <Product>$(AssemblyName) ($(TargetFramework))</Product>
     <NeutralLanguage>en</NeutralLanguage>
-    <Version>3.0.5</Version>
+    <Version>3.0.6</Version>
     <Description>.Net MAUI Entry control that provides a list of suggestions as the user types.</Description>
     <PackageTags>net8 maui zoft AutoCompleteEntry AutoCompleteBox AutoCompleteView AutoComplete</PackageTags>
-    <PackageReleaseNotes>Add support for CursorPosition value and Complete event</PackageReleaseNotes>
+    <PackageReleaseNotes>Add support for ClearButtonVisibility</PackageReleaseNotes>
     <PackageReadmeFile>README.md</PackageReadmeFile>
 
     <LangVersion>latest</LangVersion>

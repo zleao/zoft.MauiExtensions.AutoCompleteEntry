@@ -1,4 +1,3 @@
-using System.Collections;
 using Android.Content;
 using Android.Runtime;
 using Android.Text;
@@ -8,6 +7,7 @@ using Android.Widget;
 using AndroidX.AppCompat.Widget;
 using Java.Lang;
 using Microsoft.Maui.Platform;
+using System.Collections;
 using Color = Microsoft.Maui.Graphics.Color;
 
 namespace zoft.MauiExtensions.Controls.Platform;
@@ -38,6 +38,12 @@ public sealed class AndroidAutoCompleteEntry : AppCompatAutoCompleteTextView
         ItemClick += OnItemClick;
 
         Adapter = _adapter = new AutoCompleteAdapter(Context, global::Android.Resource.Layout.SimpleDropDownItem1Line);
+    }
+
+    public void FreeResources()
+    {
+        ItemClick -= OnItemClick;
+        _adapter?.Dispose();
     }
 
     // Setting Threshold = 0 in the constructor does not allow the control to display suggestions when the Text property is null or empty.
@@ -161,6 +167,11 @@ public sealed class AndroidAutoCompleteEntry : AppCompatAutoCompleteTextView
             TextChanged?.Invoke(this, new AutoCompleteEntryTextChangedEventArgs(AutoCompleteEntryTextChangeReason.SuggestionChosen));
         }
         SuggestionChosen?.Invoke(this, new AutoCompleteEntrySuggestionChosenEventArgs(obj));
+    }
+
+    private void OnClick(object sender, EventArgs e)
+    {
+        Text = string.Empty;
     }
 
     /// <inheritdoc />
