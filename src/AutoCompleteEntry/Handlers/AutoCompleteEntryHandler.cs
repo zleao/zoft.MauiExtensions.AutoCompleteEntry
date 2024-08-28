@@ -27,26 +27,26 @@ public partial class AutoCompleteEntryHandler : IAutoCompleteEntryHandler
 			[nameof(IEntry.IsEnabled)] = MapIsEnabled,
 #endif
 			[nameof(IEntry.Background)] = MapBackground,
+            [nameof(IEntry.CharacterSpacing)] = MapCharacterSpacing,
             [nameof(IEntry.ClearButtonVisibility)] = MapClearButtonVisibility,
 			[nameof(IEntry.CursorPosition)] = MapCursorPosition,
-            [nameof(IEntry.CharacterSpacing)] = MapCharacterSpacing,
-			[nameof(IEntry.Font)] = MapFont,
+            [nameof(AutoCompleteEntry.DisplayMemberPath)] = MapDisplayMemberPath,
+            [nameof(IEntry.Font)] = MapFont,
 			[nameof(ITextAlignment.HorizontalTextAlignment)] = MapHorizontalTextAlignment,
-			[nameof(ITextAlignment.VerticalTextAlignment)] = MapVerticalTextAlignment,
-			[nameof(IEntry.IsReadOnly)] = MapIsReadOnly,
-			[nameof(IEntry.IsTextPredictionEnabled)] = MapIsTextPredictionEnabled,
-			[nameof(IEntry.MaxLength)] = MapMaxLength,
+            [nameof(IEntry.IsReadOnly)] = MapIsReadOnly,
+            [nameof(AutoCompleteEntry.IsSuggestionListOpen)] = MapIsSuggestionListOpen,
+            [nameof(IEntry.IsTextPredictionEnabled)] = MapIsTextPredictionEnabled,
+            [nameof(AutoCompleteEntry.ItemsSource)] = MapItemsSource,
+            [nameof(IEntry.MaxLength)] = MapMaxLength,
 			[nameof(IEntry.Placeholder)] = MapPlaceholder,
 			[nameof(IEntry.PlaceholderColor)] = MapPlaceholderColor,
-			[nameof(IEntry.Text)] = MapText,
+            [nameof(AutoCompleteEntry.SelectedSuggestion)] = MapSelectedSuggestion,
+            [nameof(IEntry.Text)] = MapText,
 			[nameof(IEntry.TextColor)] = MapTextColor,
 			[nameof(AutoCompleteEntry.TextMemberPath)] = MapTextMemberPath,
-			[nameof(AutoCompleteEntry.DisplayMemberPath)] = MapDisplayMemberPath,
-			[nameof(AutoCompleteEntry.IsSuggestionListOpen)] = MapIsSuggestionListOpen,
 			[nameof(AutoCompleteEntry.UpdateTextOnSelect)] = MapUpdateTextOnSelect,
-			[nameof(AutoCompleteEntry.ItemsSource)] = MapItemsSource,
-			[nameof(AutoCompleteEntry.SelectedSuggestion)] = MapSelectedSuggestion
-		};
+            [nameof(ITextAlignment.VerticalTextAlignment)] = MapVerticalTextAlignment
+        };
 
 	/// <summary>
 	/// Command Mapper dictionary
