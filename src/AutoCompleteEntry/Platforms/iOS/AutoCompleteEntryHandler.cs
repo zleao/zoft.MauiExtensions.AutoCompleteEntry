@@ -124,7 +124,10 @@ public partial class AutoCompleteEntryHandler : ViewHandler<AutoCompleteEntry, I
     /// </summary>
     /// <param name="handler"></param>
     /// <param name="entry"></param>
-    public static void MapClearButtonVisibility(IAutoCompleteEntryHandler handler, IEntry entry) { }
+    public static void MapClearButtonVisibility(IAutoCompleteEntryHandler handler, IEntry entry)
+    {
+        handler.PlatformView?.InputTextField.UpdateClearButtonVisibility(entry);
+    }
 
     /// <summary>
     /// Map the CursorPosition value
