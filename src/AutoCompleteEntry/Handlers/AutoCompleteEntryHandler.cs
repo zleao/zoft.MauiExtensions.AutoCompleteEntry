@@ -27,8 +27,9 @@ public partial class AutoCompleteEntryHandler : IAutoCompleteEntryHandler
 			[nameof(IEntry.IsEnabled)] = MapIsEnabled,
 #endif
 			[nameof(IEntry.Background)] = MapBackground,
+            [nameof(IEntry.ClearButtonVisibility)] = MapClearButtonVisibility,
 			[nameof(IEntry.CursorPosition)] = MapCursorPosition,
-			[nameof(IEntry.CharacterSpacing)] = MapCharacterSpacing,
+            [nameof(IEntry.CharacterSpacing)] = MapCharacterSpacing,
 			[nameof(IEntry.Font)] = MapFont,
 			[nameof(ITextAlignment.HorizontalTextAlignment)] = MapHorizontalTextAlignment,
 			[nameof(ITextAlignment.VerticalTextAlignment)] = MapVerticalTextAlignment,

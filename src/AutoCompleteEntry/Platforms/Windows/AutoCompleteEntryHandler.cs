@@ -12,36 +12,59 @@ namespace zoft.MauiExtensions.Controls.Handlers
         /// <inheritdoc/>
         protected override AutoSuggestBox CreatePlatformView() => new()
         {
-            AutoMaximizeSuggestionArea = false,
-            //QueryIcon = new SymbolIcon(Symbol.Find),
+            AutoMaximizeSuggestionArea = false
         };
 
         /// <inheritdoc/>
         protected override void ConnectHandler(AutoSuggestBox platformView)
         {
-            platformView.Loaded += OnLoaded;
-            platformView.TextChanged += AutoSuggestBox_TextChanged;
-            platformView.SuggestionChosen += AutoSuggestBox_SuggestionChosen;
-            platformView.GotFocus += Control_GotFocus;
-            platformView.KeyUp += OnPlatformKeyUp;
+            platformView.GotFocus += PlatformView_OnGotFocus;
+            platformView.KeyUp += PlatformView_OnKeyUp;
+            platformView.Loaded += PlatformView_OnLoaded;
+            platformView.SuggestionChosen += PlatformView_OnSuggestionChosen;
+            platformView.TextChanged += PlatformView_OnTextChanged;
         }
 
         /// <inheritdoc/>
         protected override void DisconnectHandler(AutoSuggestBox platformView)
         {
-            platformView.Loaded -= OnLoaded;
-            platformView.TextChanged -= AutoSuggestBox_TextChanged;
-            platformView.SuggestionChosen -= AutoSuggestBox_SuggestionChosen;
-            platformView.GotFocus -= Control_GotFocus;
-            platformView.KeyUp -= OnPlatformKeyUp;
+            platformView.GotFocus -= PlatformView_OnGotFocus;
+            platformView.KeyUp -= PlatformView_OnKeyUp;
+            platformView.Loaded -= PlatformView_OnLoaded;
+            platformView.SuggestionChosen -= PlatformView_OnSuggestionChosen;
+            platformView.TextChanged -= PlatformView_OnTextChanged;
 
             base.DisconnectHandler(platformView);
         }
 
-        private void OnLoaded(object sender, Microsoft.UI.Xaml.RoutedEventArgs e)
+
+        private void PlatformView_OnGotFocus(object sender, Microsoft.UI.Xaml.RoutedEventArgs e)
+        {
+            if (VirtualView?.ItemsSource?.Count > 0)
+            {
+                PlatformView.IsSuggestionListOpen = true;
+            }
+        }
+
+        // Note: this is copied from MAUI's EntryHandler.Windows.cs > OnPlatformKeyUp
+        private void PlatformView_OnKeyUp(object sender, KeyRoutedEventArgs args)
+        {
+            if (args?.Key != VirtualKey.Enter)
+                return;
+
+            if (VirtualView?.ReturnType == ReturnType.Next)
+            {
+                PlatformView?.TryMoveFocus(FocusNavigationDirection.Next);
+            }
+
+            VirtualView?.SendCompleted();
+        }
+
+        private void PlatformView_OnLoaded(object sender, Microsoft.UI.Xaml.RoutedEventArgs e)
         {
             if (VirtualView != null)
             {
+                PlatformView?.UpdateClearButtonVisibility(VirtualView);
                 PlatformView?.UpdateTextColor(VirtualView);
                 PlatformView?.UpdatePlaceholder(VirtualView);
                 PlatformView?.UpdatePlaceholderColor(VirtualView);
@@ -57,37 +80,16 @@ namespace zoft.MauiExtensions.Controls.Handlers
             }
         }
 
-        private void AutoSuggestBox_TextChanged(object sender, AutoSuggestBoxTextChangedEventArgs e)
-        {
-            VirtualView?.OnTextChanged(PlatformView.Text, (AutoCompleteEntryTextChangeReason)e.Reason);
-        }
-
-        private void AutoSuggestBox_SuggestionChosen(object sender, AutoSuggestBoxSuggestionChosenEventArgs e)
+        private void PlatformView_OnSuggestionChosen(object sender, AutoSuggestBoxSuggestionChosenEventArgs e)
         {
             VirtualView?.OnSuggestionSelected(e.SelectedItem);
         }
 
-        private void Control_GotFocus(object sender, Microsoft.UI.Xaml.RoutedEventArgs e)
+        private void PlatformView_OnTextChanged(object sender, AutoSuggestBoxTextChangedEventArgs e)
         {
-            if (VirtualView?.ItemsSource?.Count > 0)
-            {
-                PlatformView.IsSuggestionListOpen = true;
-            }
+            VirtualView?.OnTextChanged(PlatformView.Text, (AutoCompleteEntryTextChangeReason)e.Reason);
         }
 
-        // Note: this is copied from MAUI's EntryHandler.Windows.cs > OnPlatformKeyUp
-        void OnPlatformKeyUp(object sender, KeyRoutedEventArgs args)
-        {
-            if (args?.Key != VirtualKey.Enter)
-                return;
-
-            if (VirtualView?.ReturnType == ReturnType.Next)
-            {
-                PlatformView?.TryMoveFocus(FocusNavigationDirection.Next);
-            }
-
-            VirtualView?.SendCompleted();
-        }
 
         /// <summary>
         /// Map the Background value
@@ -99,6 +101,21 @@ namespace zoft.MauiExtensions.Controls.Handlers
             handler.PlatformView?.UpdateBackground(entry);
         }
 
+        /// <summary>
+        /// Map the ClearButtonVisibility value
+        /// </summary>
+        /// <param name="handler"></param>
+        /// <param name="entry"></param>
+        public static void MapClearButtonVisibility(IAutoCompleteEntryHandler handler, AutoCompleteEntry autoCompleteEntry) 
+        {
+            handler.PlatformView?.UpdateClearButtonVisibility(autoCompleteEntry);
+        }
+
+        /// <summary>
+        /// Map the CursorPosition value
+        /// </summary>
+        /// <param name="handler"></param>
+        /// <param name="entry"></param>
         public static void MapCursorPosition(IAutoCompleteEntryHandler handler, IEntry entry)
         {
             // AutoSuggestBox does not support this property

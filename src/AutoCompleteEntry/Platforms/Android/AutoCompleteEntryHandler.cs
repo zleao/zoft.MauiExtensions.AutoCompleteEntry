@@ -1,5 +1,7 @@
+using Android.Graphics.Drawables;
 using Android.Views;
 using Android.Views.InputMethods;
+using AndroidX.Core.Content;
 using Microsoft.Maui.Handlers;
 using Microsoft.Maui.Platform;
 using zoft.MauiExtensions.Controls.Platform;
@@ -8,6 +10,11 @@ namespace zoft.MauiExtensions.Controls.Handlers;
 
 public partial class AutoCompleteEntryHandler : ViewHandler<AutoCompleteEntry, AndroidAutoCompleteEntry>
 {
+    Drawable _clearButtonDrawable;
+    bool _clearButtonVisible;
+
+   
+
     /// <inheritdoc/>
     protected override AndroidAutoCompleteEntry CreatePlatformView() => new(Context);
 
@@ -16,42 +23,37 @@ public partial class AutoCompleteEntryHandler : ViewHandler<AutoCompleteEntry, A
     {
         base.ConnectHandler(platformView);
 
-        platformView.ViewAttachedToWindow += OnLoaded;
-        platformView.TextChanged += AutoCompleteEntry_TextChanged;
-        platformView.CursorPositionChanged += AutoCompleteEntry_CursorPositionChanged;
-        platformView.SuggestionChosen += AutoCompleteEntry_SuggestionChosen;
-        platformView.EditorAction += AutoCompleteEntry_EditorAction;
+        platformView.CursorPositionChanged += PlatformView_OnCursorPositionChanged;
+        platformView.EditorAction += PlatformView_OnEditorAction;
+        platformView.SuggestionChosen += PlatformView_OnSuggestionChosen;
+        platformView.TextChanged += PlatformView_OnTextChanged;
+        platformView.Touch += PlatformView_OnTouch;
+        platformView.ViewAttachedToWindow += PlatformView_OnViewAttachedToWindow;
     }
 
     /// <inheritdoc/>
     protected override void DisconnectHandler(AndroidAutoCompleteEntry platformView)
     {
-        platformView.ViewAttachedToWindow -= OnLoaded;
-        platformView.TextChanged -= AutoCompleteEntry_TextChanged;
-        platformView.CursorPositionChanged -= AutoCompleteEntry_CursorPositionChanged;
-        platformView.SuggestionChosen -= AutoCompleteEntry_SuggestionChosen;
-        platformView.EditorAction -= AutoCompleteEntry_EditorAction;    
+        platformView.CursorPositionChanged -= PlatformView_OnCursorPositionChanged;
+        platformView.EditorAction -= PlatformView_OnEditorAction;
+        platformView.SuggestionChosen -= PlatformView_OnSuggestionChosen;
+        platformView.TextChanged -= PlatformView_OnTextChanged;
+        platformView.Touch -= PlatformView_OnTouch;
+        platformView.ViewAttachedToWindow -= PlatformView_OnViewAttachedToWindow;
+
+        platformView.FreeResources();
 
         base.DisconnectHandler(platformView);
     }
 
-    private void AutoCompleteEntry_TextChanged(object sender, AutoCompleteEntryTextChangedEventArgs e)
-    {
-        VirtualView?.OnTextChanged(PlatformView.Text, e.Reason);
-    }
 
-    private void AutoCompleteEntry_CursorPositionChanged(object sender, AutoCompleteEntryCursorPositionChangedEventArgs e)
+    private void PlatformView_OnCursorPositionChanged(object sender, AutoCompleteEntryCursorPositionChangedEventArgs e)
     {
         VirtualView?.OnCursorPositionChanged(e.CursorPosition);
     }
 
-    private void AutoCompleteEntry_SuggestionChosen(object sender, AutoCompleteEntrySuggestionChosenEventArgs e)
-    {
-        VirtualView?.OnSuggestionSelected(e.SelectedItem);
-    }
-
     // Note: this is copied from MAUI's EntryHandler.Android.cs > OnEditorAction
-    private void AutoCompleteEntry_EditorAction(object sender, Android.Widget.TextView.EditorActionEventArgs e)
+    private void PlatformView_OnEditorAction(object sender, Android.Widget.TextView.EditorActionEventArgs e)
     {
         var returnType = VirtualView?.ReturnType;
 
@@ -91,8 +93,30 @@ public partial class AutoCompleteEntryHandler : ViewHandler<AutoCompleteEntry, A
         e.Handled = handled;
     }
 
-    private void OnLoaded(object sender, Android.Views.View.ViewAttachedToWindowEventArgs e)
+    private void PlatformView_OnSuggestionChosen(object sender, AutoCompleteEntrySuggestionChosenEventArgs e)
     {
+        VirtualView?.OnSuggestionSelected(e.SelectedItem);
+    }
+
+    private void PlatformView_OnTextChanged(object sender, AutoCompleteEntryTextChangedEventArgs e)
+    {
+        VirtualView?.OnTextChanged(PlatformView.Text, e.Reason);
+
+        PlatformView.UpdateClearButtonVisibility(VirtualView);
+    }
+
+    private void PlatformView_OnTouch(object sender, Android.Views.View.TouchEventArgs e)
+    {
+        e.Handled = _clearButtonVisible
+                    &&
+                    VirtualView != null
+                    &&
+                    PlatformView.HandleClearButtonTouched(e, GetClearButtonDrawable);
+    }
+
+    private void PlatformView_OnViewAttachedToWindow(object sender, Android.Views.View.ViewAttachedToWindowEventArgs e)
+    {
+        PlatformView.UpdateClearButtonVisibility(VirtualView);
         PlatformView.UpdateTextColor(VirtualView);
         PlatformView.UpdatePlaceholder(VirtualView);
         PlatformView.UpdatePlaceholderColor(VirtualView);
@@ -106,6 +130,7 @@ public partial class AutoCompleteEntryHandler : ViewHandler<AutoCompleteEntry, A
         PlatformView.UpdateItemsSource(VirtualView);
     }
 
+
     /// <summary>
     /// Map the Background value
     /// </summary>
@@ -114,6 +139,16 @@ public partial class AutoCompleteEntryHandler : ViewHandler<AutoCompleteEntry, A
     public static void MapBackground(IAutoCompleteEntryHandler handler, IEntry entry)
     {
         handler.PlatformView?.UpdateBackground(entry);
+    }
+
+    /// <summary>
+    /// Map the ClearButtonVisibility value
+    /// </summary>
+    /// <param name="handler"></param>
+    /// <param name="autoCompleteEntry"></param>
+    public static void MapClearButtonVisibility(IAutoCompleteEntryHandler handler, AutoCompleteEntry autoCompleteEntry) 
+    {
+        handler.PlatformView?.UpdateClearButtonVisibility(autoCompleteEntry);
     }
 
     /// <summary>
@@ -313,5 +348,42 @@ public partial class AutoCompleteEntryHandler : ViewHandler<AutoCompleteEntry, A
     public static void MapSelectedSuggestion(IAutoCompleteEntryHandler handler, AutoCompleteEntry autoCompleteEntry) 
     {
         handler?.PlatformView.UpdateSelectedSuggestion(autoCompleteEntry);
+    }
+
+    // Returns the default 'X' char drawable in the AppCompatEditText.
+    protected virtual Drawable GetClearButtonDrawable() =>
+        _clearButtonDrawable ??= ContextCompat.GetDrawable(Context, Resource.Drawable.abc_ic_clear_material);
+
+    internal void ShowClearButton()
+    {
+        if (_clearButtonVisible)
+        {
+            return;
+        }
+
+        var drawable = GetClearButtonDrawable();
+
+        if (VirtualView?.TextColor is not null)
+            drawable?.SetColorFilter(VirtualView.TextColor.ToPlatform(), FilterMode.SrcIn);
+        else
+            drawable?.ClearColorFilter();
+
+        if (PlatformView.LayoutDirection == Android.Views.LayoutDirection.Rtl)
+            PlatformView.SetCompoundDrawablesWithIntrinsicBounds(drawable, null, null, null);
+        else
+            PlatformView.SetCompoundDrawablesWithIntrinsicBounds(null, null, drawable, null);
+
+        _clearButtonVisible = true;
+    }
+
+    internal void HideClearButton()
+    {
+        if (!_clearButtonVisible)
+        {
+            return;
+        }
+
+        PlatformView.SetCompoundDrawablesWithIntrinsicBounds(null, null, null, null);
+        _clearButtonVisible = false;
     }
 }

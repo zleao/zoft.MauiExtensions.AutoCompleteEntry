@@ -1,6 +1,7 @@
 ﻿using Microsoft.Maui.Controls.Internals;
 using Microsoft.Maui.Platform;
 using Microsoft.UI.Xaml.Controls;
+using Uno.UI.Extensions;
 using zoft.MauiExtensions.Core.Extensions;
 
 namespace zoft.MauiExtensions.Controls.Platform
@@ -18,50 +19,19 @@ namespace zoft.MauiExtensions.Controls.Platform
             "TextControlPlaceholderForegroundDisabled"
         };
 
-        /// <summary>
-        /// Update the Text
-        /// </summary>
-        /// <param name="platformControl"></param>
-        /// <param name="autoCompleteEntry"></param>
-        public static void UpdateText(this AutoSuggestBox platformControl, AutoCompleteEntry autoCompleteEntry)
+        public static void UpdateClearButtonVisibility(this AutoSuggestBox platformControl, AutoCompleteEntry autoCompleteEntry)
         {
-            var text = TextTransformUtilites.GetTransformedText(autoCompleteEntry.Text, autoCompleteEntry.TextTransform);
-            if (platformControl.Text != text)
-            {
-                platformControl.Text = text;
-            }
+            platformControl.FindFirstDescendant<TextBox>()?.UpdateClearButtonVisibility(autoCompleteEntry);
         }
 
         /// <summary>
-        /// Update the Placeholder
+        /// Update the DisplayMemberPath
         /// </summary>
         /// <param name="platformControl"></param>
         /// <param name="autoCompleteEntry"></param>
-        public static void UpdatePlaceholder(this AutoSuggestBox platformControl, AutoCompleteEntry autoCompleteEntry)
+        public static void UpdateDisplayMemberPath(this AutoSuggestBox platformControl, AutoCompleteEntry autoCompleteEntry)
         {
-            platformControl.PlaceholderText = autoCompleteEntry.Placeholder ?? string.Empty;
-        }
-
-        /// <summary>
-        /// Update the VerticalTextAlignment
-        /// </summary>
-        /// <param name="platformControl"></param>
-        /// <param name="autoCompleteEntry"></param>
-        public static void UpdateVerticalTextAlignment(this AutoSuggestBox platformControl, AutoCompleteEntry autoCompleteEntry)
-        {
-            platformControl.VerticalContentAlignment = autoCompleteEntry.VerticalTextAlignment.ToPlatformVerticalAlignment();
-        }
-
-        /// <summary>
-        /// Update the PlaceholderColor
-        /// </summary>
-        /// <param name="platformControl"></param>
-        /// <param name="autoCompleteEntry"></param>
-        public static void UpdatePlaceholderColor(this AutoSuggestBox platformControl, AutoCompleteEntry autoCompleteEntry)
-        {
-            UpdateColors(platformControl.Resources, 
-                        _placeholderForegroundColorKeys,
-                        autoCompleteEntry.PlaceholderColor?.ToPlatform());
+            platformControl.DisplayMemberPath = autoCompleteEntry.DisplayMemberPath;
         }
 
         /// <summary>
@@ -72,6 +42,36 @@ namespace zoft.MauiExtensions.Controls.Platform
         public static void UpdateHorizontalTextAlignment(this AutoSuggestBox platformControl, AutoCompleteEntry autoCompleteEntry)
         {
             platformControl.HorizontalContentAlignment = autoCompleteEntry.HorizontalTextAlignment.ToPlatformHorizontalAlignment();
+        }
+
+        /// <summary>
+        /// Update the IsReadOnly
+        /// </summary>
+        /// <param name="platformControl"></param>
+        /// <param name="autoCompleteEntry"></param>
+        public static void UpdateIsReadOnly(this AutoSuggestBox platformControl, AutoCompleteEntry autoCompleteEntry)
+        {
+            MauiAutoSuggestBox.SetIsReadOnly(platformControl, autoCompleteEntry.IsReadOnly);
+        }
+
+        /// <summary>
+        /// Update the IsSuggestionListOpen
+        /// </summary>
+        /// <param name="platformControl"></param>
+        /// <param name="autoCompleteEntry"></param>
+        public static void UpdateIsSuggestionListOpen(this AutoSuggestBox platformControl, AutoCompleteEntry autoCompleteEntry)
+        {
+            platformControl.IsSuggestionListOpen = autoCompleteEntry.IsSuggestionListOpen;
+        }
+
+        /// <summary>
+        /// Update the ItemsSource
+        /// </summary>
+        /// <param name="platformControl"></param>
+        /// <param name="autoCompleteEntry"></param>
+        public static void UpdateItemsSource(this AutoSuggestBox platformControl, AutoCompleteEntry autoCompleteEntry)
+        {
+            platformControl.ItemsSource = autoCompleteEntry.ItemsSource;
         }
 
         /// <summary>
@@ -98,13 +98,50 @@ namespace zoft.MauiExtensions.Controls.Platform
         }
 
         /// <summary>
-        /// Update the IsReadOnly
+        /// Update the Placeholder
         /// </summary>
         /// <param name="platformControl"></param>
         /// <param name="autoCompleteEntry"></param>
-        public static void UpdateIsReadOnly(this AutoSuggestBox platformControl, AutoCompleteEntry autoCompleteEntry)
+        public static void UpdatePlaceholder(this AutoSuggestBox platformControl, AutoCompleteEntry autoCompleteEntry)
         {
-            MauiAutoSuggestBox.SetIsReadOnly(platformControl, autoCompleteEntry.IsReadOnly);
+            platformControl.PlaceholderText = autoCompleteEntry.Placeholder ?? string.Empty;
+        }
+
+        /// <summary>
+        /// Update the PlaceholderColor
+        /// </summary>
+        /// <param name="platformControl"></param>
+        /// <param name="autoCompleteEntry"></param>
+        public static void UpdatePlaceholderColor(this AutoSuggestBox platformControl, AutoCompleteEntry autoCompleteEntry)
+        {
+            UpdateColors(platformControl.Resources,
+                        _placeholderForegroundColorKeys,
+                        autoCompleteEntry.PlaceholderColor?.ToPlatform());
+        }
+
+        /// <summary>
+        /// Update the SelectedSuggestion
+        /// </summary>
+        /// <param name="platformControl"></param>
+        /// <param name="autoCompleteEntry"></param>
+        public static void UpdateSelectedSuggestion(this AutoSuggestBox platformControl, AutoCompleteEntry autoCompleteEntry)
+        {
+            object o = autoCompleteEntry.SelectedSuggestion;
+            platformControl.Text = !string.IsNullOrEmpty(autoCompleteEntry.TextMemberPath) ? o.GetPropertyValueAsString(autoCompleteEntry.TextMemberPath) : o?.ToString();
+        }
+
+        /// <summary>
+        /// Update the Text
+        /// </summary>
+        /// <param name="platformControl"></param>
+        /// <param name="autoCompleteEntry"></param>
+        public static void UpdateText(this AutoSuggestBox platformControl, AutoCompleteEntry autoCompleteEntry)
+        {
+            var text = TextTransformUtilites.GetTransformedText(autoCompleteEntry.Text, autoCompleteEntry.TextTransform);
+            if (platformControl.Text != text)
+            {
+                platformControl.Text = text;
+            }
         }
 
         /// <summary>
@@ -118,26 +155,6 @@ namespace zoft.MauiExtensions.Controls.Platform
         }
 
         /// <summary>
-        /// Update the DisplayMemberPath
-        /// </summary>
-        /// <param name="platformControl"></param>
-        /// <param name="autoCompleteEntry"></param>
-        public static void UpdateDisplayMemberPath(this AutoSuggestBox platformControl, AutoCompleteEntry autoCompleteEntry)
-        {
-            platformControl.DisplayMemberPath = autoCompleteEntry.DisplayMemberPath;
-        }
-
-        /// <summary>
-        /// Update the IsSuggestionListOpen
-        /// </summary>
-        /// <param name="platformControl"></param>
-        /// <param name="autoCompleteEntry"></param>
-        public static void UpdateIsSuggestionListOpen(this AutoSuggestBox platformControl, AutoCompleteEntry autoCompleteEntry)
-        {
-            platformControl.IsSuggestionListOpen = autoCompleteEntry.IsSuggestionListOpen;
-        }
-
-        /// <summary>
         /// Update the UpdateTextOnSelect
         /// </summary>
         /// <param name="platformControl"></param>
@@ -148,24 +165,13 @@ namespace zoft.MauiExtensions.Controls.Platform
         }
 
         /// <summary>
-        /// Update the ItemsSource
+        /// Update the VerticalTextAlignment
         /// </summary>
         /// <param name="platformControl"></param>
         /// <param name="autoCompleteEntry"></param>
-        public static void UpdateItemsSource(this AutoSuggestBox platformControl, AutoCompleteEntry autoCompleteEntry)
+        public static void UpdateVerticalTextAlignment(this AutoSuggestBox platformControl, AutoCompleteEntry autoCompleteEntry)
         {
-            platformControl.ItemsSource = autoCompleteEntry.ItemsSource;
-        }
-
-        /// <summary>
-        /// Update the SelectedSuggestion
-        /// </summary>
-        /// <param name="platformControl"></param>
-        /// <param name="autoCompleteEntry"></param>
-        public static void UpdateSelectedSuggestion(this AutoSuggestBox platformControl, AutoCompleteEntry autoCompleteEntry)
-        {
-            object o = autoCompleteEntry.SelectedSuggestion;
-            platformControl.Text = !string.IsNullOrEmpty(autoCompleteEntry.TextMemberPath) ? o.GetPropertyValueAsString(autoCompleteEntry.TextMemberPath) : o?.ToString();
+            platformControl.VerticalContentAlignment = autoCompleteEntry.VerticalTextAlignment.ToPlatformVerticalAlignment();
         }
 
         private static void UpdateColors(Microsoft.UI.Xaml.ResourceDictionary resource, string[] keys, Microsoft.UI.Xaml.Media.Brush brush)

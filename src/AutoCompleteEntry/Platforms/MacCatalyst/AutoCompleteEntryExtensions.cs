@@ -11,15 +11,70 @@ namespace zoft.MauiExtensions.Controls.Platform;
 public static class AutoCompleteEntryExtensions
 {
     /// <summary>
-    /// Update the Text
+    /// Update the DisplayCompleteEntry
     /// </summary>
     /// <param name="iosAutoCompleteEntry"></param>
     /// <param name="autoCompleteEntry"></param>
-    public static void UpdateText(this IOSAutoCompleteEntry iosAutoCompleteEntry, AutoCompleteEntry autoCompleteEntry)
+    public static void UpdateDisplayMemberPath(this IOSAutoCompleteEntry iosAutoCompleteEntry, AutoCompleteEntry autoCompleteEntry)
     {
-        if (iosAutoCompleteEntry.Text != autoCompleteEntry.Text)
+        iosAutoCompleteEntry.SetItems(autoCompleteEntry.ItemsSource,
+                                      (o) => !string.IsNullOrEmpty(autoCompleteEntry?.DisplayMemberPath) ? o.GetPropertyValueAsString(autoCompleteEntry?.DisplayMemberPath) : o?.ToString(),
+                                      (o) => !string.IsNullOrEmpty(autoCompleteEntry?.TextMemberPath) ? o.GetPropertyValueAsString(autoCompleteEntry?.TextMemberPath) : o?.ToString());
+    }
+
+    /// <summary>
+    /// Update the IsReadOnly
+    /// </summary>
+    /// <param name="iosAutoCompleteEntry"></param>
+    /// <param name="autoCompleteEntry"></param>
+    public static void UpdateIsReadOnly(this IOSAutoCompleteEntry iosAutoCompleteEntry, AutoCompleteEntry autoCompleteEntry)
+    {
+        iosAutoCompleteEntry.InputTextField.UserInteractionEnabled = !(autoCompleteEntry.IsReadOnly || autoCompleteEntry.InputTransparent);
+    }
+
+    /// <summary>
+    /// Update the IsSuggestionListOpen
+    /// </summary>
+    /// <param name="iosAutoCompleteEntry"></param>
+    /// <param name="autoCompleteEntry"></param>
+    public static void UpdateIsSuggestionListOpen(this IOSAutoCompleteEntry iosAutoCompleteEntry, AutoCompleteEntry autoCompleteEntry)
+    {
+        iosAutoCompleteEntry.IsSuggestionListOpen = autoCompleteEntry.IsSuggestionListOpen;
+    }
+
+    /// <summary>
+    /// Update the IsTextPredictionEnabled
+    /// </summary>
+    /// <param name="iosAutoCompleteEntry"></param>
+    /// <param name="autoCompleteEntry"></param>
+    public static void UpdateIsTextPredictionEnabled(this IOSAutoCompleteEntry iosAutoCompleteEntry, AutoCompleteEntry autoCompleteEntry)
+    {
+        iosAutoCompleteEntry.InputTextField.AutocorrectionType = autoCompleteEntry.IsTextPredictionEnabled ? UITextAutocorrectionType.Yes : UITextAutocorrectionType.No;
+    }
+
+    /// <summary>
+    /// Update the ItemsSource
+    /// </summary>
+    /// <param name="iosAutoCompleteEntry"></param>
+    /// <param name="autoCompleteEntry"></param>
+    public static void UpdateItemsSource(this IOSAutoCompleteEntry iosAutoCompleteEntry, AutoCompleteEntry autoCompleteEntry)
+    {
+        iosAutoCompleteEntry.SetItems(autoCompleteEntry?.ItemsSource,
+                                      (o) => !string.IsNullOrEmpty(autoCompleteEntry?.DisplayMemberPath) ? o.GetPropertyValueAsString(autoCompleteEntry?.DisplayMemberPath) : o?.ToString(),
+                                      (o) => !string.IsNullOrEmpty(autoCompleteEntry?.TextMemberPath) ? o.GetPropertyValueAsString(autoCompleteEntry?.TextMemberPath) : o?.ToString());
+    }
+
+    /// <summary>
+    /// Update the MaxLength
+    /// </summary>
+    /// <param name="iosAutoCompleteEntry"></param>
+    /// <param name="autoCompleteEntry"></param>
+    public static void UpdateMaxLength(this IOSAutoCompleteEntry iosAutoCompleteEntry, AutoCompleteEntry autoCompleteEntry)
+    {
+        var newText = iosAutoCompleteEntry.InputTextField.AttributedText.TrimToMaxLength(autoCompleteEntry.MaxLength);
+        if (newText != null && iosAutoCompleteEntry.InputTextField.AttributedText != null && !iosAutoCompleteEntry.InputTextField.AttributedText.Equals(newText))
         {
-            iosAutoCompleteEntry.Text = autoCompleteEntry.Text;
+            iosAutoCompleteEntry.InputTextField.AttributedText = newText;
         }
     }
 
@@ -49,59 +104,27 @@ public static class AutoCompleteEntryExtensions
     }
 
     /// <summary>
-    /// Update the IsTextPredictionEnabled
+    /// Update the SelectedSuggestion
     /// </summary>
     /// <param name="iosAutoCompleteEntry"></param>
     /// <param name="autoCompleteEntry"></param>
-    public static void UpdateIsTextPredictionEnabled(this IOSAutoCompleteEntry iosAutoCompleteEntry, AutoCompleteEntry autoCompleteEntry)
+    public static void UpdateSelectedSuggestion(this IOSAutoCompleteEntry iosAutoCompleteEntry, AutoCompleteEntry autoCompleteEntry)
     {
-        iosAutoCompleteEntry.InputTextField.AutocorrectionType = autoCompleteEntry.IsTextPredictionEnabled ? UITextAutocorrectionType.Yes : UITextAutocorrectionType.No;
+        var o = autoCompleteEntry.SelectedSuggestion;
+        iosAutoCompleteEntry.Text = !string.IsNullOrEmpty(autoCompleteEntry.TextMemberPath) ? o.GetPropertyValueAsString(autoCompleteEntry.TextMemberPath) : o?.ToString();
     }
 
     /// <summary>
-    /// Update the MaxLength
+    /// Update the Text
     /// </summary>
     /// <param name="iosAutoCompleteEntry"></param>
     /// <param name="autoCompleteEntry"></param>
-    public static void UpdateMaxLength(this IOSAutoCompleteEntry iosAutoCompleteEntry, AutoCompleteEntry autoCompleteEntry)
+    public static void UpdateText(this IOSAutoCompleteEntry iosAutoCompleteEntry, AutoCompleteEntry autoCompleteEntry)
     {
-        var newText = iosAutoCompleteEntry.InputTextField.AttributedText.TrimToMaxLength(autoCompleteEntry.MaxLength);
-        if (newText != null && iosAutoCompleteEntry.InputTextField.AttributedText != null && !iosAutoCompleteEntry.InputTextField.AttributedText.Equals(newText))
+        if (iosAutoCompleteEntry.Text != autoCompleteEntry.Text)
         {
-            iosAutoCompleteEntry.InputTextField.AttributedText = newText;
+            iosAutoCompleteEntry.Text = autoCompleteEntry.Text;
         }
-    }
-
-    /// <summary>
-    /// Update the IsReadOnly
-    /// </summary>
-    /// <param name="iosAutoCompleteEntry"></param>
-    /// <param name="autoCompleteEntry"></param>
-    public static void UpdateIsReadOnly(this IOSAutoCompleteEntry iosAutoCompleteEntry, AutoCompleteEntry autoCompleteEntry)
-    {
-        iosAutoCompleteEntry.InputTextField.UserInteractionEnabled = !(autoCompleteEntry.IsReadOnly || autoCompleteEntry.InputTransparent);
-    }
-
-    /// <summary>
-    /// Update the DisplayCompleteEntry
-    /// </summary>
-    /// <param name="iosAutoCompleteEntry"></param>
-    /// <param name="autoCompleteEntry"></param>
-    public static void UpdateDisplayMemberPath(this IOSAutoCompleteEntry iosAutoCompleteEntry, AutoCompleteEntry autoCompleteEntry)
-    {
-        iosAutoCompleteEntry.SetItems(autoCompleteEntry.ItemsSource, 
-                                      (o) => !string.IsNullOrEmpty(autoCompleteEntry?.DisplayMemberPath) ? o.GetPropertyValueAsString(autoCompleteEntry?.DisplayMemberPath) : o?.ToString(),
-                                      (o) => !string.IsNullOrEmpty(autoCompleteEntry?.TextMemberPath) ? o.GetPropertyValueAsString(autoCompleteEntry?.TextMemberPath) : o?.ToString());
-        }
-
-    /// <summary>
-    /// Update the IsSuggestionListOpen
-    /// </summary>
-    /// <param name="iosAutoCompleteEntry"></param>
-    /// <param name="autoCompleteEntry"></param>
-    public static void UpdateIsSuggestionListOpen(this IOSAutoCompleteEntry iosAutoCompleteEntry, AutoCompleteEntry autoCompleteEntry)
-    {
-        iosAutoCompleteEntry.IsSuggestionListOpen = autoCompleteEntry.IsSuggestionListOpen;
     }
 
     /// <summary>
@@ -112,28 +135,5 @@ public static class AutoCompleteEntryExtensions
     public static void UpdateUpdateTextOnSelect(this IOSAutoCompleteEntry iosAutoCompleteEntry, AutoCompleteEntry autoCompleteEntry)
     {
         iosAutoCompleteEntry.UpdateTextOnSelect = autoCompleteEntry.UpdateTextOnSelect;
-    }
-
-    /// <summary>
-    /// Update the ItemsSource
-    /// </summary>
-    /// <param name="iosAutoCompleteEntry"></param>
-    /// <param name="autoCompleteEntry"></param>
-    public static void UpdateItemsSource(this IOSAutoCompleteEntry iosAutoCompleteEntry, AutoCompleteEntry autoCompleteEntry)
-    {
-        iosAutoCompleteEntry.SetItems(autoCompleteEntry?.ItemsSource,
-                                      (o) => !string.IsNullOrEmpty(autoCompleteEntry?.DisplayMemberPath) ? o.GetPropertyValueAsString(autoCompleteEntry?.DisplayMemberPath) : o?.ToString(),
-                                      (o) => !string.IsNullOrEmpty(autoCompleteEntry?.TextMemberPath) ? o.GetPropertyValueAsString(autoCompleteEntry?.TextMemberPath) : o?.ToString());
-    }
-
-    /// <summary>
-    /// Update the SelectedSuggestion
-    /// </summary>
-    /// <param name="iosAutoCompleteEntry"></param>
-    /// <param name="autoCompleteEntry"></param>
-    public static void UpdateSelectedSuggestion(this IOSAutoCompleteEntry iosAutoCompleteEntry, AutoCompleteEntry autoCompleteEntry)
-    {
-        var o = autoCompleteEntry.SelectedSuggestion;
-        iosAutoCompleteEntry.Text = !string.IsNullOrEmpty(autoCompleteEntry.TextMemberPath) ? o.GetPropertyValueAsString(autoCompleteEntry.TextMemberPath) : o?.ToString(); 
     }
 }

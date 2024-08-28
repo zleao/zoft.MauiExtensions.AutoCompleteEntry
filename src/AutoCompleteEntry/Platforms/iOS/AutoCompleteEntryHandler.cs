@@ -27,32 +27,48 @@ public partial class AutoCompleteEntryHandler : ViewHandler<AutoCompleteEntry, I
     {
         base.ConnectHandler(platformView);
 
-        platformView.OnLoaded += AutoCompleteEntry_OnLoaded;
-        platformView.TextChanged += AutoCompleteEntry_TextChanged;
-        platformView.CursorPositionChanged += AutoCompleteEntry_CursorPositionChanged;
-        platformView.SuggestionChosen += AutoCompleteEntry_SuggestionChosen;
-        platformView.EditingDidBegin += AutoCompleteEntry_EditingDidBegin;
-        platformView.EditingDidEnd += AutoCompleteEntry_EditingDidEnd;
-        platformView.ShouldReturn += AutoCompleteEntry_ShouldReturn;
+        platformView.CursorPositionChanged += PlatformView_OnCursorPositionChanged;
+        platformView.EditingDidBegin += PlatformView_OnEditingDidBegin;
+        platformView.EditingDidEnd += PlatformView_OnEditingDidEnd;
+        platformView.Loaded += PlatformView_OnLoaded;
+        platformView.ShouldReturn += PlatformView_OnShouldReturn;
+        platformView.SuggestionChosen += PlatformView_OnSuggestionChosen;
+        platformView.TextChanged += PlatformView_OnTextChanged;
     }
 
     /// <inheritdoc/>
     protected override void DisconnectHandler(IOSAutoCompleteEntry platformView)
     {
-        platformView.OnLoaded -= AutoCompleteEntry_OnLoaded;
-        platformView.TextChanged -= AutoCompleteEntry_TextChanged;
-        platformView.CursorPositionChanged -= AutoCompleteEntry_CursorPositionChanged;
-        platformView.SuggestionChosen -= AutoCompleteEntry_SuggestionChosen;
-        platformView.EditingDidBegin -= AutoCompleteEntry_EditingDidBegin;
-        platformView.EditingDidEnd -= AutoCompleteEntry_EditingDidEnd;
-        platformView.ShouldReturn -= AutoCompleteEntry_ShouldReturn;
+        platformView.CursorPositionChanged -= PlatformView_OnCursorPositionChanged;
+        platformView.EditingDidBegin -= PlatformView_OnEditingDidBegin;
+        platformView.EditingDidEnd -= PlatformView_OnEditingDidEnd;
+        platformView.Loaded -= PlatformView_OnLoaded;
+        platformView.ShouldReturn -= PlatformView_OnShouldReturn;
+        platformView.SuggestionChosen -= PlatformView_OnSuggestionChosen;
+        platformView.TextChanged -= PlatformView_OnTextChanged;
 
         platformView.FreeResources();
 
         base.DisconnectHandler(platformView);
     }
 
-    private void AutoCompleteEntry_OnLoaded(object sender, EventArgs e)
+
+    private void PlatformView_OnCursorPositionChanged(object sender, AutoCompleteEntryCursorPositionChangedEventArgs e)
+    {
+        VirtualView?.OnCursorPositionChanged(e.CursorPosition);
+    }
+
+    private void PlatformView_OnEditingDidBegin(object sender, EventArgs e)
+    {
+        VirtualView.Focus();
+    }
+
+    private void PlatformView_OnEditingDidEnd(object sender, EventArgs e)
+    {
+        VirtualView.Unfocus();
+    }
+
+    private void PlatformView_OnLoaded(object sender, EventArgs e)
     {
         PlatformView.UpdateText(VirtualView);
         PlatformView.UpdatePlaceholder(VirtualView);
@@ -67,35 +83,21 @@ public partial class AutoCompleteEntryHandler : ViewHandler<AutoCompleteEntry, I
         PlatformView.UpdateItemsSource(VirtualView);
     }
 
-    private void AutoCompleteEntry_TextChanged(object sender, AutoCompleteEntryTextChangedEventArgs e)
+    private void PlatformView_OnShouldReturn(object sender, EventArgs e)
     {
-        VirtualView.OnTextChanged(PlatformView.Text, e.Reason);
+        VirtualView?.SendCompleted();
     }
 
-    private void AutoCompleteEntry_CursorPositionChanged(object sender, AutoCompleteEntryCursorPositionChangedEventArgs e)
-    {
-        VirtualView?.OnCursorPositionChanged(e.CursorPosition);
-    }
-
-    private void AutoCompleteEntry_SuggestionChosen(object sender, AutoCompleteEntrySuggestionChosenEventArgs e)
+    private void PlatformView_OnSuggestionChosen(object sender, AutoCompleteEntrySuggestionChosenEventArgs e)
     {
         VirtualView.OnSuggestionSelected(e.SelectedItem);
     }
 
-    private void AutoCompleteEntry_EditingDidBegin(object sender, EventArgs e)
+    private void PlatformView_OnTextChanged(object sender, AutoCompleteEntryTextChangedEventArgs e)
     {
-        VirtualView.Focus();
+        VirtualView.OnTextChanged(PlatformView.Text, e.Reason);
     }
-       
-    private void AutoCompleteEntry_EditingDidEnd(object sender, EventArgs e)
-    {
-        VirtualView.Unfocus();
-    }
-    
-    private void AutoCompleteEntry_ShouldReturn(object sender, EventArgs e)
-    {
-        VirtualView?.SendCompleted();
-    }
+
 
     /// <summary>
     /// Map the background value
@@ -106,6 +108,13 @@ public partial class AutoCompleteEntryHandler : ViewHandler<AutoCompleteEntry, I
     {
         handler.PlatformView?.InputTextField.UpdateBackground(entry);
     }
+    
+    /// <summary>
+    /// Map the ClearButtonVisibility value
+    /// </summary>
+    /// <param name="handler"></param>
+    /// <param name="entry"></param>
+    public static void MapClearButtonVisibility(IAutoCompleteEntryHandler handler, IEntry entry) { }
 
     /// <summary>
     /// Map the CursorPosition value

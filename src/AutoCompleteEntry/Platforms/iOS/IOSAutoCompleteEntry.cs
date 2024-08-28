@@ -28,7 +28,7 @@ public sealed class IOSAutoCompleteEntry : UIView
     /// </summary>
     public event EventHandler<AutoCompleteEntrySuggestionChosenEventArgs> SuggestionChosen;
 
-    internal EventHandler OnLoaded;
+    internal EventHandler Loaded;
 
     internal EventHandler EditingDidBegin;
 
@@ -188,7 +188,7 @@ public sealed class IOSAutoCompleteEntry : UIView
     {
         base.MovedToWindow();
 
-        OnLoaded?.Invoke(this, EventArgs.Empty);
+        Loaded?.Invoke(this, EventArgs.Empty);
 
         UpdateSuggestionListOpenState();
     }

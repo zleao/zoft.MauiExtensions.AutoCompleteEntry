@@ -18,6 +18,13 @@ namespace zoft.MauiExtensions.Controls.Handlers
 		public static void MapBackground(IAutoCompleteEntryHandler handler, IEntry entry) { }
 
         /// <summary>
+        /// Map the ClearButtonVisibility value
+        /// </summary>
+        /// <param name="handler"></param>
+        /// <param name="entry"></param>
+        public static void MapClearButtonVisibility(IAutoCompleteEntryHandler handler, IEntry entry) { }
+
+        /// <summary>
         /// Map the CursorPosition value
         /// </summary>
         /// <param name="handler"></param>

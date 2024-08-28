@@ -21,6 +21,9 @@
     <PackageReference Include="Microsoft.Maui.Controls" Version="8.0.80" />
     <PackageReference Include="Microsoft.Maui.Controls.Compatibility" Version="8.0.80" />
   </ItemGroup>
+<ItemGroup Condition="$(TargetFramework.StartsWith('net8.0-windows')) == true">
+	<PackageReference Include="CommunityToolkit.WinUI.Extensions" Version="8.1.240821" />
+</ItemGroup>
   <ItemGroup Condition="$(TargetFramework.StartsWith('net8.0-maccatalyst')) == true">
     <PackageReference Include="Microsoft.Maui.Graphics" Version="8.0.80" />
   </ItemGroup>

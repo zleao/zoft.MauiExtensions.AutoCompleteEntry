@@ -39,7 +39,9 @@
                                     TextChangedCommand="{Binding TextChangedCommand}"
                                     CursorPosition="{Binding CursorPosition, Mode=TwoWay}"
                                     SelectedSuggestion="{Binding SelectedItem}"
-                                    Completed="AutoCompleteEntry_Completed"/>
+                                    Completed="AutoCompleteEntry_Completed"
+                                    ClearButtonVisibility="WhileEditing"
+                                    HeightRequest="50"/>
 
             <Frame BorderColor="Gray" 
                    BackgroundColor="LightGray" 

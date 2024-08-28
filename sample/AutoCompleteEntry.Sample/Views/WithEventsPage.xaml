@@ -12,11 +12,12 @@
     </ContentPage.Resources>
 
     <Grid>
+        
         <Image Source="dotnet_bot.png"
                HeightRequest="200"
                HorizontalOptions="Center" />
 
-        <VerticalStackLayout Spacing="10" Margin="10">
+        <VerticalStackLayout Spacing="10" Padding="0">
             
             <Label>
                 <Label.FormattedText>
@@ -31,7 +32,7 @@
                 <Button Text="Set CursorPosition" Command="{Binding SetCursorPositionCommand}"/>
                 <Entry Text="{Binding NewCursorPosition, Mode=TwoWay}" Keyboard="Numeric"/>
             </HorizontalStackLayout>
-            
+
             <zoft:AutoCompleteEntry Placeholder="Search for a country or group"
                                     ItemsSource="{Binding FilteredList}"
                                     TextMemberPath="Country"
@@ -41,6 +42,7 @@
                                     CursorPositionChanged="AutoCompleteEntry_CursorPositionChanged"
                                     SuggestionChosen="AutoCompleteEntry_SuggestionChosen"
                                     Completed="AutoCompleteEntry_Completed"
+                                    ClearButtonVisibility="WhileEditing"
                                     HeightRequest="50"/>
         
             <Frame BorderColor="Gray" 
