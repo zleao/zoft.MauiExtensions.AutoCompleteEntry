@@ -84,7 +84,11 @@ xmlns:zoft="http://zoft.MauiExtensions/Controls"
                             TextMemberPath="Country"
                             DisplayMemberPath="Country"
                             TextChangedCommand="{Binding TextChangedCommand}"
-                            SelectedSuggestion="{Binding SelectedItem}"/>
+                            CursorPosition="{Binding CursorPosition, Mode=TwoWay}"
+                            SelectedSuggestion="{Binding SelectedItem}"
+                            Completed="AutoCompleteEntry_Completed"
+                            ClearButtonVisibility="Never"
+                            HeightRequest="50"/>
 </ContentPage>
 
 ```
@@ -100,7 +104,7 @@ internal partial class ListItem : ObservableObject
 
 internal partial class SampleViewModel : CoreViewModel
 {
-    private readonly List<ListItem> Teams  = new List<ListItem>() { ... }
+    private readonly List<ListItem> Teams  = new List<ListItem>() { ... };
     
     [ObservableProperty]
     private ObservableCollection<ListItem> _filteredList;
@@ -108,13 +112,13 @@ internal partial class SampleViewModel : CoreViewModel
     [ObservableProperty]
     private ListItem _selectedItem;
 
-    public Command<string> TextChangedCommand { get; }
+	[ObservableProperty]
+    private int _cursorPosition;
 
     public SampleViewModel()
     {
         FilteredList = new(Teams);
         SelectedItem = null;
-        TextChangedCommand = new Command<string>(FilterList);
     }
 
     private void FilterList(string filter)
@@ -124,6 +128,12 @@ internal partial class SampleViewModel : CoreViewModel
 
         FilteredList.AddRange(Teams.Where(t => t.Group.Contains(filter, StringComparison.CurrentCultureIgnoreCase) ||
                                                t.Country.Contains(filter, StringComparison.CurrentCultureIgnoreCase)));
+    }
+
+	[RelayCommand]
+    private void TextChanged(string text)
+    {
+        FilterList(text);
     }
 }
 ```
@@ -143,7 +153,12 @@ internal partial class SampleViewModel : CoreViewModel
                             TextMemberPath="Country"
                             DisplayMemberPath="Country"
                             TextChanged="AutoCompleteEntry_TextChanged"
-                            SuggestionChosen="AutoCompleteEntry_SuggestionChosen"/>
+                            CursorPosition="{Binding CursorPosition, Mode=TwoWay}"
+                            CursorPositionChanged="AutoCompleteEntry_CursorPositionChanged"
+                            SuggestionChosen="AutoCompleteEntry_SuggestionChosen"
+                            Completed="AutoCompleteEntry_Completed"
+                            ClearButtonVisibility="WhileEditing"
+                            HeightRequest="50"/>
 </ContentPage>
 
 ```
