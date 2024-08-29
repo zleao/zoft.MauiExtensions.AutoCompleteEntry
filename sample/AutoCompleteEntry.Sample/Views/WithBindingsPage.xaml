@@ -31,9 +31,19 @@
                 <Button Text="Set CursorPosition" Command="{Binding SetCursorPositionCommand}"/>
                 <Entry Text="{Binding NewCursorPosition, Mode=TwoWay}" Keyboard="Numeric"/>
             </HorizontalStackLayout>
+
+            <Label>
+                <Label.FormattedText>
+                    <FormattedString>
+                        <Span Text="Text: " />
+                        <Span Text="{Binding Text}"/>
+                    </FormattedString>
+                </Label.FormattedText>
+            </Label>
             
             <zoft:AutoCompleteEntry Placeholder="Search for a country or group"
                                     ItemsSource="{Binding FilteredList}"
+                                    Text="{Binding Text}"
                                     TextMemberPath="Country"
                                     DisplayMemberPath="Country"
                                     TextChangedCommand="{Binding TextChangedCommand}"

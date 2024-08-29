@@ -1,3 +1,5 @@
+using System.Windows.Input;
+
 namespace zoft.MauiExtensions.Controls;
 
 /// <summary>
@@ -112,9 +114,9 @@ public class AutoCompleteEntry : Entry
     /// Gets or Sets the TextChangedCommand, that is trigered everytime the text changes.
     /// The command receives as parameter the changed text.
     /// </summary>
-    public Command<string> TextChangedCommand
+    public ICommand TextChangedCommand
     {
-        get => (Command<string>)GetValue(TextChangedCommandProperty);
+        get => (ICommand)GetValue(TextChangedCommandProperty);
         set => SetValue(TextChangedCommandProperty, value);
     }
 
@@ -123,7 +125,7 @@ public class AutoCompleteEntry : Entry
     /// </summary>
     public static readonly BindableProperty TextChangedCommandProperty =
         BindableProperty.Create(nameof(TextChangedCommand),
-            typeof(Command<string>),
+            typeof(ICommand),
             typeof(AutoCompleteEntry));
 
     /// <summary>
