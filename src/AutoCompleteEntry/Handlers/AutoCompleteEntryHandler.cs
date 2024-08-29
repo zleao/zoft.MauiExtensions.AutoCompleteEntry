@@ -40,6 +40,7 @@ public partial class AutoCompleteEntryHandler : IAutoCompleteEntryHandler
             [nameof(IEntry.MaxLength)] = MapMaxLength,
 			[nameof(IEntry.Placeholder)] = MapPlaceholder,
 			[nameof(IEntry.PlaceholderColor)] = MapPlaceholderColor,
+            [nameof(IEntry.ReturnType)] = MapReturnType,
             [nameof(AutoCompleteEntry.SelectedSuggestion)] = MapSelectedSuggestion,
             [nameof(IEntry.Text)] = MapText,
 			[nameof(IEntry.TextColor)] = MapTextColor,

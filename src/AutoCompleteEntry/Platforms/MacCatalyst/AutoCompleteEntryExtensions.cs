@@ -104,6 +104,16 @@ public static class AutoCompleteEntryExtensions
     }
 
     /// <summary>
+    /// Update the ReturnType
+    /// </summary>
+    /// <param name="iosAutoCompleteEntry"></param>
+    /// <param name="entry"></param>
+    public static void UpdateReturnType(this IOSAutoCompleteEntry iosAutoCompleteEntry, IEntry entry)
+    {
+        iosAutoCompleteEntry.InputTextField.UpdateReturnType(entry);
+    }
+
+    /// <summary>
     /// Update the SelectedSuggestion
     /// </summary>
     /// <param name="iosAutoCompleteEntry"></param>
