@@ -64,17 +64,20 @@ namespace AutoCompleteEntry.Sample.ViewModels
         [ObservableProperty]
         private int _newCursorPosition;
 
+        [ObservableProperty]
+        private string _text;
+
         public SampleViewModel()
         {
-            FilteredList = new(_teams);
-            SelectedItem = null;
+            Text = "Port";
+            FilterList(Text);
         }
 
         public void FilterList(string filter)
         {
             SelectedItem = null;
             
-            FilteredList.Clear();
+            FilteredList?.Clear();
             FilteredList = null;
             FilteredList = new ObservableCollection<ListItem>(
                 _teams.Where(t => t.Group.Contains(filter ?? "", StringComparison.CurrentCultureIgnoreCase) ||
