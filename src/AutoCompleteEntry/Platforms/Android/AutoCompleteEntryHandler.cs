@@ -212,6 +212,16 @@ public partial class AutoCompleteEntryHandler : ViewHandler<AutoCompleteEntry, A
     }
 
     /// <summary>
+    /// Map the ReturnType value
+    /// </summary>
+    /// <param name="handler"></param>
+    /// <param name="entry"></param>
+    public static void MapReturnType(IAutoCompleteEntryHandler handler, IEntry entry)
+    {
+        handler.PlatformView?.UpdateReturnType(entry);
+    }
+
+    /// <summary>
     /// Map the HorizontalTextAlignment value
     /// </summary>
     /// <param name="handler"></param>

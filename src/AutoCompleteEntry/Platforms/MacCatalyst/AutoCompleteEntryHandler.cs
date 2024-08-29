@@ -258,6 +258,16 @@ public partial class AutoCompleteEntryHandler : ViewHandler<AutoCompleteEntry, I
     }
 
     /// <summary>
+    /// Map the ReturnType value
+    /// </summary>
+    /// <param name="handler"></param>
+    /// <param name="entry"></param>
+    public static void MapReturnType(IAutoCompleteEntryHandler handler, IEntry entry)
+    {
+        handler.PlatformView?.UpdateReturnType(entry);
+    }
+
+    /// <summary>
     /// Map the SelectedSuggestion value
     /// </summary>
     /// <param name="handler"></param>

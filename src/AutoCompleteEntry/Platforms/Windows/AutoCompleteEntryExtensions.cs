@@ -120,6 +120,16 @@ public static class AutoCompleteEntryExtensions
     }
 
     /// <summary>
+    /// Update the ReturnType
+    /// </summary>
+    /// <param name="platformControl"></param>
+    /// <param name="entry"></param>
+    public static void UpdateReturnType(this AutoSuggestBox platformControl, IEntry entry)
+    {
+        platformControl.FindFirstDescendant<TextBox>()?.UpdateReturnType(entry);
+    }
+
+    /// <summary>
     /// Update the SelectedSuggestion
     /// </summary>
     /// <param name="platformControl"></param>

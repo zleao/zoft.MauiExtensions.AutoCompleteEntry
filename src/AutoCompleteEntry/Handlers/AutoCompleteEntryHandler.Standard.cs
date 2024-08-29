@@ -116,6 +116,13 @@ public partial class AutoCompleteEntryHandler : ViewHandler<AutoCompleteEntry, o
     public static void MapPlaceholderColor(IAutoCompleteEntryHandler handler, IEntry entry) { }
 
     /// <summary>
+    /// Map the ReturnType value
+    /// </summary>
+    /// <param name="handler"></param>
+    /// <param name="entry"></param>
+    public static void MapReturnType(IAutoCompleteEntryHandler handler, IEntry entry) { }
+
+    /// <summary>
     /// Map the SelectedSuggestion value
     /// </summary>
     /// <param name="handler"></param>
