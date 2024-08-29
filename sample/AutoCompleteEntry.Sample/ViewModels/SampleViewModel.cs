@@ -64,14 +64,10 @@ namespace AutoCompleteEntry.Sample.ViewModels
         [ObservableProperty]
         private int _newCursorPosition;
 
-        public Command<string> TextChangedCommand { get; }
-
         public SampleViewModel()
         {
             FilteredList = new(_teams);
             SelectedItem = null;
-
-            TextChangedCommand = new Command<string>(OnTextChanged);
         }
 
         public void FilterList(string filter)
@@ -90,7 +86,8 @@ namespace AutoCompleteEntry.Sample.ViewModels
             return _teams.FirstOrDefault(t => t.Country.Equals(text, StringComparison.CurrentCultureIgnoreCase));
         }
 
-        private void OnTextChanged(string text)
+        [RelayCommand]
+        private void TextChanged(string text)
         {
             FilterList(text);
         }
