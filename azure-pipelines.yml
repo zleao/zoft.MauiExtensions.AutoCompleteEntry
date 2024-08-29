@@ -5,9 +5,11 @@ variables:
   PathToProjectFile: '$(PathToProjectFolder)\AutoCompleteEntry.csproj'
   BuildConfiguration: Release
 
-# Disable automatic trigger for now. To publish a new nuget manage, a manual build must be triggered
-# trigger:
-# - main
+# Disable generic automatic trigger for now. To publish a new nuget manage, a manual build must be triggered
+trigger: none
+
+# Use the pipeline to validate the build for any PR made to main branch
+pr: [main]
 
 jobs:
   - job: build_library
