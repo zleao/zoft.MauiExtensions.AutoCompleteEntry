@@ -184,6 +184,19 @@ public static class AutoCompleteEntryExtensions
         platformControl.VerticalContentAlignment = autoCompleteEntry.VerticalTextAlignment.ToPlatformVerticalAlignment();
     }
 
+    /// <summary>
+    /// Update the ItemTemplate
+    /// </summary>
+    /// <param name="platformView"></param>
+    /// <param name="virtualView"></param>
+    public static void UpdateItemTemplate(this AutoSuggestBox platformView, AutoCompleteEntry virtualView)
+    {
+        //platformView.SetItemTemplate(virtualView.ItemTemplate);
+        //platformView.SetItems(virtualView.ItemsSource,
+        //                      virtualView?.DisplayMemberPath,
+        //                      (o) => !string.IsNullOrEmpty(virtualView?.TextMemberPath) ? o.GetPropertyValueAsString(virtualView?.TextMemberPath) : o?.ToString());
+    }
+
     private static void UpdateColors(Microsoft.UI.Xaml.ResourceDictionary resource, string[] keys, Microsoft.UI.Xaml.Media.Brush brush)
     {
         if (brush is null)

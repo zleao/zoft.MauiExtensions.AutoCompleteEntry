@@ -136,8 +136,8 @@ public static class AutoCompleteEntryExtensions
     public static void UpdateDisplayMemberPath(this AndroidAutoCompleteEntry platformView, AutoCompleteEntry virtualView)
     {
         platformView.SetItems(virtualView.ItemsSource,
-                                          (o) => !string.IsNullOrEmpty(virtualView?.DisplayMemberPath) ? o.GetPropertyValueAsString(virtualView?.DisplayMemberPath) : o?.ToString(),
-                                          (o) => !string.IsNullOrEmpty(virtualView?.TextMemberPath) ? o.GetPropertyValueAsString(virtualView?.TextMemberPath) : o?.ToString());
+                              virtualView?.DisplayMemberPath,
+                              (o) => !string.IsNullOrEmpty(virtualView?.TextMemberPath) ? o.GetPropertyValueAsString(virtualView?.TextMemberPath) : o?.ToString());
     }
 
     /// <summary>
@@ -170,9 +170,9 @@ public static class AutoCompleteEntryExtensions
     /// <param name="virtualView"></param>
     public static void UpdateItemsSource(this AndroidAutoCompleteEntry platformView, AutoCompleteEntry virtualView)
     {
-        platformView.SetItems(virtualView?.ItemsSource,
-                                          (o) => !string.IsNullOrEmpty(virtualView?.DisplayMemberPath) ? o.GetPropertyValueAsString(virtualView?.DisplayMemberPath) : o?.ToString(),
-                                          (o) => !string.IsNullOrEmpty(virtualView?.TextMemberPath) ? o.GetPropertyValueAsString(virtualView?.TextMemberPath) : o?.ToString());
+        platformView.SetItems(virtualView.ItemsSource,
+                              virtualView?.DisplayMemberPath,
+                              (o) => !string.IsNullOrEmpty(virtualView?.TextMemberPath) ? o.GetPropertyValueAsString(virtualView?.TextMemberPath) : o?.ToString());
     }
 
     /// <summary>
@@ -209,5 +209,18 @@ public static class AutoCompleteEntryExtensions
     public static void UpdateUpdateTextOnSelect(this AndroidAutoCompleteEntry platformView, AutoCompleteEntry virtualView)
     {
         platformView.UpdateTextOnSelect = virtualView.UpdateTextOnSelect;
+    }
+
+    /// <summary>
+    /// Update the ItemTemplate
+    /// </summary>
+    /// <param name="platformView"></param>
+    /// <param name="virtualView"></param>
+    public static void UpdateItemTemplate(this AndroidAutoCompleteEntry platformView, AutoCompleteEntry virtualView)
+    {
+        platformView.SetItemTemplate(virtualView.ItemTemplate);
+        platformView.SetItems(virtualView.ItemsSource,
+                              virtualView?.DisplayMemberPath,
+                              (o) => !string.IsNullOrEmpty(virtualView?.TextMemberPath) ? o.GetPropertyValueAsString(virtualView?.TextMemberPath) : o?.ToString());
     }
 }

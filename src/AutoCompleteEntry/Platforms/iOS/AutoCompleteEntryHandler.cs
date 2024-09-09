@@ -326,4 +326,14 @@ public partial class AutoCompleteEntryHandler : ViewHandler<AutoCompleteEntry, I
     {
         handler.PlatformView?.InputTextField.UpdateVerticalTextAlignment(autoCompleteEntry);
     }
+
+    /// <summary>
+    /// Map the ItemTemplate value
+    /// </summary>
+    /// <param name="handler"></param>
+    /// <param name="autoCompleteEntry"></param>
+    public static void MapItemTemplate(IAutoCompleteEntryHandler handler, AutoCompleteEntry autoCompleteEntry)
+    {
+        handler?.PlatformView.UpdateItemTemplate(autoCompleteEntry);
+    }
 }

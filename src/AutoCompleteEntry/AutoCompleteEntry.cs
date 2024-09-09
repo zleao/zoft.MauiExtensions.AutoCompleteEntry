@@ -211,6 +211,20 @@ public class AutoCompleteEntry : Entry
         SuggestionChosen?.Invoke(this, new AutoCompleteEntrySuggestionChosenEventArgs(selectedItem));
     }
 
+    public DataTemplate ItemTemplate
+    {
+        get => (DataTemplate)GetValue(ItemTemplateProperty);
+        set => SetValue(ItemTemplateProperty, value);
+    }
+
+    /// <summary>
+    /// Identifies the <see cref="ItemTemplate"/> bindable property.
+    /// </summary>
+    public static readonly BindableProperty ItemTemplateProperty =
+        BindableProperty.Create(nameof(ItemTemplate),
+            typeof(DataTemplate),
+            typeof(AutoCompleteEntry), null, BindingMode.OneWay);
+
     /// <summary>
     /// Raised before the text content of the editable control component is updated.
     /// </summary>

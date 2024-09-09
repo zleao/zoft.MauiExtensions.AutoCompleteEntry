@@ -17,15 +17,15 @@
   </PropertyGroup>
   <!-- Referenced Nuget Packages -->
   <ItemGroup>
-    <PackageReference Include="zoft.MauiExtensions.Core" Version="3.0.0" />
-    <PackageReference Include="Microsoft.Maui.Controls" Version="8.0.80" />
-    <PackageReference Include="Microsoft.Maui.Controls.Compatibility" Version="8.0.80" />
+    <PackageReference Include="zoft.MauiExtensions.Core" Version="3.1.0" />
+    <PackageReference Include="Microsoft.Maui.Controls" Version="8.0.82" />
+    <PackageReference Include="Microsoft.Maui.Controls.Compatibility" Version="8.0.82" />
   </ItemGroup>
 <ItemGroup Condition="$(TargetFramework.StartsWith('net8.0-windows')) == true">
 	<PackageReference Include="CommunityToolkit.WinUI.Extensions" Version="8.1.240821" />
 </ItemGroup>
   <ItemGroup Condition="$(TargetFramework.StartsWith('net8.0-maccatalyst')) == true">
-    <PackageReference Include="Microsoft.Maui.Graphics" Version="8.0.80" />
+    <PackageReference Include="Microsoft.Maui.Graphics" Version="8.0.82" />
   </ItemGroup>
   <!-- Platform Specific Files-->
   <ItemGroup Condition="$(TargetFramework.StartsWith('net8.0-ios')) == true OR $(TargetFramework.StartsWith('net8.0-maccatalyst')) == true OR $(TargetFramework.StartsWith('net8.0-android')) == true OR $(TargetFramework.Contains('-windows')) == true">
