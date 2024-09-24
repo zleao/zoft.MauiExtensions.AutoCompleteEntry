@@ -360,6 +360,16 @@ public partial class AutoCompleteEntryHandler : ViewHandler<AutoCompleteEntry, A
         handler?.PlatformView.UpdateSelectedSuggestion(autoCompleteEntry);
     }
 
+    /// <summary>
+    /// Map the ItemTemplate value
+    /// </summary>
+    /// <param name="handler"></param>
+    /// <param name="autoCompleteEntry"></param>
+    public static void MapItemTemplate(IAutoCompleteEntryHandler handler, AutoCompleteEntry autoCompleteEntry)
+    {
+        handler?.PlatformView.UpdateItemTemplate(autoCompleteEntry);
+    }
+
     // Returns the default 'X' char drawable in the AppCompatEditText.
     protected virtual Drawable GetClearButtonDrawable() =>
         _clearButtonDrawable ??= ContextCompat.GetDrawable(Context, Resource.Drawable.abc_ic_clear_material);

@@ -40,18 +40,26 @@
                     </FormattedString>
                 </Label.FormattedText>
             </Label>
-            
+
             <zoft:AutoCompleteEntry Placeholder="Search for a country or group"
                                     ItemsSource="{Binding FilteredList}"
                                     Text="{Binding Text}"
                                     TextMemberPath="Country"
-                                    DisplayMemberPath="Country"
                                     TextChangedCommand="{Binding TextChangedCommand}"
                                     CursorPosition="{Binding CursorPosition, Mode=TwoWay}"
                                     SelectedSuggestion="{Binding SelectedItem}"
                                     Completed="AutoCompleteEntry_Completed"
                                     ClearButtonVisibility="Never"
-                                    HeightRequest="50"/>
+                                    HeightRequest="50">
+                <zoft:AutoCompleteEntry.ItemTemplate>
+                    <DataTemplate x:DataType="vm:ListItem">
+                        <Grid ColumnDefinitions="auto, *">
+                            <Label Grid.Column="0" Text="{Binding Group}" FontSize="Large" BackgroundColor="Red"/>
+                            <Label Grid.Column="1" Text="{Binding Country}" FontSize="Large" BackgroundColor="Yellow"/>
+                        </Grid>
+                    </DataTemplate>
+                </zoft:AutoCompleteEntry.ItemTemplate>
+            </zoft:AutoCompleteEntry>
 
             <Frame BorderColor="Gray" 
                    BackgroundColor="LightGray" 

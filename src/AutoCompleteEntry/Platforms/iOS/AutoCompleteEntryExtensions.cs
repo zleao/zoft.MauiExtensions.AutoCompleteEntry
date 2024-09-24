@@ -146,4 +146,17 @@ public static class AutoCompleteEntryExtensions
     {
         iosAutoCompleteEntry.UpdateTextOnSelect = autoCompleteEntry.UpdateTextOnSelect;
     }
+
+    /// <summary>
+    /// Update the ItemTemplate
+    /// </summary>
+    /// <param name="platformView"></param>
+    /// <param name="virtualView"></param>
+    public static void UpdateItemTemplate(this IOSAutoCompleteEntry platformView, AutoCompleteEntry virtualView)
+    {
+        //platformView.SetItemTemplate(virtualView.ItemTemplate);
+        //platformView.SetItems(virtualView.ItemsSource,
+        //                      virtualView?.DisplayMemberPath,
+        //                      (o) => !string.IsNullOrEmpty(virtualView?.TextMemberPath) ? o.GetPropertyValueAsString(virtualView?.TextMemberPath) : o?.ToString());
+    }
 }
