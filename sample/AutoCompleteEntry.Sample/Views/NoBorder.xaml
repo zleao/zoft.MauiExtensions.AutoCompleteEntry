@@ -1,0 +1,68 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:zoft="http://zoft.MauiExtensions/Controls"
+             xmlns:ctkm="http://schemas.microsoft.com/dotnet/2022/maui/toolkit"
+             xmlns:vm="clr-namespace:AutoCompleteEntry.Sample.ViewModels"
+             x:Class="AutoCompleteEntry.Sample.Views.NoBorder"
+             x:DataType="vm:SampleViewModel">
+
+    <ContentPage.Resources>
+        <ctkm:IsNotNullConverter x:Key="IsNotNullConverter"/>
+    </ContentPage.Resources>
+
+    <Grid>
+        
+        <Image Source="dotnet_bot.png"
+               HeightRequest="200"
+               HorizontalOptions="Center" />
+
+        <VerticalStackLayout Spacing="10" Padding="0">
+            
+            <Label>
+                <Label.FormattedText>
+                    <FormattedString>
+                        <Span Text="CursorPosition: " />
+                        <Span Text="{Binding CursorPosition}"/>
+                    </FormattedString>
+                </Label.FormattedText>
+            </Label>
+
+            <HorizontalStackLayout>
+                <Button Text="Set CursorPosition" Command="{Binding SetCursorPositionCommand}"/>
+                <Entry Text="{Binding NewCursorPosition, Mode=TwoWay}" Keyboard="Numeric"/>
+            </HorizontalStackLayout>
+
+            <zoft:AutoCompleteEntry Placeholder="Search for a country or group"
+                                    ItemsSource="{Binding FilteredList}"
+                                    TextMemberPath="Country"
+                                    DisplayMemberPath="Country"
+                                    TextChanged="AutoCompleteEntry_TextChanged"
+                                    CursorPosition="{Binding CursorPosition, Mode=TwoWay}"
+                                    CursorPositionChanged="AutoCompleteEntry_CursorPositionChanged"
+                                    SuggestionChosen="AutoCompleteEntry_SuggestionChosen"
+                                    Completed="AutoCompleteEntry_Completed"
+                                    ClearButtonVisibility="WhileEditing"
+									ShowBottomBorder="False"
+                                    HeightRequest="50"/>
+        
+            <Frame BorderColor="Gray" 
+                   BackgroundColor="LightGray" 
+                   HorizontalOptions="Start"
+                   IsVisible="{Binding SelectedItem, Converter={StaticResource IsNotNullConverter}}">
+                <VerticalStackLayout>
+                    <HorizontalStackLayout Spacing="5">
+                        <Label Text="Group:"/>
+                        <Label Text="{Binding SelectedItem.Group}" FontAttributes="Bold"/>
+                    </HorizontalStackLayout>
+                    <HorizontalStackLayout Spacing="5">
+                        <Label Text="Country:"/>
+                        <Label Text="{Binding SelectedItem.Country}" FontAttributes="Bold"/>
+                    </HorizontalStackLayout>
+                </VerticalStackLayout>
+            </Frame>
+            
+        </VerticalStackLayout>
+    </Grid>
+
+</ContentPage>

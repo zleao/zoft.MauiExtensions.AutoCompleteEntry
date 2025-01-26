@@ -13,6 +13,9 @@
         <Tab Title="With Bindings">
             <ShellContent ContentTemplate="{DataTemplate views:WithBindingsPage}" />
         </Tab>
-    </TabBar>
+		<Tab Title="No Border">
+			<ShellContent ContentTemplate="{DataTemplate views:WithBindingsPage}" />
+		</Tab>
+	</TabBar>
     
 </Shell>
