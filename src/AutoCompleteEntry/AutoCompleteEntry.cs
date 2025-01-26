@@ -243,5 +243,7 @@ public class AutoCompleteEntry : Entry
     /// Identifies the <see cref="ShowBottomBorder"/> bindable property.
     /// </summary>
     public static readonly BindableProperty ShowBottomBorderProperty =
-        BindableProperty.Create(nameof(ShowBottomBorder), typeof(bool), typeof(AutoCompleteEntry), true);
+        BindableProperty.Create(nameof(ShowBottomBorder),
+            typeof(bool),
+            typeof(AutoCompleteEntry), null, BindingMode.TwoWay);
 }
