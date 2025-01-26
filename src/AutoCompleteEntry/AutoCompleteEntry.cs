@@ -3,7 +3,7 @@ using System.Windows.Input;
 namespace zoft.MauiExtensions.Controls;
 
 /// <summary>
-/// Represents a text control that makes suggestions to users as they type. The app is notified when text 
+/// Represents a text control that makes suggestions to users as they type. The app is notified when text
 /// has been changed by the user and is responsible for providing relevant suggestions for this control to display.
 /// </summary>
 public class AutoCompleteEntry : Entry
@@ -16,7 +16,7 @@ public class AutoCompleteEntry : Entry
     public AutoCompleteEntry()
     {
     }
-    
+
     /// <summary>
     /// Gets or sets the property path that is used to get the value for display in the
     /// text box portion of the <see cref="AutoCompleteEntry"/> control, when an item is selected.
@@ -76,7 +76,7 @@ public class AutoCompleteEntry : Entry
         BindableProperty.Create(nameof(IsSuggestionListOpen), typeof(bool), typeof(AutoCompleteEntry), false);
 
     /// <summary>
-    /// Used in conjunction with <see cref="TextMemberPath"/>, gets or sets a value indicating whether items in the view will trigger an update 
+    /// Used in conjunction with <see cref="TextMemberPath"/>, gets or sets a value indicating whether items in the view will trigger an update
     /// of the editable text part of the <see cref="AutoCompleteEntry"/> when clicked.
     /// </summary>
     /// <value>A value indicating whether items in the view will trigger an update of the editable text part of the <see cref="AutoCompleteEntry"/> when clicked.</value>
@@ -177,7 +177,7 @@ public class AutoCompleteEntry : Entry
     public void OnCursorPositionChanged(int cursorPosition)
     {
         if (CursorPosition == cursorPosition) return;
-            
+
         CursorPosition = cursorPosition;
         CursorPositionChanged?.Invoke(this, new AutoCompleteEntryCursorPositionChangedEventArgs(cursorPosition));
     }
@@ -229,4 +229,19 @@ public class AutoCompleteEntry : Entry
     /// Raised before the text content of the editable control component is updated.
     /// </summary>
     public event EventHandler<AutoCompleteEntrySuggestionChosenEventArgs> SuggestionChosen;
+
+    /// <summary>
+    /// Gets or sets whether to show the bottom border (iOS only)
+    /// </summary>
+    public bool ShowBottomBorder
+    {
+        get => (bool)GetValue(ShowBottomBorderProperty);
+        set => SetValue(ShowBottomBorderProperty, value);
+    }
+
+    /// <summary>
+    /// Identifies the <see cref="ShowBottomBorder"/> bindable property.
+    /// </summary>
+    public static readonly BindableProperty ShowBottomBorderProperty =
+        BindableProperty.Create(nameof(ShowBottomBorder), typeof(bool), typeof(AutoCompleteEntry), true);
 }

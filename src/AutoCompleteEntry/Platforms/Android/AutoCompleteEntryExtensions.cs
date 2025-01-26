@@ -223,4 +223,14 @@ public static class AutoCompleteEntryExtensions
                               virtualView?.DisplayMemberPath,
                               (o) => !string.IsNullOrEmpty(virtualView?.TextMemberPath) ? o.GetPropertyValueAsString(virtualView?.TextMemberPath) : o?.ToString());
     }
+
+    /// <summary>
+    /// Update the ShowBottomBorder
+    /// </summary>
+    /// <param name="platformView"></param>
+    /// <param name="virtualView"></param>
+    public static void UpdateShowBottomBorder(this AndroidAutoCompleteEntry platformView, AutoCompleteEntry virtualView)
+    {
+        platformView.ShowBottomBorder = virtualView.ShowBottomBorder;
+    }
 }

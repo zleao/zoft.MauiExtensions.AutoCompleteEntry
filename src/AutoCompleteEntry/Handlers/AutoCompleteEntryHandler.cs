@@ -48,6 +48,7 @@ public partial class AutoCompleteEntryHandler : IAutoCompleteEntryHandler
 			[nameof(AutoCompleteEntry.UpdateTextOnSelect)] = MapUpdateTextOnSelect,
             [nameof(ITextAlignment.VerticalTextAlignment)] = MapVerticalTextAlignment,
             [nameof(AutoCompleteEntry.ItemTemplate)] = MapItemTemplate,
+            [nameof(AutoCompleteEntry.ShowBottomBorder)] = MapShowBottomBorder,
         };
 
 	/// <summary>

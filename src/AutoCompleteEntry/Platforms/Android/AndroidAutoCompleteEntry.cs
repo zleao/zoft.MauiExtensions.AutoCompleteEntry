@@ -29,6 +29,7 @@ public sealed class AndroidAutoCompleteEntry : AppCompatAutoCompleteTextView
     private bool _suppressTextChangedEvent;
     private Func<object, string> _textMemberPathFunc;
     private readonly AutoCompleteAdapter _adapter;
+    private bool _showBottomBorder = true;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="AndroidAutoCompleteEntry"/>.
@@ -131,6 +132,19 @@ public sealed class AndroidAutoCompleteEntry : AppCompatAutoCompleteTextView
             {
                 DismissDropDown();
             }
+        }
+    }
+
+    /// <summary>
+    /// Gets or sets a value indicating whether to render a border line under the text field
+    /// </summary>
+    public bool ShowBottomBorder
+    {
+        get => _showBottomBorder;
+        set
+        {
+            _showBottomBorder = value;
+            // TODO: Handle Android here
         }
     }
 

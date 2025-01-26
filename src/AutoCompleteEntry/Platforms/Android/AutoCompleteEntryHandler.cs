@@ -370,6 +370,16 @@ public partial class AutoCompleteEntryHandler : ViewHandler<AutoCompleteEntry, A
         handler?.PlatformView.UpdateItemTemplate(autoCompleteEntry);
     }
 
+    /// <summary>
+    /// Map the ShowBottomBorder value
+    /// </summary>
+    /// <param name="handler"></param>
+    /// <param name="autoCompleteEntry"></param>
+    public static void MapShowBottomBorder(IAutoCompleteEntryHandler handler, AutoCompleteEntry autoCompleteEntry)
+    {
+        handler?.PlatformView.UpdateShowBottomBorder(autoCompleteEntry);
+    }
+
     // Returns the default 'X' char drawable in the AppCompatEditText.
     protected virtual Drawable GetClearButtonDrawable() =>
         _clearButtonDrawable ??= ContextCompat.GetDrawable(Context, Resource.Drawable.abc_ic_clear_material);

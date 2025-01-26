@@ -197,6 +197,16 @@ public static class AutoCompleteEntryExtensions
         //                      (o) => !string.IsNullOrEmpty(virtualView?.TextMemberPath) ? o.GetPropertyValueAsString(virtualView?.TextMemberPath) : o?.ToString());
     }
 
+    /// <summary>
+    /// Update the ShowBottomBorder
+    /// </summary>
+    /// <param name="iosAutoCompleteEntry"></param>
+    /// <param name="autoCompleteEntry"></param>
+    public static void UpdateShowBottomBorder(this AutoSuggestBox platformView, AutoCompleteEntry virtualView)
+    {
+        //platformView.ShowBottomBorder = virtualView.ShowBottomBorder;
+    }
+
     private static void UpdateColors(Microsoft.UI.Xaml.ResourceDictionary resource, string[] keys, Microsoft.UI.Xaml.Media.Brush brush)
     {
         if (brush is null)
