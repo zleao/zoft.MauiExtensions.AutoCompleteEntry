@@ -163,4 +163,11 @@ public partial class AutoCompleteEntryHandler : ViewHandler<AutoCompleteEntry, o
     /// <param name="handler"></param>
     /// <param name="entry"></param>
     public static void MapVerticalTextAlignment(IAutoCompleteEntryHandler handler, IEntry entry) { }
+
+    /// <summary>
+    /// Map the ShowBottomBorder value
+    /// </summary>
+    /// <param name="handler"></param>
+    /// <param name="autoCompleteEntry"></param>
+    public static void MapShowBottomBorder(IAutoCompleteEntryHandler handler, AutoCompleteEntry autoCompleteEntry) { }
 }

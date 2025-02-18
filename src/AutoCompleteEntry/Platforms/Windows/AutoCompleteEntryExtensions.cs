@@ -184,6 +184,16 @@ public static class AutoCompleteEntryExtensions
         platformControl.VerticalContentAlignment = autoCompleteEntry.VerticalTextAlignment.ToPlatformVerticalAlignment();
     }
 
+    /// <summary>
+    /// Update the ShowBottomBorder
+    /// </summary>
+    /// <param name="iosAutoCompleteEntry"></param>
+    /// <param name="autoCompleteEntry"></param>
+    public static void UpdateShowBottomBorder(this AutoSuggestBox platformView, AutoCompleteEntry virtualView)
+    {
+        //TODO: Implement for Windows
+    }
+
     private static void UpdateColors(Microsoft.UI.Xaml.ResourceDictionary resource, string[] keys, Microsoft.UI.Xaml.Media.Brush brush)
     {
         if (brush is null)

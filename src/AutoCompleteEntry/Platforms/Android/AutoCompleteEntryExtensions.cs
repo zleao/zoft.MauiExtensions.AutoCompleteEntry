@@ -210,4 +210,14 @@ public static class AutoCompleteEntryExtensions
     {
         platformView.UpdateTextOnSelect = virtualView.UpdateTextOnSelect;
     }
+
+    /// <summary>
+    /// Update the ShowBottomBorder
+    /// </summary>
+    /// <param name="platformView"></param>
+    /// <param name="virtualView"></param>
+    public static void UpdateShowBottomBorder(this AndroidAutoCompleteEntry platformView, AutoCompleteEntry virtualView)
+    {
+        platformView.ShowBottomBorder = virtualView.ShowBottomBorder;
+    }
 }

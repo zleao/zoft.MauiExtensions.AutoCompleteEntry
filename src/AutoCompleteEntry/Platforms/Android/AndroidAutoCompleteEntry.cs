@@ -1,4 +1,5 @@
 using Android.Content;
+using Android.Graphics.Drawables;
 using Android.Runtime;
 using Android.Text;
 using Android.Views;
@@ -18,8 +19,10 @@ namespace zoft.MauiExtensions.Controls.Platform;
 public sealed class AndroidAutoCompleteEntry : AppCompatAutoCompleteTextView
 {
     private bool _suppressTextChangedEvent;
+    private bool _showBottomBorder = true;
     private Func<object, string> _textMemberPathFunc;
     private readonly AutoCompleteAdapter _adapter;
+    private Drawable _originalBackground;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="AndroidAutoCompleteEntry"/>.
@@ -38,6 +41,10 @@ public sealed class AndroidAutoCompleteEntry : AppCompatAutoCompleteTextView
         ItemClick += OnItemClick;
 
         Adapter = _adapter = new AutoCompleteAdapter(Context, global::Android.Resource.Layout.SimpleDropDownItem1Line);
+
+        _originalBackground = Background;
+
+        UpdateBottomBorderVisibility();
     }
 
     public void FreeResources()
@@ -130,6 +137,28 @@ public sealed class AndroidAutoCompleteEntry : AppCompatAutoCompleteTextView
     /// Gets or sets a value indicating whether items in the view will trigger an update of the editable text part of the <see cref="AutoCompleteEntry"/> when clicked.
     /// </summary>
     public bool UpdateTextOnSelect { get; set; } = true;
+
+    /// <summary>
+    /// Gets or sets a value indicating whether to render a border line under the text field
+    /// </summary>
+    public bool ShowBottomBorder
+    {
+        get => _showBottomBorder;
+        set
+        {
+             _showBottomBorder = value;
+
+            UpdateBottomBorderVisibility();
+        }
+    }
+
+    private void UpdateBottomBorderVisibility()
+    {
+        if (ShowBottomBorder)
+            Background = _originalBackground;
+        else
+            Background = null;
+    }
 
     /// <inheritdoc />
     protected override void OnTextChanged(ICharSequence text, int start, int lengthBefore, int lengthAfter)

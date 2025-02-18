@@ -46,7 +46,8 @@ public partial class AutoCompleteEntryHandler : IAutoCompleteEntryHandler
 			[nameof(IEntry.TextColor)] = MapTextColor,
 			[nameof(AutoCompleteEntry.TextMemberPath)] = MapTextMemberPath,
 			[nameof(AutoCompleteEntry.UpdateTextOnSelect)] = MapUpdateTextOnSelect,
-            [nameof(ITextAlignment.VerticalTextAlignment)] = MapVerticalTextAlignment
+            [nameof(ITextAlignment.VerticalTextAlignment)] = MapVerticalTextAlignment,
+            [nameof(AutoCompleteEntry.ShowBottomBorder)] = MapShowBottomBorder,
         };
 
 	/// <summary>

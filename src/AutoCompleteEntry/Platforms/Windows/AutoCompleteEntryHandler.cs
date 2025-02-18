@@ -318,4 +318,14 @@ public partial class AutoCompleteEntryHandler : ViewHandler<AutoCompleteEntry, A
     {
         handler.PlatformView?.UpdateVerticalTextAlignment(autoCompleteEntry);
     }
+
+    /// <summary>
+    /// Map the ShowBottomBorder value
+    /// </summary>
+    /// <param name="handler"></param>
+    /// <param name="autoCompleteEntry"></param>
+    public static void MapShowBottomBorder(IAutoCompleteEntryHandler handler, AutoCompleteEntry autoCompleteEntry)
+    {
+        handler?.PlatformView.UpdateShowBottomBorder(autoCompleteEntry);
+    }
 }
