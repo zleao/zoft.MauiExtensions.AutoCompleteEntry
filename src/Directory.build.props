@@ -13,14 +13,14 @@
     <NeutralLanguage>en</NeutralLanguage>
     <Version>3.0.8</Version>
     <Description>.Net MAUI Entry control that provides a list of suggestions as the user types.</Description>
-    <PackageTags>net8 maui zoft AutoCompleteEntry AutoCompleteBox AutoCompleteView AutoComplete</PackageTags>
+    <PackageTags>net9 maui zoft AutoCompleteEntry AutoCompleteBox AutoCompleteView AutoComplete</PackageTags>
     <PackageReleaseNotes>Add support for ReturnType</PackageReleaseNotes>
     <PackageReadmeFile>README.md</PackageReadmeFile>
 
     <LangVersion>latest</LangVersion>
     <Platform>AnyCPU</Platform>
     <DebugType>full</DebugType>
-    <LangVersion>10.0</LangVersion>
+    <LangVersion>13.0</LangVersion>
 
     <RootNamespace>zoft.MauiExtensions.Controls</RootNamespace>
   </PropertyGroup>

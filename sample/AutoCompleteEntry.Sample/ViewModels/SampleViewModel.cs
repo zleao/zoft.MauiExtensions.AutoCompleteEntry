@@ -1,7 +1,7 @@
-using System.Collections.ObjectModel;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
-using zoft.MauiExtensions.Core.ViewModels;
+using System.Collections.ObjectModel;
+using zoft.MauiExtensions.Core.Models;
 
 namespace AutoCompleteEntry.Sample.ViewModels
 {
@@ -14,7 +14,7 @@ namespace AutoCompleteEntry.Sample.ViewModels
         private string _country;
     }
 
-    internal partial class SampleViewModel : CoreViewModel
+    internal partial class SampleViewModel : ZoftObservableObject
     {
         private readonly List<ListItem> _teams =
         [
