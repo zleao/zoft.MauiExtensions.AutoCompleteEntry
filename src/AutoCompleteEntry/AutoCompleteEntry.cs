@@ -215,4 +215,21 @@ public class AutoCompleteEntry : Entry
     /// Raised before the text content of the editable control component is updated.
     /// </summary>
     public event EventHandler<AutoCompleteEntrySuggestionChosenEventArgs> SuggestionChosen;
+
+    /// <summary>
+    /// Gets or sets whether to show the bottom border, default is true.
+    /// </summary>
+    public bool ShowBottomBorder
+    {
+        get => (bool)GetValue(ShowBottomBorderProperty);
+        set => SetValue(ShowBottomBorderProperty, value);
+    }
+
+    /// <summary>
+    /// Identifies the <see cref="ShowBottomBorder"/> bindable property.
+    /// </summary>
+    public static readonly BindableProperty ShowBottomBorderProperty =
+        BindableProperty.Create(nameof(ShowBottomBorder),
+            typeof(bool),
+            typeof(AutoCompleteEntry), true, BindingMode.TwoWay);
 }

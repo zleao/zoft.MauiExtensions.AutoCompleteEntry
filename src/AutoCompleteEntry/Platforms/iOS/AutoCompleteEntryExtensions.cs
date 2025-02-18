@@ -146,4 +146,14 @@ public static class AutoCompleteEntryExtensions
     {
         iosAutoCompleteEntry.UpdateTextOnSelect = autoCompleteEntry.UpdateTextOnSelect;
     }
+
+    /// <summary>
+    /// Update the ShowBottomBorder
+    /// </summary>
+    /// <param name="iosAutoCompleteEntry"></param>
+    /// <param name="autoCompleteEntry"></param>
+    public static void UpdateShowBottomBorder(this IOSAutoCompleteEntry iosAutoCompleteEntry, AutoCompleteEntry autoCompleteEntry)
+    {
+        iosAutoCompleteEntry.ShowBottomBorder = autoCompleteEntry.ShowBottomBorder;
+    }
 }

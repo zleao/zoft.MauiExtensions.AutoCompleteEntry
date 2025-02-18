@@ -33,7 +33,4 @@
     <Compile Remove="**\Standard\**\*.cs" />
     <None Include="**\Standard\**\*.cs" />
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Platforms\Tizen\" />
-  </ItemGroup>
 </Project>
