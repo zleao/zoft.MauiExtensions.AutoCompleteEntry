@@ -1,6 +1,6 @@
 variables:
   
-  TOOLKIT_NET_VERSION: '8.0.x'
+  DotNetVersion: '9.0.200'
   PathToProjectFolder: 'src\AutoCompleteEntry'
   PathToProjectFile: '$(PathToProjectFolder)\AutoCompleteEntry.csproj'
   BuildConfiguration: Release
@@ -19,15 +19,15 @@ jobs:
     steps:
 
       - task: UseDotNet@2
-        displayName: Install .NET $(TOOLKIT_NET_VERSION)
+        displayName: Install .NET $(DotNetVersion)
         inputs:
           packageType: 'sdk'
-          version: '$(TOOLKIT_NET_VERSION)'
+          version: '$(DotNetVersion)'
 
       - task: CmdLine@2
-        displayName: 'Install .NET MAUI Workload $(TOOLKIT_NET_VERSION)'
+        displayName: 'Install .NET MAUI Workload $(DotNetVersion)'
         inputs:
-          script: dotnet workload install maui
+          script: dotnet workload restore $(PathToProjectFile)
 
       - task: NuGetToolInstaller@1
         displayName: 'Install Latest Nuget Package Manager'
