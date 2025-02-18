@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <TargetFrameworks>net8.0;net8.0-android;net8.0-ios;net8.0-maccatalyst</TargetFrameworks>
-    <TargetFrameworks Condition="$([MSBuild]::IsOSPlatform('windows'))">$(TargetFrameworks);net8.0-windows10.0.19041.0</TargetFrameworks>
+    <TargetFrameworks>net9.0;net9.0-android;net9.0-ios;net9.0-maccatalyst</TargetFrameworks>
+    <TargetFrameworks Condition="$([MSBuild]::IsOSPlatform('windows'))">$(TargetFrameworks);net9.0-windows10.0.19041.0</TargetFrameworks>
     <UseMaui>true</UseMaui>
     <SingleProject>true</SingleProject>
     <ImplicitUsings>enable</ImplicitUsings>
@@ -17,18 +17,17 @@
   </PropertyGroup>
   <!-- Referenced Nuget Packages -->
   <ItemGroup>
-    <PackageReference Include="zoft.MauiExtensions.Core" Version="3.0.0" />
-    <PackageReference Include="Microsoft.Maui.Controls" Version="8.0.80" />
-    <PackageReference Include="Microsoft.Maui.Controls.Compatibility" Version="8.0.80" />
+    <PackageReference Include="zoft.MauiExtensions.Core" Version="5.0.0" />
+    <PackageReference Include="Microsoft.Maui.Controls" Version="9.0.40" />
   </ItemGroup>
-<ItemGroup Condition="$(TargetFramework.StartsWith('net8.0-windows')) == true">
-	<PackageReference Include="CommunityToolkit.WinUI.Extensions" Version="8.1.240821" />
+<ItemGroup Condition="$(TargetFramework.StartsWith('net9.0-windows')) == true">
+	<PackageReference Include="CommunityToolkit.WinUI.Extensions" Version="8.1.240916" />
 </ItemGroup>
-  <ItemGroup Condition="$(TargetFramework.StartsWith('net8.0-maccatalyst')) == true">
-    <PackageReference Include="Microsoft.Maui.Graphics" Version="8.0.80" />
+  <ItemGroup Condition="$(TargetFramework.StartsWith('net9.0-maccatalyst')) == true">
+    <PackageReference Include="Microsoft.Maui.Graphics" Version="9.0.40" />
   </ItemGroup>
   <!-- Platform Specific Files-->
-  <ItemGroup Condition="$(TargetFramework.StartsWith('net8.0-ios')) == true OR $(TargetFramework.StartsWith('net8.0-maccatalyst')) == true OR $(TargetFramework.StartsWith('net8.0-android')) == true OR $(TargetFramework.Contains('-windows')) == true">
+  <ItemGroup Condition="$(TargetFramework.StartsWith('net9.0-ios')) == true OR $(TargetFramework.StartsWith('net9.0-maccatalyst')) == true OR $(TargetFramework.StartsWith('net9.0-android')) == true OR $(TargetFramework.Contains('-windows')) == true">
     <Compile Remove="**\*.Standard.cs" />
     <None Include="**\*.Standard.cs" />
     <Compile Remove="**\Standard\**\*.cs" />
