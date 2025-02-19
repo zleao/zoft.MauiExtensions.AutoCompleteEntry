@@ -16,12 +16,12 @@ namespace zoft.MauiExtensions.Controls.Platform;
 /// <summary>
 ///  Extends AppCompatAutoCompleteTextView to have similar APIs and behavior to WinUI's AutoSuggestBox, which greatly simplifies wrapping it
 /// </summary>
-public sealed class AndroidAutoCompleteEntry : AppCompatAutoCompleteTextView
+public sealed partial class AndroidAutoCompleteEntry : AppCompatAutoCompleteTextView
 {
     private bool _suppressTextChangedEvent;
     private bool _showBottomBorder = true;
     private Func<object, string> _textMemberPathFunc;
-    private readonly AutoCompleteAdapter _adapter;
+    private readonly AutoCompleteEntryAdapter _adapter;
     private Drawable _originalBackground;
 
     /// <summary>
@@ -30,17 +30,17 @@ public sealed class AndroidAutoCompleteEntry : AppCompatAutoCompleteTextView
     public AndroidAutoCompleteEntry(Context context) : base(context)
     {
         SetMaxLines(1);
-            
+
         //Search should be triggered even with empty text field
         Threshold = 0;
 
         //Disables text suggestions
         InputType = InputTypes.TextFlagNoSuggestions | InputTypes.TextVariationVisiblePassword;
-            
+
         //Listen to when a suggestion is selected
         ItemClick += OnItemClick;
 
-        Adapter = _adapter = new AutoCompleteAdapter(Context, global::Android.Resource.Layout.SimpleDropDownItem1Line);
+        Adapter = _adapter = new AutoCompleteEntryAdapter(Context);
 
         _originalBackground = Background;
 
@@ -67,11 +67,10 @@ public sealed class AndroidAutoCompleteEntry : AppCompatAutoCompleteTextView
         base.OnFocusChanged(gainFocus, direction, previouslyFocusedRect);
     }
 
-    internal void SetItems(IList items, Func<object, string> displayMemberPathFunc, Func<object, string> textMemberPathFunc)
+    internal void SetItems(IList items, string displayMemberPath, Func<object, string> textMemberPathFunc)
     {
         _textMemberPathFunc = textMemberPathFunc;
-        
-        _adapter.UpdateList(items is null ? Enumerable.Empty<string>() : items.OfType<object>(), displayMemberPathFunc);
+        _adapter.UpdateList(items is null ? Enumerable.Empty<string>() : items.OfType<object>(), displayMemberPath);
     }
 
     /// <summary>
@@ -146,7 +145,7 @@ public sealed class AndroidAutoCompleteEntry : AppCompatAutoCompleteTextView
         get => _showBottomBorder;
         set
         {
-             _showBottomBorder = value;
+            _showBottomBorder = value;
 
             UpdateBottomBorderVisibility();
         }
@@ -221,6 +220,11 @@ public sealed class AndroidAutoCompleteEntry : AppCompatAutoCompleteTextView
         //Override to avoid updating textbox on itemclick. We'll do this later using TextMemberPath and raise the proper TextChanged event then
     }
 
+    internal void SetItemTemplate(DataTemplate itemTemplate)
+    {
+        _adapter.ItemTemplate = itemTemplate;
+    }
+
     /// <summary>
     /// Raised after the text content of the editable control component is updated.
     /// </summary>
@@ -232,61 +236,4 @@ public sealed class AndroidAutoCompleteEntry : AppCompatAutoCompleteTextView
     /// Raised before the text content of the editable control component is updated.
     /// </summary>
     public event EventHandler<AutoCompleteEntrySuggestionChosenEventArgs> SuggestionChosen;
-
-    private class AutoCompleteAdapter : ArrayAdapter, IFilterable
-    {
-        private readonly AutoCompleteFilter _filter = new();
-        private List<object> resultList;
-        private Func<object, string> _displayMemberPathFunc;
-
-        public AutoCompleteAdapter(Context context, int textViewResourceId) : base(context, textViewResourceId)
-        {
-            resultList = new List<object>();
-            SetNotifyOnChange(true);
-        }
-
-        public void UpdateList(IEnumerable<object> list, Func<object, string> displayMemberPathFunc)
-        {
-            _displayMemberPathFunc = displayMemberPathFunc;
-            resultList = list.ToList();
-            _filter.SetFilter(resultList.Select(s => _displayMemberPathFunc(s)));
-            NotifyDataSetChanged();
-        }
-
-        public override int Count => resultList.Count;
-
-        public override Filter Filter => _filter;
-
-        public override Java.Lang.Object GetItem(int position) => _displayMemberPathFunc(GetObject(position));
-            
-        public object GetObject(int position) => resultList[position];
-
-        private class AutoCompleteFilter : Filter
-        {
-            private IEnumerable<string> resultList;
-
-            public AutoCompleteFilter()
-            {
-            }
-
-            public void SetFilter(IEnumerable<string> list)
-            {
-                resultList = list;
-            }
-
-            protected override FilterResults PerformFiltering(ICharSequence constraint)
-            {
-                if (resultList is null)
-                {
-                    return new FilterResults() { Count = 0, Values = null };
-                }
-                var arr = resultList.ToArray();
-                return new FilterResults() { Count = arr.Length, Values = arr };
-            }
-
-            protected override void PublishResults(ICharSequence constraint, FilterResults results)
-            {
-            }
-        }
-    }
 }

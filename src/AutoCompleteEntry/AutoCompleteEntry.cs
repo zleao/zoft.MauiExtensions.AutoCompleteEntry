@@ -232,4 +232,22 @@ public class AutoCompleteEntry : Entry
         BindableProperty.Create(nameof(ShowBottomBorder),
             typeof(bool),
             typeof(AutoCompleteEntry), true, BindingMode.TwoWay);
+
+    /// <summary>
+    /// Get or Set the item template to apply to the list of results
+    /// </summary>
+    public DataTemplate ItemTemplate
+    {
+        get => (DataTemplate)GetValue(ItemTemplateProperty);
+        set => SetValue(ItemTemplateProperty, value);
+    }
+
+    /// <summary>
+    /// Identifies the <see cref="ItemTemplate"/> bindable property.
+    /// </summary>
+    public static readonly BindableProperty ItemTemplateProperty =
+        BindableProperty.Create(nameof(ItemTemplate),
+            typeof(DataTemplate),
+            typeof(AutoCompleteEntry), null, BindingMode.OneWay);
+
 }

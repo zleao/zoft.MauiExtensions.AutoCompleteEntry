@@ -156,4 +156,14 @@ public static class AutoCompleteEntryExtensions
     {
         iosAutoCompleteEntry.ShowBottomBorder = autoCompleteEntry.ShowBottomBorder;
     }
+
+    /// <summary>
+    /// Update the ItemTemplate
+    /// </summary>
+    /// <param name="platformView"></param>
+    /// <param name="virtualView"></param>
+    public static void UpdateItemTemplate(this IOSAutoCompleteEntry platformView, AutoCompleteEntry virtualView)
+    {
+        //TODO: Implement ItemTemplate handling
+    }
 }

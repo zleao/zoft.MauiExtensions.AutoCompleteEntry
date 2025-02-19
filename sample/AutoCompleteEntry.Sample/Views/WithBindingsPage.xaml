@@ -62,7 +62,24 @@
                 ShowBottomBorder="{Binding ShowBottomBorder}"
                 Text="{Binding Text}"
                 TextChangedCommand="{Binding TextChangedCommand}"
-                TextMemberPath="Country" />
+                TextMemberPath="Country">
+                <zoft:AutoCompleteEntry.ItemTemplate>
+                    <DataTemplate x:DataType="vm:ListItem">
+                        <Grid ColumnDefinitions="auto, *">
+                            <Label
+                                Grid.Column="0"
+                                BackgroundColor="Red"
+                                FontSize="Large"
+                                Text="{Binding Group}" />
+                            <Label
+                                Grid.Column="1"
+                                BackgroundColor="Yellow"
+                                FontSize="Large"
+                                Text="{Binding Country}" />
+                        </Grid>
+                    </DataTemplate>
+                </zoft:AutoCompleteEntry.ItemTemplate>
+            </zoft:AutoCompleteEntry>
 
             <Frame
                 BackgroundColor="LightGray"

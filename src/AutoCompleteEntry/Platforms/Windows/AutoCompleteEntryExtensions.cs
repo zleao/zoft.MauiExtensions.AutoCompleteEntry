@@ -194,6 +194,16 @@ public static class AutoCompleteEntryExtensions
         //TODO: Implement for Windows
     }
 
+    /// <summary>
+    /// Update the ItemTemplate
+    /// </summary>
+    /// <param name="platformView"></param>
+    /// <param name="virtualView"></param>
+    public static void UpdateItemTemplate(this AutoSuggestBox platformView, AutoCompleteEntry virtualView)
+    {
+        //TOOD: Implement for Windows
+    }
+
     private static void UpdateColors(Microsoft.UI.Xaml.ResourceDictionary resource, string[] keys, Microsoft.UI.Xaml.Media.Brush brush)
     {
         if (brush is null)
