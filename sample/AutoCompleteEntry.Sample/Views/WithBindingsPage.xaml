@@ -81,12 +81,13 @@
                 </zoft:AutoCompleteEntry.ItemTemplate>
             </zoft:AutoCompleteEntry>
 
-            <Frame
+            <Border
                 BackgroundColor="LightGray"
-                BorderColor="Gray"
                 HorizontalOptions="Start"
-                IsVisible="{Binding SelectedItem, Converter={StaticResource IsNotNullConverter}}">
-                <VerticalStackLayout>
+                IsVisible="{Binding SelectedItem, Converter={StaticResource IsNotNullConverter}}"
+                Stroke="Gray"
+                StrokeShape="RoundRectangle 8">
+                <VerticalStackLayout Padding="10">
                     <HorizontalStackLayout Spacing="5">
                         <Label Text="Group:" />
                         <Label FontAttributes="Bold" Text="{Binding SelectedItem.Group}" />
@@ -96,7 +97,7 @@
                         <Label FontAttributes="Bold" Text="{Binding SelectedItem.Country}" />
                     </HorizontalStackLayout>
                 </VerticalStackLayout>
-            </Frame>
+            </Border>
 
         </VerticalStackLayout>
     </Grid>
