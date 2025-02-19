@@ -65,17 +65,23 @@
                 TextMemberPath="Country">
                 <zoft:AutoCompleteEntry.ItemTemplate>
                     <DataTemplate x:DataType="vm:ListItem">
-                        <Grid ColumnDefinitions="auto, *">
+                        <Grid ColumnDefinitions="auto, *" HeightRequest="35">
                             <Label
                                 Grid.Column="0"
+                                Padding="2"
                                 BackgroundColor="Red"
                                 FontSize="Large"
-                                Text="{Binding Group}" />
+                                Text="{Binding Group}"
+                                TextColor="White"
+                                VerticalTextAlignment="Center" />
                             <Label
                                 Grid.Column="1"
+                                Padding="2"
                                 BackgroundColor="Yellow"
                                 FontSize="Large"
-                                Text="{Binding Country}" />
+                                Text="{Binding Country}"
+                                TextColor="Black"
+                                VerticalTextAlignment="Center" />
                         </Grid>
                     </DataTemplate>
                 </zoft:AutoCompleteEntry.ItemTemplate>
