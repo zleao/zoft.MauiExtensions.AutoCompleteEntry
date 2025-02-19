@@ -33,6 +33,7 @@ internal class AutoCompleteEntryAdapter : BaseAdapter, IFilterable
                     label.SetBinding(Label.TextProperty, _displayMemberPath ?? ".");
                     label.HorizontalTextAlignment = Microsoft.Maui.TextAlignment.Center;
                     label.VerticalTextAlignment = Microsoft.Maui.TextAlignment.Center;
+                    label.MinimumHeightRequest = 35;
 
                     return label;
                 });
