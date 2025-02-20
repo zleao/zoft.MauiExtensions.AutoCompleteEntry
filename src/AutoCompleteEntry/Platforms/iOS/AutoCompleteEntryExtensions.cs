@@ -18,7 +18,7 @@ public static class AutoCompleteEntryExtensions
     public static void UpdateDisplayMemberPath(this IOSAutoCompleteEntry iosAutoCompleteEntry, AutoCompleteEntry autoCompleteEntry)
     {
         iosAutoCompleteEntry.SetItems(autoCompleteEntry.ItemsSource,
-                                      (o) => !string.IsNullOrEmpty(autoCompleteEntry?.DisplayMemberPath) ? o.GetPropertyValueAsString(autoCompleteEntry?.DisplayMemberPath) : o?.ToString(),
+                                      autoCompleteEntry?.DisplayMemberPath,
                                       (o) => !string.IsNullOrEmpty(autoCompleteEntry?.TextMemberPath) ? o.GetPropertyValueAsString(autoCompleteEntry?.TextMemberPath) : o?.ToString());
     }
 
@@ -60,7 +60,7 @@ public static class AutoCompleteEntryExtensions
     public static void UpdateItemsSource(this IOSAutoCompleteEntry iosAutoCompleteEntry, AutoCompleteEntry autoCompleteEntry)
     {
         iosAutoCompleteEntry.SetItems(autoCompleteEntry?.ItemsSource,
-                                      (o) => !string.IsNullOrEmpty(autoCompleteEntry?.DisplayMemberPath) ? o.GetPropertyValueAsString(autoCompleteEntry?.DisplayMemberPath) : o?.ToString(),
+                                      autoCompleteEntry?.DisplayMemberPath,
                                       (o) => !string.IsNullOrEmpty(autoCompleteEntry?.TextMemberPath) ? o.GetPropertyValueAsString(autoCompleteEntry?.TextMemberPath) : o?.ToString());
     }
 
@@ -162,8 +162,8 @@ public static class AutoCompleteEntryExtensions
     /// </summary>
     /// <param name="platformView"></param>
     /// <param name="virtualView"></param>
-    public static void UpdateItemTemplate(this IOSAutoCompleteEntry platformView, AutoCompleteEntry virtualView)
+    public static void UpdateItemTemplate(this IOSAutoCompleteEntry iosAutoCompleteEntry, AutoCompleteEntry autoCompleteEntry)
     {
-        //TODO: Implement ItemTemplate handling
+        iosAutoCompleteEntry.ItemTemplate = autoCompleteEntry.ItemTemplate;
     }
 }

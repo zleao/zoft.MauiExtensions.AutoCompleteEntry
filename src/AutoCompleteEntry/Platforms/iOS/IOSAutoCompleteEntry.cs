@@ -1,5 +1,7 @@
 using CoreGraphics;
 using Foundation;
+using Microsoft.Maui.Controls.Internals;
+using Microsoft.Maui.Controls.Platform.Compatibility;
 using ObjCRuntime;
 using System.Collections;
 using System.Collections.Specialized;
@@ -43,6 +45,8 @@ public sealed class IOSAutoCompleteEntry : UIView
     private bool _showBottomBorder = true;
     private readonly NSObject _keyboardShownObserverToken;
     private readonly NSObject _keyboardHiddenObserverToken;
+
+    public DataTemplate ItemTemplate { get; set; }
 
     /// <summary>
     /// Gets a reference to the text field in the view
@@ -246,7 +250,7 @@ public sealed class IOSAutoCompleteEntry : UIView
         Layer.MasksToBounds = true;
     }
 
-    internal void SetItems(IList items, Func<object, string> labelFunc, Func<object, string> textFunc)
+    internal void SetItems(IList items, string displayMemberPath, Func<object, string> textFunc)
     {
         _textFunc = textFunc;
 
@@ -260,7 +264,7 @@ public sealed class IOSAutoCompleteEntry : UIView
 
         if (items != null)
         {
-            var suggestionTableSource = new TableSource(SelectionList, items, labelFunc);
+            var suggestionTableSource = new TableSource(SelectionList, items, displayMemberPath, ItemTemplate);
             suggestionTableSource.TableRowSelected += SuggestionTableSource_TableRowSelected;
             SelectionList.Source = suggestionTableSource;
             SelectionList.ReloadData();
@@ -359,15 +363,42 @@ public sealed class IOSAutoCompleteEntry : UIView
     {
         private readonly UITableView _view;
         private readonly IList _items;
-        private readonly Func<object, string> _labelFunc;
+        private readonly string _displayMemberPath;
+        private readonly DataTemplate _itemTemplate;
         private readonly string _cellIdentifier;
+        private readonly Page _listViewContainer;
 
-        public TableSource(UITableView view, IList items, Func<object, string> labelFunc)
+        private DataTemplate _defaultItemTemplate;
+        internal DataTemplate DefaultItemTemplate
+        {
+            get
+            {
+                if (_defaultItemTemplate == null)
+                {
+                    _defaultItemTemplate = new DataTemplate(() =>
+                    {
+                        var label = new Label();
+                        label.SetBinding(Label.TextProperty, _displayMemberPath ?? ".");
+                        label.HorizontalTextAlignment = Microsoft.Maui.TextAlignment.Center;
+                        label.VerticalTextAlignment = Microsoft.Maui.TextAlignment.Center;
+                        label.MinimumHeightRequest = 35;
+
+                        return label;
+                    });
+                }
+
+                return _defaultItemTemplate;
+            }
+        }
+
+        public TableSource(UITableView view, IList items, string displayMemberPath, DataTemplate itemTemplate)
         {
             _view = view;
             _items = items;
-            _labelFunc = labelFunc;
+            _displayMemberPath = displayMemberPath;
+            _itemTemplate = itemTemplate;
             _cellIdentifier = Guid.NewGuid().ToString();
+            _listViewContainer = Application.Current.Windows[0].Page;
 
             CheckIfItemsSourceIsNotifiable();
         }
@@ -411,11 +442,21 @@ public sealed class IOSAutoCompleteEntry : UIView
         {
             var cell = tableView.DequeueReusableCell(_cellIdentifier);
 
-            cell ??= new UITableViewCell(UITableViewCellStyle.Default, _cellIdentifier);
-
             var item = _items[indexPath.Row];
 
-            cell.TextLabel.Text = _labelFunc(item);
+            var templateToUse = _itemTemplate ?? DefaultItemTemplate;
+
+            if (cell is not UIContainerCell containerCell)
+            {
+                var view = (View)templateToUse.CreateContent(item, _listViewContainer);
+                view.BindingContext = item;
+                view.Parent = _listViewContainer;
+                cell = new UIContainerCell(_cellIdentifier, view);
+            }
+            else
+            {
+                containerCell.View.BindingContext = item;
+            }
 
             return cell;
         }
@@ -440,22 +481,19 @@ public sealed class IOSAutoCompleteEntry : UIView
         private void OnTableRowSelected(NSIndexPath itemIndexPath)
         {
             var item = _items[itemIndexPath.Row];
-            var label = _labelFunc(item);
-            TableRowSelected?.Invoke(this, new TableRowSelectedEventArgs<object>(item, label, itemIndexPath));
+            TableRowSelected?.Invoke(this, new TableRowSelectedEventArgs<object>(item, itemIndexPath));
         }
     }
 
     private class TableRowSelectedEventArgs<T> : EventArgs
     {
-        public TableRowSelectedEventArgs(T selectedItem, string selectedItemLabel, NSIndexPath selectedItemIndexPath)
+        public TableRowSelectedEventArgs(T selectedItem, NSIndexPath selectedItemIndexPath)
         {
             SelectedItem = selectedItem;
-            SelectedItemLabel = selectedItemLabel;
             SelectedItemIndexPath = selectedItemIndexPath;
         }
 
         public T SelectedItem { get; }
-        public string SelectedItemLabel { get; }
         public NSIndexPath SelectedItemIndexPath { get; }
     }
 
