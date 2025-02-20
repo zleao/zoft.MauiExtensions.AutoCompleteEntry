@@ -1,10 +1,7 @@
 using CoreGraphics;
 using Foundation;
-using Microsoft.Maui.Controls.Internals;
-using Microsoft.Maui.Controls.Platform.Compatibility;
 using ObjCRuntime;
 using System.Collections;
-using System.Collections.Specialized;
 using System.Drawing;
 using UIKit;
 
@@ -13,7 +10,7 @@ namespace zoft.MauiExtensions.Controls.Platform;
 /// <summary>
 ///  Creates a UIView with dropdown with a similar API and behavior to UWP's AutoSuggestBox
 /// </summary>
-public sealed class IOSAutoCompleteEntry : UIView
+public sealed partial class IOSAutoCompleteEntry : UIView
 {
     /// <summary>
     /// Raised after the text content of the editable control component is updated.
@@ -250,11 +247,11 @@ public sealed class IOSAutoCompleteEntry : UIView
         Layer.MasksToBounds = true;
     }
 
-    internal void SetItems(IList items, string displayMemberPath, Func<object, string> textFunc)
+    internal void SetItems(IList items, string displayMemberPath, Func<object, string> textFunc, IMauiContext mauiContext)
     {
         _textFunc = textFunc;
 
-        if (SelectionList.Source is TableSource oldSource)
+        if (SelectionList.Source is AutoCompleteEntryTableSource oldSource)
         {
             oldSource.TableRowSelected -= SuggestionTableSource_TableRowSelected;
             oldSource.Dispose();
@@ -264,7 +261,7 @@ public sealed class IOSAutoCompleteEntry : UIView
 
         if (items != null)
         {
-            var suggestionTableSource = new TableSource(SelectionList, items, displayMemberPath, ItemTemplate);
+            var suggestionTableSource = new AutoCompleteEntryTableSource(SelectionList, items, displayMemberPath, ItemTemplate, mauiContext);
             suggestionTableSource.TableRowSelected += SuggestionTableSource_TableRowSelected;
             SelectionList.Source = suggestionTableSource;
             SelectionList.ReloadData();
@@ -357,144 +354,6 @@ public sealed class IOSAutoCompleteEntry : UIView
         SuggestionChosen?.Invoke(this, new AutoCompleteEntrySuggestionChosenEventArgs(selection));
         IsSuggestionListOpen = false;
         ResignFirstResponder();
-    }
-
-    private class TableSource : UITableViewSource
-    {
-        private readonly UITableView _view;
-        private readonly IList _items;
-        private readonly string _displayMemberPath;
-        private readonly DataTemplate _itemTemplate;
-        private readonly string _cellIdentifier;
-        private readonly Page _listViewContainer;
-
-        private DataTemplate _defaultItemTemplate;
-        internal DataTemplate DefaultItemTemplate
-        {
-            get
-            {
-                if (_defaultItemTemplate == null)
-                {
-                    _defaultItemTemplate = new DataTemplate(() =>
-                    {
-                        var label = new Label();
-                        label.SetBinding(Label.TextProperty, _displayMemberPath ?? ".");
-                        label.HorizontalTextAlignment = Microsoft.Maui.TextAlignment.Center;
-                        label.VerticalTextAlignment = Microsoft.Maui.TextAlignment.Center;
-                        label.MinimumHeightRequest = 35;
-
-                        return label;
-                    });
-                }
-
-                return _defaultItemTemplate;
-            }
-        }
-
-        public TableSource(UITableView view, IList items, string displayMemberPath, DataTemplate itemTemplate)
-        {
-            _view = view;
-            _items = items;
-            _displayMemberPath = displayMemberPath;
-            _itemTemplate = itemTemplate;
-            _cellIdentifier = Guid.NewGuid().ToString();
-            _listViewContainer = Application.Current.Windows[0].Page;
-
-            CheckIfItemsSourceIsNotifiable();
-        }
-
-        private void CheckIfItemsSourceIsNotifiable()
-        {
-            if (_items is INotifyCollectionChanged notifiableItems)
-            {
-                notifiableItems.CollectionChanged += NotifiableItems_CollectionChanged;
-            }
-        }
-
-        private void NotifiableItems_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
-        {
-            if (!MainThread.IsMainThread)
-            {
-                MainThread.BeginInvokeOnMainThread(() => CollectionChanged(e));
-            }
-            else
-            {
-                CollectionChanged(e);
-            }
-        }
-
-        private void CollectionChanged(NotifyCollectionChangedEventArgs args)
-        {
-            _view.ReloadData();
-        }
-
-        protected override void Dispose(bool disposing)
-        {
-            base.Dispose(disposing);
-
-            if (disposing && _items is INotifyCollectionChanged notifiableItems)
-            {
-                notifiableItems.CollectionChanged -= NotifiableItems_CollectionChanged;
-            }
-        }
-
-        public override UITableViewCell GetCell(UITableView tableView, NSIndexPath indexPath)
-        {
-            var cell = tableView.DequeueReusableCell(_cellIdentifier);
-
-            var item = _items[indexPath.Row];
-
-            var templateToUse = _itemTemplate ?? DefaultItemTemplate;
-
-            if (cell is not UIContainerCell containerCell)
-            {
-                var view = (View)templateToUse.CreateContent(item, _listViewContainer);
-                view.BindingContext = item;
-                view.Parent = _listViewContainer;
-                cell = new UIContainerCell(_cellIdentifier, view);
-            }
-            else
-            {
-                containerCell.View.BindingContext = item;
-            }
-
-            return cell;
-        }
-
-        public override void RowSelected(UITableView tableView, NSIndexPath indexPath)
-        {
-            OnTableRowSelected(indexPath);
-        }
-
-        public override nint RowsInSection(UITableView tableview, nint section)
-        {
-            return _items.Count;
-        }
-
-        public override nfloat GetHeightForRow(UITableView tableView, NSIndexPath indexPath)
-        {
-            return 30f;
-        }
-
-        public event EventHandler<TableRowSelectedEventArgs<object>> TableRowSelected;
-
-        private void OnTableRowSelected(NSIndexPath itemIndexPath)
-        {
-            var item = _items[itemIndexPath.Row];
-            TableRowSelected?.Invoke(this, new TableRowSelectedEventArgs<object>(item, itemIndexPath));
-        }
-    }
-
-    private class TableRowSelectedEventArgs<T> : EventArgs
-    {
-        public TableRowSelectedEventArgs(T selectedItem, NSIndexPath selectedItemIndexPath)
-        {
-            SelectedItem = selectedItem;
-            SelectedItemIndexPath = selectedItemIndexPath;
-        }
-
-        public T SelectedItem { get; }
-        public NSIndexPath SelectedItemIndexPath { get; }
     }
 
     public class MyUITextField : UITextField
