@@ -1,3 +1,4 @@
+using CoreAnimation;
 using CoreGraphics;
 using Foundation;
 using ObjCRuntime;
@@ -38,7 +39,7 @@ public sealed partial class IOSAutoCompleteEntry : UIView
     private nfloat _keyboardHeight;
     private NSLayoutConstraint _bottomConstraint;
     private Func<object, string> _textFunc;
-    private CoreAnimation.CALayer _border;
+    private CoreAnimation.CALayer _border = null;
     private bool _showBottomBorder = true;
     private readonly NSObject _keyboardShownObserverToken;
     private readonly NSObject _keyboardHiddenObserverToken;
@@ -150,6 +151,13 @@ public sealed partial class IOSAutoCompleteEntry : UIView
 
         _keyboardShownObserverToken?.Dispose();
         _keyboardHiddenObserverToken?.Dispose();
+
+        if(_border != null && _border.SuperLayer != null)
+        {
+            _border.RemoveFromSuperLayer();
+            _border.Dispose();
+            _border = null;
+        }
     }
 
     /// <summary>
@@ -232,17 +240,20 @@ public sealed partial class IOSAutoCompleteEntry : UIView
     public override void LayoutSubviews()
     {
         base.LayoutSubviews();
+
         AddBottomBorder();
     }
 
     private void AddBottomBorder()
     {
-        _border = new CoreAnimation.CALayer();
+        if (_border != null) return;
+
         const float width = 1f;
+        _border = new CoreAnimation.CALayer();
         _border.BorderColor = UIColor.LightGray.CGColor;
         _border.Frame = new CGRect(0, Frame.Size.Height - width, Frame.Size.Width, Frame.Size.Height);
         _border.BorderWidth = width;
-        _border.Hidden = !_showBottomBorder;
+        _border.Hidden = !ShowBottomBorder;
         Layer.AddSublayer(_border);
         Layer.MasksToBounds = true;
     }
