@@ -16,8 +16,8 @@ public static class AutoCompleteEntryExtensions
     /// This will return True to handle OnTouch to prevent re-activating keyboard after clearing the text.
     /// </summary>
     /// <returns>True if clear button is clicked and Text is cleared. False if not.</returns>
-    public static bool HandleClearButtonTouched(this AndroidAutoCompleteEntry platformView, 
-                                                Android.Views.View.TouchEventArgs touchEvent, 
+    public static bool HandleClearButtonTouched(this AndroidAutoCompleteEntry platformView,
+                                                Android.Views.View.TouchEventArgs touchEvent,
                                                 Func<Drawable> getClearButtonDrawable)
     {
         if (platformView is null)
@@ -113,9 +113,9 @@ public static class AutoCompleteEntryExtensions
         bool isFocused = platformView.IsFocused;
         bool hasText = virtualView.Text?.Length > 0;
         bool shouldDisplayClearButton = virtualView.ClearButtonVisibility == ClearButtonVisibility.WhileEditing
-                                        && 
+                                        &&
                                         hasText
-                                        && 
+                                        &&
                                         isFocused;
 
         if (shouldDisplayClearButton)
@@ -135,9 +135,10 @@ public static class AutoCompleteEntryExtensions
     /// <param name="virtualView"></param>
     public static void UpdateDisplayMemberPath(this AndroidAutoCompleteEntry platformView, AutoCompleteEntry virtualView)
     {
-        platformView.SetItems(virtualView.ItemsSource,
-                                          (o) => !string.IsNullOrEmpty(virtualView?.DisplayMemberPath) ? o.GetPropertyValueAsString(virtualView?.DisplayMemberPath) : o?.ToString(),
-                                          (o) => !string.IsNullOrEmpty(virtualView?.TextMemberPath) ? o.GetPropertyValueAsString(virtualView?.TextMemberPath) : o?.ToString());
+        platformView.SetItems(
+            virtualView.ItemsSource,
+            virtualView?.DisplayMemberPath,
+            (o) => !string.IsNullOrEmpty(virtualView?.TextMemberPath) ? o.GetPropertyValueAsString(virtualView?.TextMemberPath) : o?.ToString());
     }
 
     /// <summary>
@@ -170,9 +171,10 @@ public static class AutoCompleteEntryExtensions
     /// <param name="virtualView"></param>
     public static void UpdateItemsSource(this AndroidAutoCompleteEntry platformView, AutoCompleteEntry virtualView)
     {
-        platformView.SetItems(virtualView?.ItemsSource,
-                                          (o) => !string.IsNullOrEmpty(virtualView?.DisplayMemberPath) ? o.GetPropertyValueAsString(virtualView?.DisplayMemberPath) : o?.ToString(),
-                                          (o) => !string.IsNullOrEmpty(virtualView?.TextMemberPath) ? o.GetPropertyValueAsString(virtualView?.TextMemberPath) : o?.ToString());
+        platformView.SetItems(
+            virtualView?.ItemsSource,
+            virtualView?.DisplayMemberPath,
+            (o) => !string.IsNullOrEmpty(virtualView?.TextMemberPath) ? o.GetPropertyValueAsString(virtualView?.TextMemberPath) : o?.ToString());
     }
 
     /// <summary>
@@ -219,5 +221,18 @@ public static class AutoCompleteEntryExtensions
     public static void UpdateShowBottomBorder(this AndroidAutoCompleteEntry platformView, AutoCompleteEntry virtualView)
     {
         platformView.ShowBottomBorder = virtualView.ShowBottomBorder;
+    }
+
+    /// <summary>
+    /// Update the ItemTemplate
+    /// </summary>
+    /// <param name="platformView"></param>
+    /// <param name="virtualView"></param>
+    public static void UpdateItemTemplate(this AndroidAutoCompleteEntry platformView, AutoCompleteEntry virtualView)
+    {
+        platformView.SetItemTemplate(virtualView.ItemTemplate);
+        platformView.SetItems(virtualView.ItemsSource,
+                              virtualView?.DisplayMemberPath,
+                              (o) => !string.IsNullOrEmpty(virtualView?.TextMemberPath) ? o.GetPropertyValueAsString(virtualView?.TextMemberPath) : o?.ToString());
     }
 }

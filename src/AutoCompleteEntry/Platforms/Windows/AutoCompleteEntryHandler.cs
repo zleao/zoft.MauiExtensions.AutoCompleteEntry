@@ -328,4 +328,14 @@ public partial class AutoCompleteEntryHandler : ViewHandler<AutoCompleteEntry, A
     {
         handler?.PlatformView.UpdateShowBottomBorder(autoCompleteEntry);
     }
+
+    /// <summary>
+    /// Map the ItemTemplate value
+    /// </summary>
+    /// <param name="handler"></param>
+    /// <param name="autoCompleteEntry"></param>
+    public static void MapItemTemplate(IAutoCompleteEntryHandler handler, AutoCompleteEntry autoCompleteEntry)
+    {
+        handler?.PlatformView.UpdateItemTemplate(autoCompleteEntry);
+    }
 }

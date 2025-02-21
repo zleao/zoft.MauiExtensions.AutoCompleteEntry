@@ -62,14 +62,38 @@
                 ShowBottomBorder="{Binding ShowBottomBorder}"
                 Text="{Binding Text}"
                 TextChangedCommand="{Binding TextChangedCommand}"
-                TextMemberPath="Country" />
+                TextMemberPath="Country">
+                <zoft:AutoCompleteEntry.ItemTemplate>
+                    <DataTemplate x:DataType="vm:ListItem">
+                        <Grid ColumnDefinitions="auto, *" HeightRequest="35">
+                            <Label
+                                Grid.Column="0"
+                                Padding="2"
+                                BackgroundColor="Red"
+                                FontSize="Large"
+                                Text="{Binding Group}"
+                                TextColor="White"
+                                VerticalTextAlignment="Center" />
+                            <Label
+                                Grid.Column="1"
+                                Padding="2"
+                                BackgroundColor="Yellow"
+                                FontSize="Large"
+                                Text="{Binding Country}"
+                                TextColor="Black"
+                                VerticalTextAlignment="Center" />
+                        </Grid>
+                    </DataTemplate>
+                </zoft:AutoCompleteEntry.ItemTemplate>
+            </zoft:AutoCompleteEntry>
 
-            <Frame
+            <Border
                 BackgroundColor="LightGray"
-                BorderColor="Gray"
                 HorizontalOptions="Start"
-                IsVisible="{Binding SelectedItem, Converter={StaticResource IsNotNullConverter}}">
-                <VerticalStackLayout>
+                IsVisible="{Binding SelectedItem, Converter={StaticResource IsNotNullConverter}}"
+                Stroke="Gray"
+                StrokeShape="RoundRectangle 8">
+                <VerticalStackLayout Padding="10">
                     <HorizontalStackLayout Spacing="5">
                         <Label Text="Group:" />
                         <Label FontAttributes="Bold" Text="{Binding SelectedItem.Group}" />
@@ -79,7 +103,7 @@
                         <Label FontAttributes="Bold" Text="{Binding SelectedItem.Country}" />
                     </HorizontalStackLayout>
                 </VerticalStackLayout>
-            </Frame>
+            </Border>
 
         </VerticalStackLayout>
     </Grid>

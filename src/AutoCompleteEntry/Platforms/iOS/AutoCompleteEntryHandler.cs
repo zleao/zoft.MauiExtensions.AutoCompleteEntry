@@ -76,11 +76,11 @@ public partial class AutoCompleteEntryHandler : ViewHandler<AutoCompleteEntry, I
         PlatformView.InputTextField.UpdateHorizontalTextAlignment(VirtualView);
         PlatformView.UpdateMaxLength(VirtualView);
         PlatformView.UpdateIsReadOnly(VirtualView);
-        PlatformView.UpdateDisplayMemberPath(VirtualView);
+        PlatformView.UpdateDisplayMemberPath(VirtualView, MauiContext);
         PlatformView.UpdateIsEnabled(VirtualView);
         PlatformView.UpdateUpdateTextOnSelect(VirtualView);
         PlatformView.UpdateIsSuggestionListOpen(VirtualView);
-        PlatformView.UpdateItemsSource(VirtualView);
+        PlatformView.UpdateItemsSource(VirtualView, MauiContext);
     }
 
     private void PlatformView_OnShouldReturn(object sender, EventArgs e)
@@ -146,7 +146,7 @@ public partial class AutoCompleteEntryHandler : ViewHandler<AutoCompleteEntry, I
     /// <param name="autoCompleteEntry"></param>
     public static void MapDisplayMemberPath(IAutoCompleteEntryHandler handler, AutoCompleteEntry autoCompleteEntry)
     {
-        handler?.PlatformView?.UpdateDisplayMemberPath(autoCompleteEntry);
+        handler?.PlatformView?.UpdateDisplayMemberPath(autoCompleteEntry, handler.MauiContext);
     }
 
     /// <summary>
@@ -224,7 +224,7 @@ public partial class AutoCompleteEntryHandler : ViewHandler<AutoCompleteEntry, I
     /// <param name="autoCompleteEntry"></param>
     public static void MapItemsSource(IAutoCompleteEntryHandler handler, AutoCompleteEntry autoCompleteEntry)
     {
-        handler?.PlatformView?.UpdateItemsSource(autoCompleteEntry);
+        handler?.PlatformView?.UpdateItemsSource(autoCompleteEntry, handler.MauiContext);
     }
 
     /// <summary>
@@ -335,5 +335,15 @@ public partial class AutoCompleteEntryHandler : ViewHandler<AutoCompleteEntry, I
     public static void MapShowBottomBorder(IAutoCompleteEntryHandler handler, AutoCompleteEntry autoCompleteEntry)
     {
         handler?.PlatformView.UpdateShowBottomBorder(autoCompleteEntry);
+    }
+
+    /// <summary>
+    /// Map the ItemTemplate value
+    /// </summary>
+    /// <param name="handler"></param>
+    /// <param name="autoCompleteEntry"></param>
+    public static void MapItemTemplate(IAutoCompleteEntryHandler handler, AutoCompleteEntry autoCompleteEntry)
+    {
+        handler?.PlatformView.UpdateItemTemplate(autoCompleteEntry);
     }
 }

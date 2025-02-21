@@ -15,11 +15,12 @@ public static class AutoCompleteEntryExtensions
     /// </summary>
     /// <param name="iosAutoCompleteEntry"></param>
     /// <param name="autoCompleteEntry"></param>
-    public static void UpdateDisplayMemberPath(this IOSAutoCompleteEntry iosAutoCompleteEntry, AutoCompleteEntry autoCompleteEntry)
+    public static void UpdateDisplayMemberPath(this IOSAutoCompleteEntry iosAutoCompleteEntry, AutoCompleteEntry autoCompleteEntry, IMauiContext mauiContext)
     {
         iosAutoCompleteEntry.SetItems(autoCompleteEntry.ItemsSource,
-                                      (o) => !string.IsNullOrEmpty(autoCompleteEntry?.DisplayMemberPath) ? o.GetPropertyValueAsString(autoCompleteEntry?.DisplayMemberPath) : o?.ToString(),
-                                      (o) => !string.IsNullOrEmpty(autoCompleteEntry?.TextMemberPath) ? o.GetPropertyValueAsString(autoCompleteEntry?.TextMemberPath) : o?.ToString());
+                                      autoCompleteEntry?.DisplayMemberPath,
+                                      (o) => !string.IsNullOrEmpty(autoCompleteEntry?.TextMemberPath) ? o.GetPropertyValueAsString(autoCompleteEntry?.TextMemberPath) : o?.ToString(),
+                                      mauiContext);
     }
 
     /// <summary>
@@ -57,11 +58,12 @@ public static class AutoCompleteEntryExtensions
     /// </summary>
     /// <param name="iosAutoCompleteEntry"></param>
     /// <param name="autoCompleteEntry"></param>
-    public static void UpdateItemsSource(this IOSAutoCompleteEntry iosAutoCompleteEntry, AutoCompleteEntry autoCompleteEntry)
+    public static void UpdateItemsSource(this IOSAutoCompleteEntry iosAutoCompleteEntry, AutoCompleteEntry autoCompleteEntry, IMauiContext mauiContext)
     {
         iosAutoCompleteEntry.SetItems(autoCompleteEntry?.ItemsSource,
-                                      (o) => !string.IsNullOrEmpty(autoCompleteEntry?.DisplayMemberPath) ? o.GetPropertyValueAsString(autoCompleteEntry?.DisplayMemberPath) : o?.ToString(),
-                                      (o) => !string.IsNullOrEmpty(autoCompleteEntry?.TextMemberPath) ? o.GetPropertyValueAsString(autoCompleteEntry?.TextMemberPath) : o?.ToString());
+                                      autoCompleteEntry?.DisplayMemberPath,
+                                      (o) => !string.IsNullOrEmpty(autoCompleteEntry?.TextMemberPath) ? o.GetPropertyValueAsString(autoCompleteEntry?.TextMemberPath) : o?.ToString(),
+                                      mauiContext);
     }
 
     /// <summary>
@@ -155,5 +157,15 @@ public static class AutoCompleteEntryExtensions
     public static void UpdateShowBottomBorder(this IOSAutoCompleteEntry iosAutoCompleteEntry, AutoCompleteEntry autoCompleteEntry)
     {
         iosAutoCompleteEntry.ShowBottomBorder = autoCompleteEntry.ShowBottomBorder;
+    }
+
+    /// <summary>
+    /// Update the ItemTemplate
+    /// </summary>
+    /// <param name="platformView"></param>
+    /// <param name="virtualView"></param>
+    public static void UpdateItemTemplate(this IOSAutoCompleteEntry iosAutoCompleteEntry, AutoCompleteEntry autoCompleteEntry)
+    {
+        iosAutoCompleteEntry.ItemTemplate = autoCompleteEntry.ItemTemplate;
     }
 }
