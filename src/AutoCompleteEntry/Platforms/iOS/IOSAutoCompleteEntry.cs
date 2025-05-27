@@ -11,13 +11,13 @@ namespace zoft.MauiExtensions.Controls.Platform;
 /// <summary>
 ///  Creates a UIView with dropdown with a similar API and behavior to UWP's AutoSuggestBox
 /// </summary>
-public sealed partial class IOSAutoCompleteEntry : UIView
+public sealed class IOSAutoCompleteEntry : UIView
 {
     /// <summary>
     /// Raised after the text content of the editable control component is updated.
     /// </summary>
     public event EventHandler<AutoCompleteEntryTextChangedEventArgs> TextChanged;
-        
+
     /// <summary>
     /// Raised after the cursor position of the editable control component is updated.
     /// </summary>
@@ -128,12 +128,15 @@ public sealed partial class IOSAutoCompleteEntry : UIView
         InputTextField.SelectedTextRangeChanged += InputText_OnTextRangeChanged;
         InputTextField.ShouldReturn += InputText_OnShouldReturn;
 
-        AddSubview(InputTextField);    
+        AddSubview(InputTextField);
 
-        InputTextField.TopAnchor.ConstraintEqualTo(TopAnchor).Active = true;
-        InputTextField.LeftAnchor.ConstraintEqualTo(LeftAnchor).Active = true;
-        InputTextField.WidthAnchor.ConstraintEqualTo(WidthAnchor).Active = true;
-        InputTextField.HeightAnchor.ConstraintEqualTo(HeightAnchor).Active = true;
+        NSLayoutConstraint.ActivateConstraints(new[]
+        {
+            InputTextField.TopAnchor.ConstraintEqualTo(TopAnchor),
+            InputTextField.LeftAnchor.ConstraintEqualTo(LeftAnchor),
+            InputTextField.RightAnchor.ConstraintEqualTo(RightAnchor),
+            InputTextField.BottomAnchor.ConstraintEqualTo(BottomAnchor),
+        });
 
         SelectionList = new UITableView { TranslatesAutoresizingMaskIntoConstraints = false };
 
@@ -152,7 +155,7 @@ public sealed partial class IOSAutoCompleteEntry : UIView
         _keyboardShownObserverToken?.Dispose();
         _keyboardHiddenObserverToken?.Dispose();
 
-        if(_border != null && _border.SuperLayer != null)
+        if (_border != null && _border.SuperLayer != null)
         {
             _border.RemoveFromSuperLayer();
             _border.Dispose();
@@ -219,14 +222,14 @@ public sealed partial class IOSAutoCompleteEntry : UIView
         TextChanged?.Invoke(this, new AutoCompleteEntryTextChangedEventArgs(AutoCompleteEntryTextChangeReason.UserInput));
 
         InputText_OnTextRangeChanged(sender, e);
-            
+
         IsSuggestionListOpen = true;
     }
 
     private void InputText_OnTextRangeChanged(object sender, EventArgs e)
     {
         var cp = InputTextField.GetOffsetFromPosition(InputTextField.BeginningOfDocument, InputTextField.SelectedTextRange?.Start ?? InputTextField.EndOfDocument).ToInt32();
-            
+
         CursorPositionChanged?.Invoke(this, new AutoCompleteEntryCursorPositionChangedEventArgs(cp));
     }
 
@@ -313,7 +316,9 @@ public sealed partial class IOSAutoCompleteEntry : UIView
         else
         {
             if (SelectionList.Superview != null)
+            {
                 SelectionList.RemoveFromSuperview();
+            }
         }
     }
 
@@ -370,7 +375,7 @@ public sealed partial class IOSAutoCompleteEntry : UIView
     public class MyUITextField : UITextField
     {
         public event EventHandler<EventArgs> SelectedTextRangeChanged;
-            
+
         public override UITextRange SelectedTextRange
         {
             get => base.SelectedTextRange;
@@ -379,7 +384,7 @@ public sealed partial class IOSAutoCompleteEntry : UIView
                 if (base.SelectedTextRange == null || !base.SelectedTextRange.Equals(value))
                 {
                     base.SelectedTextRange = value;
-                            
+
                     SelectedTextRangeChanged?.Invoke(this, EventArgs.Empty);
                 }
             }
