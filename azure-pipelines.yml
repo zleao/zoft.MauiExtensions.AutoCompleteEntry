@@ -1,6 +1,6 @@
 variables:
   
-  DotNetVersion: '9.0.200'
+  DotNetVersion: '9.0.300'
   PathToProjectFolder: 'src\AutoCompleteEntry'
   PathToProjectFile: '$(PathToProjectFolder)\AutoCompleteEntry.csproj'
   BuildConfiguration: Release
@@ -55,6 +55,8 @@ jobs:
 
   - job: 'publish_nuget_package'
     displayName: 'Publish NuGet Package'
+    pool:
+      vmImage: windows-latest
     condition: and(succeeded(), ne(variables['Build.Reason'], 'PullRequest'))
     dependsOn: build_library
     steps:
