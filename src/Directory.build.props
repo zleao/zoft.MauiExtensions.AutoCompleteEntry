@@ -14,7 +14,10 @@
     <Version>4.0.3</Version>
     <Description>.Net MAUI Entry control that provides a list of suggestions as the user types.</Description>
     <PackageTags>net9 maui zoft AutoCompleteEntry AutoCompleteBox AutoCompleteView AutoComplete</PackageTags>
-    <PackageReleaseNotes>Add support for custom ItemTemplate (only for iOS and Android)</PackageReleaseNotes>
+    <PackageReleaseNotes>
+		[iOS] Fix Height and Width Request.
+		[iOS] [WINDOWS] Make sure to propagate the Focus related events.
+	</PackageReleaseNotes>
     <PackageReadmeFile>README.md</PackageReadmeFile>
 
     <LangVersion>latest</LangVersion>
