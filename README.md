@@ -12,7 +12,7 @@ Entry control that makes suggestions to users as they type.
 
 Add NuGet Package to your project: 
 ```
-dotnet add package zoft.MauiExtensions.Controls.AutoCompleteEntry`
+dotnet add package zoft.MauiExtensions.Controls.AutoCompleteEntry
 ```
 You can find the nuget package here [zoft.MauiExtensions.Controls.AutoCompleteEntry](https://www.nuget.org/packages/zoft.MauiExtensions.Controls.AutoCompleteEntry/)
 

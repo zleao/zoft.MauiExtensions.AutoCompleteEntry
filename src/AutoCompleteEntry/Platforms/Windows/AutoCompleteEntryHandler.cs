@@ -19,6 +19,7 @@ public partial class AutoCompleteEntryHandler : ViewHandler<AutoCompleteEntry, A
     protected override void ConnectHandler(AutoSuggestBox platformView)
     {
         platformView.GotFocus += PlatformView_OnGotFocus;
+        platformView.LostFocus += PlatformView_LostFocus;
         platformView.KeyUp += PlatformView_OnKeyUp;
         platformView.Loaded += PlatformView_OnLoaded;
         platformView.SuggestionChosen += PlatformView_OnSuggestionChosen;
@@ -29,6 +30,7 @@ public partial class AutoCompleteEntryHandler : ViewHandler<AutoCompleteEntry, A
     protected override void DisconnectHandler(AutoSuggestBox platformView)
     {
         platformView.GotFocus -= PlatformView_OnGotFocus;
+        platformView.LostFocus -= PlatformView_LostFocus;
         platformView.KeyUp -= PlatformView_OnKeyUp;
         platformView.Loaded -= PlatformView_OnLoaded;
         platformView.SuggestionChosen -= PlatformView_OnSuggestionChosen;
@@ -43,6 +45,19 @@ public partial class AutoCompleteEntryHandler : ViewHandler<AutoCompleteEntry, A
         if (VirtualView?.ItemsSource?.Count > 0)
         {
             PlatformView.IsSuggestionListOpen = true;
+        }
+
+        if (VirtualView is IEntry virtualView)
+        {
+            virtualView.IsFocused = true;
+        }
+    }
+
+    private void PlatformView_LostFocus(object sender, Microsoft.UI.Xaml.RoutedEventArgs e)
+    {
+        if (VirtualView is IEntry virtualView)
+        {
+            virtualView.IsFocused = false;
         }
     }
 

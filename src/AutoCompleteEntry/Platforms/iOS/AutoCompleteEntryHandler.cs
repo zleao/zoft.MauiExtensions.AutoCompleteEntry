@@ -48,12 +48,18 @@ public partial class AutoCompleteEntryHandler : ViewHandler<AutoCompleteEntry, I
 
     private void PlatformView_OnEditingDidBegin(object sender, EventArgs e)
     {
-        VirtualView.Focus();
+        if (VirtualView is IEntry virtualView)
+        {
+            virtualView.IsFocused = true;
+        }
     }
 
     private void PlatformView_OnEditingDidEnd(object sender, EventArgs e)
     {
-        VirtualView.Unfocus();
+        if (VirtualView is IEntry virtualView)
+        {
+            virtualView.IsFocused = false;
+        }
     }
 
     private void PlatformView_OnLoaded(object sender, EventArgs e)
