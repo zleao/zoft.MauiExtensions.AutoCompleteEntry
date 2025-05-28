@@ -249,5 +249,4 @@ public class AutoCompleteEntry : Entry
         BindableProperty.Create(nameof(ItemTemplate),
             typeof(DataTemplate),
             typeof(AutoCompleteEntry), null, BindingMode.OneWay);
-
 }
