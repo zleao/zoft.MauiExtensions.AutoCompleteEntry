@@ -15,7 +15,7 @@
     <Description>.Net MAUI Entry control that provides a list of suggestions as the user types.</Description>
     <PackageTags>net9 maui zoft AutoCompleteEntry AutoCompleteBox AutoCompleteView AutoComplete</PackageTags>
     <PackageReleaseNotes>
-		[iOS] [ANDROID] Fix initial text binding, whe there's no seletected item.
+		[iOS] [ANDROID] Fix initial text binding, when there's no selected item.
 	</PackageReleaseNotes>
     <PackageReadmeFile>README.md</PackageReadmeFile>
 
