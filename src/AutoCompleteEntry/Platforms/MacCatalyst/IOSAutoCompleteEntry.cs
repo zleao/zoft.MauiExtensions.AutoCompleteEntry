@@ -1,8 +1,8 @@
+using CoreAnimation;
 using CoreGraphics;
 using Foundation;
 using ObjCRuntime;
 using System.Collections;
-using System.Collections.Specialized;
 using System.Drawing;
 using UIKit;
 
@@ -17,7 +17,7 @@ public sealed class IOSAutoCompleteEntry : UIView
     /// Raised after the text content of the editable control component is updated.
     /// </summary>
     public event EventHandler<AutoCompleteEntryTextChangedEventArgs> TextChanged;
-        
+
     /// <summary>
     /// Raised after the cursor position of the editable control component is updated.
     /// </summary>
@@ -39,7 +39,7 @@ public sealed class IOSAutoCompleteEntry : UIView
     private nfloat _keyboardHeight;
     private NSLayoutConstraint _bottomConstraint;
     private Func<object, string> _textFunc;
-    private CoreAnimation.CALayer _border;
+    private CoreAnimation.CALayer _border = null;
     private bool _showBottomBorder = true;
     private readonly NSObject _keyboardShownObserverToken;
     private readonly NSObject _keyboardHiddenObserverToken;
@@ -128,12 +128,15 @@ public sealed class IOSAutoCompleteEntry : UIView
         InputTextField.SelectedTextRangeChanged += InputText_OnTextRangeChanged;
         InputTextField.ShouldReturn += InputText_OnShouldReturn;
 
-        AddSubview(InputTextField);    
+        AddSubview(InputTextField);
 
-        InputTextField.TopAnchor.ConstraintEqualTo(TopAnchor).Active = true;
-        InputTextField.LeftAnchor.ConstraintEqualTo(LeftAnchor).Active = true;
-        InputTextField.WidthAnchor.ConstraintEqualTo(WidthAnchor).Active = true;
-        InputTextField.HeightAnchor.ConstraintEqualTo(HeightAnchor).Active = true;
+        NSLayoutConstraint.ActivateConstraints(new[]
+        {
+            InputTextField.TopAnchor.ConstraintEqualTo(TopAnchor),
+            InputTextField.LeftAnchor.ConstraintEqualTo(LeftAnchor),
+            InputTextField.RightAnchor.ConstraintEqualTo(RightAnchor),
+            InputTextField.BottomAnchor.ConstraintEqualTo(BottomAnchor),
+        });
 
         SelectionList = new UITableView { TranslatesAutoresizingMaskIntoConstraints = false };
 
@@ -219,14 +222,14 @@ public sealed class IOSAutoCompleteEntry : UIView
         TextChanged?.Invoke(this, new AutoCompleteEntryTextChangedEventArgs(AutoCompleteEntryTextChangeReason.UserInput));
 
         InputText_OnTextRangeChanged(sender, e);
-            
+
         IsSuggestionListOpen = true;
     }
 
     private void InputText_OnTextRangeChanged(object sender, EventArgs e)
     {
         var cp = InputTextField.GetOffsetFromPosition(InputTextField.BeginningOfDocument, InputTextField.SelectedTextRange?.Start ?? InputTextField.EndOfDocument).ToInt32();
-            
+
         CursorPositionChanged?.Invoke(this, new AutoCompleteEntryCursorPositionChangedEventArgs(cp));
     }
 
@@ -235,11 +238,12 @@ public sealed class IOSAutoCompleteEntry : UIView
         ShouldReturn?.Invoke(this, EventArgs.Empty);
         return false;
     }
-        
+
     /// <inheritdoc />
     public override void LayoutSubviews()
     {
         base.LayoutSubviews();
+
         AddBottomBorder();
     }
 
@@ -292,17 +296,10 @@ public sealed class IOSAutoCompleteEntry : UIView
                 return;
             }
 
-#if MACCATALYST14_2_OR_GREATER
             if (viewController.PresentedViewController != null)
             {
                 viewController = viewController.PresentedViewController;
             }
-#else
-            if (viewController.ModalViewController != null)
-            {
-                viewController = viewController.ModalViewController;
-            }
-#endif
 
             if (SelectionList.Superview == null)
             {
@@ -319,7 +316,9 @@ public sealed class IOSAutoCompleteEntry : UIView
         else
         {
             if (SelectionList.Superview != null)
+            {
                 SelectionList.RemoveFromSuperview();
+            }
         }
     }
 
@@ -376,7 +375,7 @@ public sealed class IOSAutoCompleteEntry : UIView
     public class MyUITextField : UITextField
     {
         public event EventHandler<EventArgs> SelectedTextRangeChanged;
-            
+
         public override UITextRange SelectedTextRange
         {
             get => base.SelectedTextRange;
@@ -385,7 +384,7 @@ public sealed class IOSAutoCompleteEntry : UIView
                 if (base.SelectedTextRange == null || !base.SelectedTextRange.Equals(value))
                 {
                     base.SelectedTextRange = value;
-                            
+
                     SelectedTextRangeChanged?.Invoke(this, EventArgs.Empty);
                 }
             }

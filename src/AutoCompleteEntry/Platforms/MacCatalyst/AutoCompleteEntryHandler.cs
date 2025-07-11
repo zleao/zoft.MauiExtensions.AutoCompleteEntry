@@ -11,18 +11,6 @@ public partial class AutoCompleteEntryHandler : ViewHandler<AutoCompleteEntry, I
     protected override IOSAutoCompleteEntry CreatePlatformView() => new();
 
     /// <inheritdoc/>
-    public override Size GetDesiredSize(double widthConstraint, double heightConstraint)
-    {
-        if (double.IsInfinity(widthConstraint) || double.IsInfinity(heightConstraint))
-        {
-            PlatformView.InputTextField.SizeToFit();
-            return new Size(PlatformView.InputTextField.Frame.Width, PlatformView.InputTextField.Frame.Height);
-        }
-
-        return base.GetDesiredSize(widthConstraint, heightConstraint);
-    }
-
-    /// <inheritdoc/>
     protected override void ConnectHandler(IOSAutoCompleteEntry platformView)
     {
         base.ConnectHandler(platformView);

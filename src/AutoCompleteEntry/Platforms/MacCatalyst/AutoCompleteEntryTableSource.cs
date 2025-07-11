@@ -1,4 +1,4 @@
-using Foundation;
+﻿using Foundation;
 using Microsoft.Maui.Controls.Internals;
 using Microsoft.Maui.Platform;
 using System.Collections;

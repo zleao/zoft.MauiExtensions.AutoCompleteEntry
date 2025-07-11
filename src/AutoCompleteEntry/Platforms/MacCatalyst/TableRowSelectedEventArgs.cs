@@ -1,4 +1,4 @@
-using Foundation;
+﻿using Foundation;
 
 namespace zoft.MauiExtensions.Controls.Platform;
 

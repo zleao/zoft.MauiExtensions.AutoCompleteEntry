@@ -1,4 +1,4 @@
-﻿using Foundation;
+using Foundation;
 using Microsoft.Maui.Platform;
 using UIKit;
 using zoft.MauiExtensions.Core.Extensions;
