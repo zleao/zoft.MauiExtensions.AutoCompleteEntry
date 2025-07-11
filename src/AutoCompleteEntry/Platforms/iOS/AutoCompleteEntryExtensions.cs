@@ -122,8 +122,16 @@ public static class AutoCompleteEntryExtensions
     /// <param name="autoCompleteEntry"></param>
     public static void UpdateSelectedSuggestion(this IOSAutoCompleteEntry iosAutoCompleteEntry, AutoCompleteEntry autoCompleteEntry)
     {
-        var o = autoCompleteEntry.SelectedSuggestion;
-        iosAutoCompleteEntry.Text = !string.IsNullOrEmpty(autoCompleteEntry.TextMemberPath) ? o.GetPropertyValueAsString(autoCompleteEntry.TextMemberPath) : o?.ToString();
+        if (autoCompleteEntry.SelectedSuggestion is null)
+        {
+            return;
+        }
+
+        iosAutoCompleteEntry.Text = 
+            !string.IsNullOrEmpty(autoCompleteEntry.TextMemberPath) ?
+            autoCompleteEntry.SelectedSuggestion.GetPropertyValueAsString(autoCompleteEntry.TextMemberPath) 
+            :
+            autoCompleteEntry.SelectedSuggestion.ToString();
     }
 
     /// <summary>
