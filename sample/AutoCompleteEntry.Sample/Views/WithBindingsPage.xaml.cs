@@ -6,7 +6,7 @@ namespace AutoCompleteEntry.Sample.Views
     {
         public WithBindingsPage()
         {
-            BindingContext = new SampleViewModel();
+            BindingContext = new SampleViewModel("Port");
 
             InitializeComponent();
         }
