@@ -1,8 +1,8 @@
+using CoreAnimation;
 using CoreGraphics;
 using Foundation;
 using ObjCRuntime;
 using System.Collections;
-using System.Collections.Specialized;
 using System.Drawing;
 using UIKit;
 
@@ -17,7 +17,7 @@ public sealed class IOSAutoCompleteEntry : UIView
     /// Raised after the text content of the editable control component is updated.
     /// </summary>
     public event EventHandler<AutoCompleteEntryTextChangedEventArgs> TextChanged;
-        
+
     /// <summary>
     /// Raised after the cursor position of the editable control component is updated.
     /// </summary>
@@ -39,10 +39,12 @@ public sealed class IOSAutoCompleteEntry : UIView
     private nfloat _keyboardHeight;
     private NSLayoutConstraint _bottomConstraint;
     private Func<object, string> _textFunc;
-    private CoreAnimation.CALayer _border;
+    private CoreAnimation.CALayer _border = null;
     private bool _showBottomBorder = true;
     private readonly NSObject _keyboardShownObserverToken;
     private readonly NSObject _keyboardHiddenObserverToken;
+
+    public DataTemplate ItemTemplate { get; set; }
 
     /// <summary>
     /// Gets a reference to the text field in the view
@@ -126,12 +128,15 @@ public sealed class IOSAutoCompleteEntry : UIView
         InputTextField.SelectedTextRangeChanged += InputText_OnTextRangeChanged;
         InputTextField.ShouldReturn += InputText_OnShouldReturn;
 
-        AddSubview(InputTextField);    
+        AddSubview(InputTextField);
 
-        InputTextField.TopAnchor.ConstraintEqualTo(TopAnchor).Active = true;
-        InputTextField.LeftAnchor.ConstraintEqualTo(LeftAnchor).Active = true;
-        InputTextField.WidthAnchor.ConstraintEqualTo(WidthAnchor).Active = true;
-        InputTextField.HeightAnchor.ConstraintEqualTo(HeightAnchor).Active = true;
+        NSLayoutConstraint.ActivateConstraints(new[]
+        {
+            InputTextField.TopAnchor.ConstraintEqualTo(TopAnchor),
+            InputTextField.LeftAnchor.ConstraintEqualTo(LeftAnchor),
+            InputTextField.RightAnchor.ConstraintEqualTo(RightAnchor),
+            InputTextField.BottomAnchor.ConstraintEqualTo(BottomAnchor),
+        });
 
         SelectionList = new UITableView { TranslatesAutoresizingMaskIntoConstraints = false };
 
@@ -149,6 +154,13 @@ public sealed class IOSAutoCompleteEntry : UIView
 
         _keyboardShownObserverToken?.Dispose();
         _keyboardHiddenObserverToken?.Dispose();
+
+        if (_border != null && _border.SuperLayer != null)
+        {
+            _border.RemoveFromSuperLayer();
+            _border.Dispose();
+            _border = null;
+        }
     }
 
     /// <summary>
@@ -210,14 +222,14 @@ public sealed class IOSAutoCompleteEntry : UIView
         TextChanged?.Invoke(this, new AutoCompleteEntryTextChangedEventArgs(AutoCompleteEntryTextChangeReason.UserInput));
 
         InputText_OnTextRangeChanged(sender, e);
-            
+
         IsSuggestionListOpen = true;
     }
 
     private void InputText_OnTextRangeChanged(object sender, EventArgs e)
     {
         var cp = InputTextField.GetOffsetFromPosition(InputTextField.BeginningOfDocument, InputTextField.SelectedTextRange?.Start ?? InputTextField.EndOfDocument).ToInt32();
-            
+
         CursorPositionChanged?.Invoke(this, new AutoCompleteEntryCursorPositionChangedEventArgs(cp));
     }
 
@@ -226,31 +238,34 @@ public sealed class IOSAutoCompleteEntry : UIView
         ShouldReturn?.Invoke(this, EventArgs.Empty);
         return false;
     }
-        
+
     /// <inheritdoc />
     public override void LayoutSubviews()
     {
         base.LayoutSubviews();
+
         AddBottomBorder();
     }
 
     private void AddBottomBorder()
     {
-        _border = new CoreAnimation.CALayer();
+        if (_border != null) return;
+
         const float width = 1f;
+        _border = new CoreAnimation.CALayer();
         _border.BorderColor = UIColor.LightGray.CGColor;
         _border.Frame = new CGRect(0, Frame.Size.Height - width, Frame.Size.Width, Frame.Size.Height);
         _border.BorderWidth = width;
-        _border.Hidden = !_showBottomBorder;
+        _border.Hidden = !ShowBottomBorder;
         Layer.AddSublayer(_border);
         Layer.MasksToBounds = true;
     }
 
-    internal void SetItems(IList items, Func<object, string> labelFunc, Func<object, string> textFunc)
+    internal void SetItems(IList items, string displayMemberPath, Func<object, string> textFunc, IMauiContext mauiContext)
     {
         _textFunc = textFunc;
 
-        if (SelectionList.Source is TableSource oldSource)
+        if (SelectionList.Source is AutoCompleteEntryTableSource oldSource)
         {
             oldSource.TableRowSelected -= SuggestionTableSource_TableRowSelected;
             oldSource.Dispose();
@@ -260,7 +275,7 @@ public sealed class IOSAutoCompleteEntry : UIView
 
         if (items != null)
         {
-            var suggestionTableSource = new TableSource(SelectionList, items, labelFunc);
+            var suggestionTableSource = new AutoCompleteEntryTableSource(SelectionList, items, displayMemberPath, ItemTemplate, mauiContext);
             suggestionTableSource.TableRowSelected += SuggestionTableSource_TableRowSelected;
             SelectionList.Source = suggestionTableSource;
             SelectionList.ReloadData();
@@ -281,17 +296,10 @@ public sealed class IOSAutoCompleteEntry : UIView
                 return;
             }
 
-#if MACCATALYST14_2_OR_GREATER
             if (viewController.PresentedViewController != null)
             {
                 viewController = viewController.PresentedViewController;
             }
-#else
-            if (viewController.ModalViewController != null)
-            {
-                viewController = viewController.ModalViewController;
-            }
-#endif
 
             if (SelectionList.Superview == null)
             {
@@ -308,7 +316,9 @@ public sealed class IOSAutoCompleteEntry : UIView
         else
         {
             if (SelectionList.Superview != null)
+            {
                 SelectionList.RemoveFromSuperview();
+            }
         }
     }
 
@@ -362,114 +372,10 @@ public sealed class IOSAutoCompleteEntry : UIView
         ResignFirstResponder();
     }
 
-    private class TableSource : UITableViewSource
-    {
-        private readonly UITableView _view;
-        private readonly IList _items;
-        private readonly Func<object, string> _labelFunc;
-        private readonly string _cellIdentifier;
-
-        public TableSource(UITableView view, IList items, Func<object, string> labelFunc)
-        {
-            _view = view;
-            _items = items;
-            _labelFunc = labelFunc;
-            _cellIdentifier = Guid.NewGuid().ToString();
-
-            CheckIfItemsSourceIsNotifiable();
-        }
-
-        private void CheckIfItemsSourceIsNotifiable()
-        {
-            if (_items is INotifyCollectionChanged notifiableItems)
-            {
-                notifiableItems.CollectionChanged += NotifiableItems_CollectionChanged;
-            }
-        }
-
-        private void NotifiableItems_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
-        {
-            if (!MainThread.IsMainThread)
-            {
-                MainThread.BeginInvokeOnMainThread(() => CollectionChanged(e));
-            }
-            else
-            {
-                CollectionChanged(e);
-            }
-        }
-
-        private void CollectionChanged(NotifyCollectionChangedEventArgs args)
-        {
-            _view.ReloadData();
-        }
-
-        protected override void Dispose(bool disposing)
-        {
-            base.Dispose(disposing);
-
-            if (disposing && _items is INotifyCollectionChanged notifiableItems)
-            {
-                notifiableItems.CollectionChanged -= NotifiableItems_CollectionChanged;
-            }
-        }
-
-        public override UITableViewCell GetCell(UITableView tableView, NSIndexPath indexPath)
-        {
-            var cell = tableView.DequeueReusableCell(_cellIdentifier);
-
-            cell ??= new UITableViewCell(UITableViewCellStyle.Default, _cellIdentifier);
-
-            var item = _items[indexPath.Row];
-
-            cell.TextLabel.Text = _labelFunc(item);
-
-            return cell;
-        }
-
-        public override void RowSelected(UITableView tableView, NSIndexPath indexPath)
-        {
-            OnTableRowSelected(indexPath);
-        }
-
-        public override nint RowsInSection(UITableView tableview, nint section)
-        {
-            return _items.Count;
-        }
-
-        public override nfloat GetHeightForRow(UITableView tableView, NSIndexPath indexPath)
-        {
-            return 30f;
-        }
-
-        public event EventHandler<TableRowSelectedEventArgs<object>> TableRowSelected;
-
-        private void OnTableRowSelected(NSIndexPath itemIndexPath)
-        {
-            var item = _items[itemIndexPath.Row];
-            var label = _labelFunc(item);
-            TableRowSelected?.Invoke(this, new TableRowSelectedEventArgs<object>(item, label, itemIndexPath));
-        }
-    }
-
-    private class TableRowSelectedEventArgs<T> : EventArgs
-    {
-        public TableRowSelectedEventArgs(T selectedItem, string selectedItemLabel, NSIndexPath selectedItemIndexPath)
-        {
-            SelectedItem = selectedItem;
-            SelectedItemLabel = selectedItemLabel;
-            SelectedItemIndexPath = selectedItemIndexPath;
-        }
-
-        public T SelectedItem { get; }
-        public string SelectedItemLabel { get; }
-        public NSIndexPath SelectedItemIndexPath { get; }
-    }
-
     public class MyUITextField : UITextField
     {
         public event EventHandler<EventArgs> SelectedTextRangeChanged;
-            
+
         public override UITextRange SelectedTextRange
         {
             get => base.SelectedTextRange;
@@ -478,7 +384,7 @@ public sealed class IOSAutoCompleteEntry : UIView
                 if (base.SelectedTextRange == null || !base.SelectedTextRange.Equals(value))
                 {
                     base.SelectedTextRange = value;
-                            
+
                     SelectedTextRangeChanged?.Invoke(this, EventArgs.Empty);
                 }
             }

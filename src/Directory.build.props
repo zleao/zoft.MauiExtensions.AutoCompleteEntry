@@ -11,11 +11,11 @@
     <PackageProjectUrl>https://github.com/zleao/zoft.MauiExtensions.AutoCompleteEntry</PackageProjectUrl>
     <Product>$(AssemblyName) ($(TargetFramework))</Product>
     <NeutralLanguage>en</NeutralLanguage>
-    <Version>4.0.4</Version>
+    <Version>4.0.5</Version>
     <Description>.Net MAUI Entry control that provides a list of suggestions as the user types.</Description>
     <PackageTags>net9 maui zoft AutoCompleteEntry AutoCompleteBox AutoCompleteView AutoComplete</PackageTags>
     <PackageReleaseNotes>
-		[iOS] [ANDROID] Fix initial text binding, when there's no selected item.
+		[MACCATALYST] Improve support to MAcCatalyst, including ItemTemplate, Width/Height handling, and more.
 	</PackageReleaseNotes>
     <PackageReadmeFile>README.md</PackageReadmeFile>
 
