@@ -8,7 +8,7 @@ namespace AutoCompleteEntry.Sample.Views
 
         public WithEventsPage()
         {
-            BindingContext = new SampleViewModel();
+            BindingContext = new SampleViewModel("");
 
             InitializeComponent();
         }

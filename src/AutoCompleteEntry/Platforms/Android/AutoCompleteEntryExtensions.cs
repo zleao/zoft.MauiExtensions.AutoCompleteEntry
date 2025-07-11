@@ -184,8 +184,17 @@ public static class AutoCompleteEntryExtensions
     /// <param name="virtualView"></param>
     public static void UpdateSelectedSuggestion(this AndroidAutoCompleteEntry platformView, AutoCompleteEntry virtualView)
     {
-        object o = virtualView.SelectedSuggestion;
-        platformView.Text = !string.IsNullOrEmpty(virtualView.TextMemberPath) ? o.GetPropertyValueAsString(virtualView.TextMemberPath) : o?.ToString();
+        if (virtualView.SelectedSuggestion is null)
+        {
+            return;
+        }
+
+        platformView.Text = 
+            !string.IsNullOrEmpty(virtualView.TextMemberPath) ?
+            virtualView.SelectedSuggestion.GetPropertyValueAsString(virtualView.TextMemberPath) 
+            :
+            virtualView.SelectedSuggestion.ToString();
+
         platformView.SetSelection(platformView.Text?.Length ?? 0);
     }
 

@@ -70,9 +70,9 @@ namespace AutoCompleteEntry.Sample.ViewModels
         [ObservableProperty]
         private bool _showBottomBorder = true;
 
-        public SampleViewModel()
+        public SampleViewModel(string text)
         {
-            Text = "Port";
+            Text = text;
             FilterList(Text);
         }
 
