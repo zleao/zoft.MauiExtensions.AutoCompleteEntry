@@ -100,7 +100,7 @@ public partial class AutoCompleteEntryHandler : ViewHandler<AutoCompleteEntry, A
 
     private void PlatformView_OnTextChanged(object sender, AutoCompleteEntryTextChangedEventArgs e)
     {
-        VirtualView?.OnTextChanged(PlatformView.Text, e.Reason);
+        VirtualView?.OnAutoCompleteTextChanged(PlatformView.Text, e.Reason);
 
         PlatformView.UpdateClearButtonVisibility(VirtualView);
     }

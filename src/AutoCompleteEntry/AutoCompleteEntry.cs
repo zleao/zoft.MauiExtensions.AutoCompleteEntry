@@ -8,7 +8,7 @@ namespace zoft.MauiExtensions.Controls;
 /// </summary>
 public class AutoCompleteEntry : Entry
 {
-    private bool _suppressTextChangedEvent;
+    private bool _suppressAutoCompleteTextChangedEvent;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="AutoCompleteEntry"/> class
@@ -111,20 +111,20 @@ public class AutoCompleteEntry : Entry
 
 
     /// <summary>
-    /// Gets or Sets the TextChangedCommand, that is trigered everytime the text changes.
+    /// Gets or Sets the AutoCompleteTextChangedCommand, that is trigered everytime the text changes.
     /// The command receives as parameter the changed text.
     /// </summary>
-    public ICommand TextChangedCommand
+    public ICommand AutoCompleteTextChangedCommand
     {
-        get => (ICommand)GetValue(TextChangedCommandProperty);
-        set => SetValue(TextChangedCommandProperty, value);
+        get => (ICommand)GetValue(AutoCompleteTextChangedCommandProperty);
+        set => SetValue(AutoCompleteTextChangedCommandProperty, value);
     }
 
     /// <summary>
-    /// Identifies the <see cref="TextChangedCommand"/> bindable property.
+    /// Identifies the <see cref="AutoCompleteTextChangedCommand"/> bindable property.
     /// </summary>
-    public static readonly BindableProperty TextChangedCommandProperty =
-        BindableProperty.Create(nameof(TextChangedCommand),
+    public static readonly BindableProperty AutoCompleteTextChangedCommandProperty =
+        BindableProperty.Create(nameof(AutoCompleteTextChangedCommand),
             typeof(ICommand),
             typeof(AutoCompleteEntry));
 
@@ -133,20 +133,20 @@ public class AutoCompleteEntry : Entry
     /// </summary>
     /// <param name="text"></param>
     /// <param name="reason"></param>
-    public void OnTextChanged(string text, AutoCompleteEntryTextChangeReason reason)
+    public void OnAutoCompleteTextChanged(string text, AutoCompleteEntryTextChangeReason reason)
     {
         // Called by the native control when users enter text
 
-        _suppressTextChangedEvent = true; //prevent loop of events raising, as setting this property will make it back into the native control
+        _suppressAutoCompleteTextChangedEvent = true; //prevent loop of events raising, as setting this property will make it back into the native control
         Text = text;
-        _suppressTextChangedEvent = false;
+        _suppressAutoCompleteTextChangedEvent = false;
 
         AutoCompleteTextChanged?.Invoke(this, new AutoCompleteEntryTextChangedEventArgs(reason));
 
         if (reason == AutoCompleteEntryTextChangeReason.UserInput &&
-            TextChangedCommand?.CanExecute(Text) == true)
+            AutoCompleteTextChangedCommand?.CanExecute(Text) == true)
         {
-            TextChangedCommand?.Execute(Text);
+            AutoCompleteTextChangedCommand?.Execute(Text);
         }
     }
 
@@ -158,7 +158,7 @@ public class AutoCompleteEntry : Entry
     /// <inheritdoc/>
     protected override void OnTextChanged(string oldValue, string newValue)
     {
-        if (!_suppressTextChangedEvent) //Ensure this property changed didn't get call because we were updating it from the native text property
+        if (!_suppressAutoCompleteTextChangedEvent) //Ensure this property changed didn't get call because we were updating it from the native text property
         {
             AutoCompleteTextChanged?.Invoke(this, new AutoCompleteEntryTextChangedEventArgs(AutoCompleteEntryTextChangeReason.ProgrammaticChange));
         }
