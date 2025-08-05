@@ -131,17 +131,18 @@ public class AutoCompleteEntry : Entry
     /// <summary>
     /// Method used to signal the platform control, that the text changed
     /// </summary>
-    /// <param name="text"></param>
+    /// <param name="newValue"></param>
     /// <param name="reason"></param>
-    public void OnAutoCompleteTextChanged(string text, AutoCompleteEntryTextChangeReason reason)
+    public void OnAutoCompleteTextChanged(string oldValue, string newValue, AutoCompleteEntryTextChangeReason reason)
     {
         // Called by the native control when users enter text
 
         _suppressAutoCompleteTextChangedEvent = true; //prevent loop of events raising, as setting this property will make it back into the native control
-        Text = text;
+        Text = newValue;
         _suppressAutoCompleteTextChangedEvent = false;
 
-        AutoCompleteTextChanged?.Invoke(this, new AutoCompleteEntryTextChangedEventArgs(reason));
+        base.OnTextChanged(oldValue, newValue);
+        AutoCompleteTextChanged?.Invoke(this, new AutoCompleteEntryTextChangedEventArgs(oldValue, newValue, reason));
 
         if (reason == AutoCompleteEntryTextChangeReason.UserInput &&
             AutoCompleteTextChangedCommand?.CanExecute(Text) == true)
@@ -160,7 +161,8 @@ public class AutoCompleteEntry : Entry
     {
         if (!_suppressAutoCompleteTextChangedEvent) //Ensure this property changed didn't get call because we were updating it from the native text property
         {
-            AutoCompleteTextChanged?.Invoke(this, new AutoCompleteEntryTextChangedEventArgs(AutoCompleteEntryTextChangeReason.ProgrammaticChange));
+            AutoCompleteTextChanged?.Invoke(this, new AutoCompleteEntryTextChangedEventArgs(
+                oldValue, newValue, AutoCompleteEntryTextChangeReason.ProgrammaticChange));
         }
     }
 

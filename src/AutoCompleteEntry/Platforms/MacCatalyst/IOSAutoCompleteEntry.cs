@@ -62,8 +62,10 @@ public sealed class IOSAutoCompleteEntry : UIView
         get => InputTextField.Text;
         set
         {
+            var oldText = InputTextField.Text;
             InputTextField.Text = value;
-            TextChanged?.Invoke(this, new AutoCompleteEntryTextChangedEventArgs(AutoCompleteEntryTextChangeReason.ProgrammaticChange));
+            TextChanged?.Invoke(this, new AutoCompleteEntryTextChangedEventArgs(
+                oldText, InputTextField.Text, AutoCompleteEntryTextChangeReason.ProgrammaticChange));
             InputText_OnTextRangeChanged(this, EventArgs.Empty);
         }
     }
@@ -207,7 +209,8 @@ public sealed class IOSAutoCompleteEntry : UIView
 
     private void InputText_OnEditingChanged(object sender, EventArgs e)
     {
-        TextChanged?.Invoke(this, new AutoCompleteEntryTextChangedEventArgs(AutoCompleteEntryTextChangeReason.UserInput));
+        TextChanged?.Invoke(this, new AutoCompleteEntryTextChangedEventArgs(
+            null, InputTextField.Text, AutoCompleteEntryTextChangeReason.UserInput));
 
         InputText_OnTextRangeChanged(sender, e);
             
@@ -353,8 +356,10 @@ public sealed class IOSAutoCompleteEntry : UIView
         var selection = e.SelectedItem;
         if (UpdateTextOnSelect)
         {
+            var oldText = InputTextField.Text;
             InputTextField.Text = _textFunc(selection);
-            TextChanged?.Invoke(this, new AutoCompleteEntryTextChangedEventArgs(AutoCompleteEntryTextChangeReason.SuggestionChosen));
+            TextChanged?.Invoke(this, new AutoCompleteEntryTextChangedEventArgs(
+                oldText, InputTextField.Text, AutoCompleteEntryTextChangeReason.SuggestionChosen));
             InputText_OnTextRangeChanged(sender, e);
         }
         SuggestionChosen?.Invoke(this, new AutoCompleteEntrySuggestionChosenEventArgs(selection));
