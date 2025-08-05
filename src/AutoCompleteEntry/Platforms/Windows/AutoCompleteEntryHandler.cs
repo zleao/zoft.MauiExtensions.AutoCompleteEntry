@@ -4,7 +4,6 @@ using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Input;
 using Windows.System;
 using zoft.MauiExtensions.Controls.Platform;
-using zoft.MauiExtensions.Core.WeakSubscription;
 
 namespace zoft.MauiExtensions.Controls.Handlers;
 
@@ -103,7 +102,7 @@ public partial class AutoCompleteEntryHandler : ViewHandler<AutoCompleteEntry, A
 
     private void PlatformView_OnTextChanged(object sender, AutoSuggestBoxTextChangedEventArgs e)
     {
-        VirtualView?.OnAutoCompleteTextChanged(null, PlatformView.Text, (AutoCompleteEntryTextChangeReason)e.Reason);
+        VirtualView?.OnAutoCompleteTextChanged(PlatformView.Text, (AutoCompleteEntryTextChangeReason)e.Reason);
     }
 
     /// <summary>

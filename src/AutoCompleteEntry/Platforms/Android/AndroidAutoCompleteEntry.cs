@@ -82,11 +82,9 @@ public sealed partial class AndroidAutoCompleteEntry : AppCompatAutoCompleteText
         set
         {
             _suppressTextChangedEvent = true;
-            var oldText = base.Text;
             base.Text = value;
             _suppressTextChangedEvent = false;
-            TextChanged?.Invoke(this, new AutoCompleteEntryTextChangedEventArgs(
-                oldText, base.Text, AutoCompleteEntryTextChangeReason.ProgrammaticChange));
+            TextChanged?.Invoke(this, new AutoCompleteEntryTextChangedEventArgs(AutoCompleteEntryTextChangeReason.ProgrammaticChange));
         }
     }
 
@@ -166,7 +164,7 @@ public sealed partial class AndroidAutoCompleteEntry : AppCompatAutoCompleteText
     {
         if (!_suppressTextChangedEvent)
         {
-            TextChanged?.Invoke(this, new AutoCompleteEntryTextChangedEventArgs(null, base.Text, AutoCompleteEntryTextChangeReason.UserInput));
+            TextChanged?.Invoke(this, new AutoCompleteEntryTextChangedEventArgs(AutoCompleteEntryTextChangeReason.UserInput));
         }
 
         base.OnTextChanged(text, start, lengthBefore, lengthAfter);
@@ -192,11 +190,9 @@ public sealed partial class AndroidAutoCompleteEntry : AppCompatAutoCompleteText
         if (UpdateTextOnSelect)
         {
             _suppressTextChangedEvent = true;
-            var oldText = base.Text;
             base.Text = _textMemberPathFunc(obj);
             _suppressTextChangedEvent = false;
-            TextChanged?.Invoke(this, new AutoCompleteEntryTextChangedEventArgs(
-                oldText, base.Text, AutoCompleteEntryTextChangeReason.SuggestionChosen));
+            TextChanged?.Invoke(this, new AutoCompleteEntryTextChangedEventArgs(AutoCompleteEntryTextChangeReason.SuggestionChosen));
         }
         SuggestionChosen?.Invoke(this, new AutoCompleteEntrySuggestionChosenEventArgs(obj));
     }
