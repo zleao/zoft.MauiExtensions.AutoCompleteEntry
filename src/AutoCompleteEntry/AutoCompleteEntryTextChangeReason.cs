@@ -1,7 +1,7 @@
 ﻿namespace zoft.MauiExtensions.Controls;
 
 /// <summary>
-/// Provides data for the <see cref="AutoCompleteEntry.TextChanged"/> event.
+/// Provides data for the <see cref="AutoCompleteEntry.AutoCompleteTextChanged"/> event.
 /// </summary>
 public enum AutoCompleteEntryTextChangeReason
 {
