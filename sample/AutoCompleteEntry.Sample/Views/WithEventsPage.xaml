@@ -52,7 +52,7 @@
                 Placeholder="Search for a country or group"
                 ShowBottomBorder="{Binding ShowBottomBorder}"
                 SuggestionChosen="AutoCompleteEntry_SuggestionChosen"
-                TextChanged="AutoCompleteEntry_TextChanged"
+                AutoCompleteTextChanged="AutoCompleteEntry_TextChanged"
                 TextMemberPath="Country" />
 
             <Border
