@@ -158,6 +158,8 @@ public class AutoCompleteEntry : Entry
     /// <inheritdoc/>
     protected override void OnTextChanged(string oldValue, string newValue)
     {
+        base.OnTextChanged(oldValue, newValue);
+
         if (!_suppressAutoCompleteTextChangedEvent) //Ensure this property changed didn't get call because we were updating it from the native text property
         {
             AutoCompleteTextChanged?.Invoke(this, new AutoCompleteEntryTextChangedEventArgs(AutoCompleteEntryTextChangeReason.ProgrammaticChange));
