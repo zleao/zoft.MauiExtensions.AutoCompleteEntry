@@ -61,7 +61,7 @@
                 SelectedSuggestion="{Binding SelectedItem}"
                 ShowBottomBorder="{Binding ShowBottomBorder}"
                 Text="{Binding Text}"
-                AutoCompleteTextChangedCommand="{Binding TextChangedCommand}"
+                TextChangedCommand="{Binding TextChangedCommand}"
                 TextMemberPath="Country">
                 <zoft:AutoCompleteEntry.ItemTemplate>
                     <DataTemplate x:DataType="vm:ListItem">
