@@ -141,7 +141,7 @@ public class AutoCompleteEntry : Entry
         Text = text;
         _suppressTextChangedEvent = false;
 
-        AutoCompleteTextChanged?.Invoke(this, new AutoCompleteEntryTextChangedEventArgs(reason));
+        TextChanged?.Invoke(this, new AutoCompleteEntryTextChangedEventArgs(reason));
 
         if (reason == AutoCompleteEntryTextChangeReason.UserInput &&
             TextChangedCommand?.CanExecute(Text) == true)
@@ -153,7 +153,7 @@ public class AutoCompleteEntry : Entry
     /// <summary>
     /// Raised after the text content of the editable control component is updated.
     /// </summary>
-    public event EventHandler<AutoCompleteEntryTextChangedEventArgs> AutoCompleteTextChanged;
+    public new event EventHandler<AutoCompleteEntryTextChangedEventArgs> TextChanged;
 
     /// <inheritdoc/>
     protected override void OnTextChanged(string oldValue, string newValue)
@@ -162,7 +162,7 @@ public class AutoCompleteEntry : Entry
 
         if (!_suppressTextChangedEvent) //Ensure this property changed didn't get call because we were updating it from the native text property
         {
-            AutoCompleteTextChanged?.Invoke(this, new AutoCompleteEntryTextChangedEventArgs(AutoCompleteEntryTextChangeReason.ProgrammaticChange));
+            TextChanged?.Invoke(this, new AutoCompleteEntryTextChangedEventArgs(AutoCompleteEntryTextChangeReason.ProgrammaticChange));
         }
     }
 
