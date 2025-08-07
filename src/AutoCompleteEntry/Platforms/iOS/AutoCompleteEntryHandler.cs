@@ -89,7 +89,7 @@ public partial class AutoCompleteEntryHandler : ViewHandler<AutoCompleteEntry, I
 
     private void PlatformView_OnTextChanged(object sender, AutoCompleteEntryTextChangedEventArgs e)
     {
-        VirtualView.OnAutoCompleteTextChanged(PlatformView.Text, e.Reason);
+        VirtualView.OnTextChanged(PlatformView.Text, e.Reason);
     }
 
 
