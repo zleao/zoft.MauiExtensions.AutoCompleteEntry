@@ -6,6 +6,21 @@ A powerful AutoCompleteEntry control for .NET MAUI that makes suggestions to use
 
 [![NuGet](https://img.shields.io/nuget/v/zoft.MauiExtensions.Controls.AutoCompleteEntry.svg)](https://www.nuget.org/packages/zoft.MauiExtensions.Controls.AutoCompleteEntry/)
 
+## 📚 Table of Contents
+
+- [✨ Features](#-features)
+- [🚀 Getting Started](#-getting-started)
+- [📋 Properties Reference](#-properties-reference)  
+- [🎯 Basic Usage](#-basic-usage)
+- [💡 Usage Examples](#-usage-examples)
+- [🏗️ Platform Support Matrix](#️-platform-support-matrix)
+- [📱 Platform Screenshots](#-platform-screenshots)
+- [🎨 Advanced Customization](#-advanced-customization)
+- [🐛 Troubleshooting](#-troubleshooting)
+- [🤝 Contributing](#-contributing)
+- [📄 License](#-license)
+- [🙏 Acknowledgments](#-acknowledgments)
+
 ## ✨ Features
 
 - 🔍 **Real-time filtering** as the user types
