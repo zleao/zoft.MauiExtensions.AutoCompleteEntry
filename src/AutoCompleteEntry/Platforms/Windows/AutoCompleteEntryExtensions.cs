@@ -187,8 +187,8 @@ public static class AutoCompleteEntryExtensions
     /// <summary>
     /// Update the ShowBottomBorder
     /// </summary>
-    /// <param name="iosAutoCompleteEntry"></param>
-    /// <param name="autoCompleteEntry"></param>
+    /// <param name="platformView"></param>
+    /// <param name="virtualView"></param>
     public static void UpdateShowBottomBorder(this AutoSuggestBox platformView, AutoCompleteEntry virtualView)
     {
         //TODO: Implement for Windows
@@ -201,7 +201,7 @@ public static class AutoCompleteEntryExtensions
     /// <param name="virtualView"></param>
     public static void UpdateItemTemplate(this AutoSuggestBox platformView, AutoCompleteEntry virtualView)
     {
-        //TOOD: Implement for Windows
+        //TODO: Implement for Windows
     }
 
     private static void UpdateColors(Microsoft.UI.Xaml.ResourceDictionary resource, string[] keys, Microsoft.UI.Xaml.Media.Brush brush)
