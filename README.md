@@ -17,6 +17,7 @@ A powerful AutoCompleteEntry control for .NET MAUI that makes suggestions to use
 - [📱 Platform Screenshots](#-platform-screenshots)
 - [🎨 Advanced Customization](#-advanced-customization)
 - [🐛 Troubleshooting](#-troubleshooting)
+- [💖 Support](#-support)
 - [🤝 Contributing](#-contributing)
 - [📄 License](#-license)
 - [🙏 Acknowledgments](#-acknowledgments)
@@ -484,6 +485,14 @@ private async Task TextChanged(string text)
 - ✅ Implement efficient filtering logic
 - ✅ Use proper async/await patterns
 - ✅ Consider pagination or virtual scrolling
+
+## 💖 Support
+
+If you find this project helpful, please consider supporting its development:
+
+[![Sponsor](https://img.shields.io/badge/Sponsor-❤️-red?style=for-the-badge&logo=github-sponsors)](https://github.com/sponsors/zleao)
+
+Your support helps maintain and improve this project for the entire .NET MAUI community. Thank you! 🙏
 
 ## 🤝 Contributing
 
