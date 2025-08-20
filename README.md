@@ -2,8 +2,6 @@
 
 A powerful AutoCompleteEntry control for .NET MAUI that makes suggestions to users as they type. This control provides rich customization options, data templating support, and works consistently across all supported platforms.
 
-**NOTE:** This control is based on the awesome [dotMortem/XamarinFormsControls/AutoSuggestBox](https://github.com/dotMorten/XamarinFormsControls/tree/main/AutoSuggestBox). with some simplifications and modifications of my own.
-
 [![NuGet](https://img.shields.io/nuget/v/zoft.MauiExtensions.Controls.AutoCompleteEntry.svg)](https://www.nuget.org/packages/zoft.MauiExtensions.Controls.AutoCompleteEntry/)
 
 ## 📚 Table of Contents
@@ -351,32 +349,6 @@ While the AutoCompleteEntry works great on Windows, some advanced styling featur
 
 All core functionality including filtering, selection, and data binding works perfectly on Windows.
 
-## 📱 Platform Screenshots
-
-### Windows
-
-|![](docs/Windows_1.png)|![](docs/Windows_2.png)|![](docs/Windows_3.png)|![](docs/Windows_4.png)|
-|:---:|:---:|:---:|:---:|
-|*Initial State*|*Typing & Filtering*|*Suggestion Selection*|*Selected Item Display*|
-
-### Android
-
-|![](docs/Android_1.png)|![](docs/Android_2.png)|![](docs/Android_3.png)|![](docs/Android_4.png)|
-|:---:|:---:|:---:|:---:|
-|*Initial State*|*Typing & Filtering*|*Suggestion Selection*|*Selected Item Display*|
-
-### iOS
-
-|![](docs/iOS_1.png)|![](docs/iOS_2.png)|![](docs/iOS_3.png)|![](docs/iOS_4.png)|
-|:---:|:---:|:---:|:---:|
-|*Initial State*|*Typing & Filtering*|*Suggestion Selection*|*Selected Item Display*|
-
-### MacCatalyst
-
-|![](docs/MacCatalyst_1.png)|![](docs/MacCatalyst_2.png)|![](docs/MacCatalyst_3.png)|![](docs/MacCatalyst_4.png)|
-|:---:|:---:|:---:|:---:|
-|*Initial State*|*Typing & Filtering*|*Suggestion Selection*|*Selected Item Display*|
-
 ## 🎨 Advanced Customization
 
 ### Custom Item Templates
@@ -490,7 +462,7 @@ private async Task TextChanged(string text)
 
 If you find this project helpful, please consider supporting its development:
 
-[![Sponsor](https://img.shields.io/badge/Sponsor-❤️-red?style=for-the-badge&logo=github-sponsors)](https://github.com/sponsors/zleao)
+[![Sponsor](https://img.shields.io/badge/Sponsor-❤️-blue?style=for-the-badge&logo=github-sponsors)](https://github.com/sponsors/zleao)
 
 Your support helps maintain and improve this project for the entire .NET MAUI community. Thank you! 🙏
 
@@ -504,6 +476,5 @@ This project is licensed under the MIT License - see the [LICENSE.md](LICENSE.md
 
 ## 🙏 Acknowledgments
 
-- Based on [dotMorten/XamarinFormsControls](https://github.com/dotMorten/XamarinFormsControls) AutoSuggestBox
 - Inspired by platform-native autocomplete controls
 - Built with ❤️ for the .NET MAUI community
