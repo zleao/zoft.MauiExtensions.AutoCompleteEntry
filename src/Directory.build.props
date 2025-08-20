@@ -16,6 +16,7 @@
     <PackageTags>net9 maui zoft AutoCompleteEntry AutoCompleteBox AutoCompleteView AutoComplete</PackageTags>
     <PackageReleaseNotes>
 		[MACCATALYST] Improve support to MAcCatalyst, including ItemTemplate, Width/Height handling, and more.
+		[BUGFIX] Fire base TextChanged event
 	</PackageReleaseNotes>
     <PackageReadmeFile>README.md</PackageReadmeFile>
 
