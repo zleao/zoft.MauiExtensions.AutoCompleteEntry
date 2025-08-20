@@ -1,22 +1,33 @@
 # zoft.MauiExtensions.Controls.AutoCompleteEntry
 
-Entry control that makes suggestions to users as they type.
+A powerful AutoCompleteEntry control for .NET MAUI that makes suggestions to users as they type. This control provides rich customization options, data templating support, and works consistently across all supported platforms.
 
 **NOTE:** This control is based on the awesome [dotMortem/XamarinFormsControls/AutoSuggestBox](https://github.com/dotMorten/XamarinFormsControls/tree/main/AutoSuggestBox). with some simplifications and modifications of my own.
 
 [![NuGet](https://img.shields.io/nuget/v/zoft.MauiExtensions.Controls.AutoCompleteEntry.svg)](https://www.nuget.org/packages/zoft.MauiExtensions.Controls.AutoCompleteEntry/)
 
-## Getting Started
+## ✨ Features
 
-### Instalation
+- 🔍 **Real-time filtering** as the user types
+- 🎨 **Custom item templates** for rich suggestion display
+- 📱 **Cross-platform support** (iOS, Android, Windows, MacCatalyst)
+- 🔄 **Flexible data binding** with command and event-based approaches
+- ⚙️ **Highly customizable** appearance and behavior
+- 🎯 **Full Entry compatibility** - inherits all Entry properties and behaviors
 
-Add NuGet Package to your project: 
-```
+## 🚀 Getting Started
+
+### Installation
+
+Add the NuGet package to your project:
+
+```bash
 dotnet add package zoft.MauiExtensions.Controls.AutoCompleteEntry
 ```
-You can find the nuget package here [zoft.MauiExtensions.Controls.AutoCompleteEntry](https://www.nuget.org/packages/zoft.MauiExtensions.Controls.AutoCompleteEntry/)
 
-<br/>
+📦 [View on NuGet](https://www.nuget.org/packages/zoft.MauiExtensions.Controls.AutoCompleteEntry/)
+
+### Setup
 
 Initialize the library in your `MauiProgram.cs` file:
 
@@ -34,7 +45,7 @@ namespace AutoCompleteEntry.Sample
             builder
                 .UseMauiApp<App>()
                 .UseMauiCommunityToolkit()
-                .UseZoftAutoCompleteEntry()
+                .UseZoftAutoCompleteEntry()  // 👈 Add this line
                 .ConfigureFonts(fonts =>
                 {
                     fonts.AddFont("OpenSans-Regular.ttf", "OpenSansRegular");
@@ -47,158 +58,428 @@ namespace AutoCompleteEntry.Sample
 }
 ```
 
-<br/>
+### XAML Namespace
 
-### How to Use
-
-The filtering of results, happens as the user types and you'll only need to respond to 2 actions:
-
-**Binding based**
-- `TextChangedCommand`: Triggered every time the user changes the text. Receives the current text as parameter;
-- `SelectedSuggestion`: Holds the currently selected option;
-
-**Event based**
-- `TextChanged`: Event raised every time the user changes the text. The current text is part of the event arguments;
-- `SuggestionChosen`: Event raised every time a suggestion is chosen. The selected option is part of the event arguments;
-
-<br/>
-
-### XAML Usage
-In order to make use of the control within XAML you can use this namespace:
+Add this namespace to your XAML files:
 
 ```xml
 xmlns:zoft="http://zoft.MauiExtensions/Controls"
 ```
 
-<br/>
+## 📋 Properties Reference
 
-### Sample Using Bindings
+### AutoCompleteEntry-Specific Properties
+
+| Property | Type | Default | Description |
+|----------|------|---------|-------------|
+| `ItemsSource` | `IList` | `null` | Collection of suggestion items to display |
+| `SelectedSuggestion` | `object` | `null` | Currently selected suggestion item (two-way binding) |
+| `DisplayMemberPath` | `string` | `""` | Property path for displaying items in the suggestion list |
+| `TextMemberPath` | `string` | `""` | Property path for the text value when an item is selected |
+| `ItemTemplate` | `DataTemplate` | `null` | Custom template for rendering suggestion items |
+| `IsSuggestionListOpen` | `bool` | `false` | Controls whether the suggestion dropdown is open |
+| `UpdateTextOnSelect` | `bool` | `true` | Whether selecting an item updates the text field |
+| `ShowBottomBorder` | `bool` | `true` | Controls the visibility of the bottom border |
+| `TextChangedCommand` | `ICommand` | `null` | Command executed when text changes (receives text as parameter) |
+
+### Inherited Entry Properties
+
+AutoCompleteEntry inherits from `Entry`, so all standard Entry properties are available:
+
+| Property | Description |
+|----------|-------------|
+| `Text` | The current text value |
+| `Placeholder` | Placeholder text when empty |
+| `PlaceholderColor` | Color of the placeholder text |
+| `TextColor` | Color of the input text |
+| `FontSize`, `FontFamily`, `FontAttributes` | Text formatting |
+| `IsReadOnly` | Whether the text can be edited |
+| `MaxLength` | Maximum character length |
+| `CursorPosition` | Current cursor position |
+| `ClearButtonVisibility` | When to show the clear button |
+| `HorizontalTextAlignment`, `VerticalTextAlignment` | Text alignment |
+| `CharacterSpacing` | Spacing between characters |
+| `IsTextPredictionEnabled` | Enable/disable text prediction |
+| `ReturnType` | Keyboard return key type |
+
+### Events
+
+| Event | EventArgs | Description |
+|-------|-----------|-------------|
+| `TextChanged` | `AutoCompleteEntryTextChangedEventArgs` | Fired when text changes (includes change reason) |
+| `SuggestionChosen` | `AutoCompleteEntrySuggestionChosenEventArgs` | Fired when a suggestion is selected |
+| `CursorPositionChanged` | `AutoCompleteEntryCursorPositionChangedEventArgs` | Fired when cursor position changes |
+
+Plus all inherited Entry events: `Completed`, `Focused`, `Unfocused`
+
+## 🎯 Basic Usage
+
+The filtering of results happens as the user types. You can respond to text changes using either:
+
+**🔗 Binding-Based Approach** (Recommended)
+- Use `TextChangedCommand` for filtering logic
+- Bind `SelectedSuggestion` for the selected item
+
+**⚡ Event-Based Approach**
+- Handle `TextChanged` event for filtering
+- Handle `SuggestionChosen` event for selection
+
+## 💡 Usage Examples
+
+### Basic Example with Bindings
 
 ```xml
-<ContentPage ...
-             xmlns:zoft="http://zoft.MauiExtensions/Controls"
-             ...>
-
-    <zoft:AutoCompleteEntry Placeholder="Search for a country or group"
-                            ItemsSource="{Binding FilteredList}"
-                            TextMemberPath="Country"
-                            DisplayMemberPath="Country"
-                            TextChangedCommand="{Binding TextChangedCommand}"
-                            CursorPosition="{Binding CursorPosition, Mode=TwoWay}"
-                            SelectedSuggestion="{Binding SelectedItem}"
-                            Completed="AutoCompleteEntry_Completed"
-                            ClearButtonVisibility="Never"
-                            HeightRequest="50"/>
-</ContentPage>
-
+<zoft:AutoCompleteEntry
+    Placeholder="Search for a country or group"
+    ItemsSource="{Binding FilteredList}"
+    TextMemberPath="Country"
+    DisplayMemberPath="Country"
+    TextChangedCommand="{Binding TextChangedCommand}"
+    SelectedSuggestion="{Binding SelectedItem}"
+    HeightRequest="50" />
 ```
+
+**ViewModel Implementation:**
+
 ```csharp
-internal partial class ListItem : ObservableObject
+public partial class SampleViewModel : ObservableObject
 {
-    [ObservableProperty]
-    public string _group;
-
-    [ObservableProperty]
-    public string _country;
-}
-
-internal partial class SampleViewModel : CoreViewModel
-{
-    private readonly List<ListItem> Teams  = new List<ListItem>() { ... };
+    private readonly List<CountryItem> _allCountries = new()
+    {
+        new CountryItem { Group = "Group A", Country = "Ecuador" },
+        new CountryItem { Group = "Group B", Country = "Netherlands" },
+        // ... more items
+    };
     
     [ObservableProperty]
-    private ObservableCollection<ListItem> _filteredList;
+    private ObservableCollection<CountryItem> _filteredList;
 
     [ObservableProperty]
-    private ListItem _selectedItem;
+    private CountryItem _selectedItem;
 
-	[ObservableProperty]
+    [ObservableProperty]
     private int _cursorPosition;
 
     public SampleViewModel()
     {
-        FilteredList = new(Teams);
-        SelectedItem = null;
+        FilteredList = new(_allCountries);
     }
 
-    private void FilterList(string filter)
-    {
-        SelectedItem = null;
-        FilteredList.Clear();
-
-        FilteredList.AddRange(Teams.Where(t => t.Group.Contains(filter, StringComparison.CurrentCultureIgnoreCase) ||
-                                               t.Country.Contains(filter, StringComparison.CurrentCultureIgnoreCase)));
-    }
-
-	[RelayCommand]
+    [RelayCommand]
     private void TextChanged(string text)
     {
-        FilterList(text);
+        FilteredList.Clear();
+        
+        var filtered = _allCountries.Where(item => 
+            item.Country.Contains(text, StringComparison.OrdinalIgnoreCase) ||
+            item.Group.Contains(text, StringComparison.OrdinalIgnoreCase));
+            
+        foreach (var item in filtered)
+            FilteredList.Add(item);
     }
+}
+
+public class CountryItem
+{
+    public string Group { get; set; }
+    public string Country { get; set; }
 }
 ```
 
-
-<br/>
-
-### Sample Using Events
+### Advanced Example with Custom ItemTemplate
 
 ```xml
-<ContentPage ...
-             xmlns:zoft="http://zoft.MauiExtensions/Controls"
-             ...>
-
-    <zoft:AutoCompleteEntry Placeholder="Search for a country or group"
-                            ItemsSource="{Binding FilteredList}"
-                            TextMemberPath="Country"
-                            DisplayMemberPath="Country"
-                            TextChanged="AutoCompleteEntry_TextChanged"
-                            CursorPosition="{Binding CursorPosition, Mode=TwoWay}"
-                            CursorPositionChanged="AutoCompleteEntry_CursorPositionChanged"
-                            SuggestionChosen="AutoCompleteEntry_SuggestionChosen"
-                            Completed="AutoCompleteEntry_Completed"
-                            ClearButtonVisibility="WhileEditing"
-                            HeightRequest="50"/>
-</ContentPage>
-
+<zoft:AutoCompleteEntry
+    Placeholder="Search countries with custom display"
+    ItemsSource="{Binding FilteredList}"
+    TextMemberPath="Country"
+    DisplayMemberPath="Country"
+    TextChangedCommand="{Binding TextChangedCommand}"
+    SelectedSuggestion="{Binding SelectedItem}"
+    ShowBottomBorder="{Binding ShowBottomBorder}"
+    HeightRequest="50">
+    
+    <!-- 🎨 Custom item template for rich display -->
+    <zoft:AutoCompleteEntry.ItemTemplate>
+        <DataTemplate x:DataType="vm:CountryItem">
+            <Grid ColumnDefinitions="Auto,*,Auto" 
+                  Padding="12,8" 
+                  HeightRequest="60">
+                
+                <!-- Flag or Group Indicator -->
+                <Border Grid.Column="0"
+                        BackgroundColor="{Binding GroupColor}"
+                        WidthRequest="4"
+                        HeightRequest="40"
+                        StrokeShape="RoundRectangle 2" />
+                
+                <!-- Country Details -->
+                <StackLayout Grid.Column="1" 
+                            Margin="12,0">
+                    <Label Text="{Binding Country}"
+                           FontSize="16"
+                           FontAttributes="Bold"
+                           TextColor="Black" />
+                    <Label Text="{Binding Group}"
+                           FontSize="12"
+                           TextColor="Gray" />
+                </StackLayout>
+                
+                <!-- Population or other info -->
+                <Label Grid.Column="2"
+                       Text="{Binding Population, StringFormat='{0:N0}'}"
+                       FontSize="12"
+                       TextColor="DarkGray"
+                       VerticalOptions="Center" />
+            </Grid>
+        </DataTemplate>
+    </zoft:AutoCompleteEntry.ItemTemplate>
+</zoft:AutoCompleteEntry>
 ```
+
+### Event-Based Example
+
+```xml
+<zoft:AutoCompleteEntry
+    Placeholder="Search for a country or group"
+    ItemsSource="{Binding FilteredList}"
+    TextMemberPath="Country"
+    DisplayMemberPath="Country"
+    TextChanged="AutoCompleteEntry_TextChanged"
+    SuggestionChosen="AutoCompleteEntry_SuggestionChosen"
+    CursorPositionChanged="AutoCompleteEntry_CursorPositionChanged"
+    ClearButtonVisibility="WhileEditing"
+    HeightRequest="50" />
+```
+
+**Code-Behind Implementation:**
+
 ```csharp
-private void AutoCompleteEntry_TextChanged(object sender, zoft.MauiExtensions.Controls.AutoCompleteEntryTextChangedEventArgs e)
+private void AutoCompleteEntry_TextChanged(object sender, AutoCompleteEntryTextChangedEventArgs e)
 {
-    // Filter only when the user is typing
-    if (e.Reason == zoft.MauiExtensions.Controls.AutoCompleteEntryTextChangeReason.UserInput)
+    // Only filter when the user is actually typing
+    if (e.Reason == AutoCompleteEntryTextChangeReason.UserInput)
     {
-        //Filter the ItemsSource, based on text
-        ViewModel.FilterList((sender as zoft.MauiExtensions.Controls.AutoCompleteEntry).Text);
+        var autoComplete = sender as AutoCompleteEntry;
+        ViewModel.FilterList(autoComplete.Text);
     }
 }
 
-private void AutoCompleteEntry_SuggestionChosen(object sender, zoft.MauiExtensions.Controls.AutoCompleteEntrySuggestionChosenEventArgs e)
+private void AutoCompleteEntry_SuggestionChosen(object sender, AutoCompleteEntrySuggestionChosenEventArgs e)
 {
-    //Set the SelectedItem provided by the event arguments
-    ViewModel.SelectedItem = e.SelectedItem as ListItem;
+    // Handle the selected suggestion
+    if (e.SelectedItem is CountryItem selectedCountry)
+    {
+        ViewModel.SelectedItem = selectedCountry;
+        // Perform additional actions like navigation or validation
+    }
+}
+
+private void AutoCompleteEntry_CursorPositionChanged(object sender, AutoCompleteEntryCursorPositionChangedEventArgs e)
+{
+    // Track cursor position for analytics or custom behavior
+    Console.WriteLine($"Cursor moved to position: {e.NewCursorPosition}");
 }
 ```
 
-<br/>
-<br/>
+### Programmatic Control Examples
 
-#### Windows
+```csharp
+// Programmatically open/close the suggestion list
+autoCompleteEntry.IsSuggestionListOpen = true;
+
+// Control text updates on selection
+autoCompleteEntry.UpdateTextOnSelect = false; // Keep original text when selecting
+
+// Customize appearance
+autoCompleteEntry.ShowBottomBorder = false; // Remove bottom border
+autoCompleteEntry.ClearButtonVisibility = ClearButtonVisibility.WhileEditing;
+
+// Handle selection programmatically
+autoCompleteEntry.SelectedSuggestion = mySelectedItem;
+```
+
+## 🏗️ Platform Support Matrix
+
+| Feature | Windows | Android | iOS | MacCatalyst | Notes |
+|---------|---------|---------|-----|-------------|-------|
+| **Core Functionality** |
+| Text Input & Filtering | ✅ | ✅ | ✅ | ✅ | Full support |
+| ItemsSource Binding | ✅ | ✅ | ✅ | ✅ | Full support |
+| Selection Events | ✅ | ✅ | ✅ | ✅ | Full support |
+| **Appearance & Styling** |
+| ItemTemplate | ❌ | ✅ | ✅ | ✅ | Windows: Planned for future release |
+| ShowBottomBorder | ❌ | ✅ | ✅ | ✅ | Windows: Planned for future release |
+| Text Styling | ✅ | ✅ | ✅ | ✅ | Fonts, colors, alignment |
+| **Behavior** |
+| UpdateTextOnSelect | ✅ | ✅ | ✅ | ✅ | Full support |
+| IsSuggestionListOpen | ✅ | ✅ | ✅ | ✅ | Full support |
+| CursorPosition | ✅ | ✅ | ✅ | ✅ | Full support |
+| **Entry Features** |
+| ClearButtonVisibility | ✅ | ✅ | ✅ | ✅ | Full support |
+| Placeholder | ✅ | ✅ | ✅ | ✅ | Full support |
+| IsReadOnly | ✅ | ✅ | ✅ | ✅ | Full support |
+| MaxLength | ✅ | ✅ | ✅ | ✅ | Full support |
+
+### Legend
+- ✅ **Fully Supported** - Feature works as expected
+- ❌ **Not Implemented** - Feature exists in API but not yet implemented on this platform
+- ⚠️ **Limited Support** - Feature works with some limitations
+
+### Windows Platform Notes
+
+While the AutoCompleteEntry works great on Windows, some advanced styling features are still in development:
+
+- **ItemTemplate**: Currently displays items using their string representation. Custom templates are planned for a future release.
+- **ShowBottomBorder**: This styling option doesn't affect the Windows presentation currently.
+
+All core functionality including filtering, selection, and data binding works perfectly on Windows.
+
+## 📱 Platform Screenshots
+
+### Windows
 
 |![](docs/Windows_1.png)|![](docs/Windows_2.png)|![](docs/Windows_3.png)|![](docs/Windows_4.png)|
 |:---:|:---:|:---:|:---:|
+|*Initial State*|*Typing & Filtering*|*Suggestion Selection*|*Selected Item Display*|
 
-#### Android
+### Android
 
 |![](docs/Android_1.png)|![](docs/Android_2.png)|![](docs/Android_3.png)|![](docs/Android_4.png)|
 |:---:|:---:|:---:|:---:|
+|*Initial State*|*Typing & Filtering*|*Suggestion Selection*|*Selected Item Display*|
 
-#### iOS
+### iOS
 
 |![](docs/iOS_1.png)|![](docs/iOS_2.png)|![](docs/iOS_3.png)|![](docs/iOS_4.png)|
 |:---:|:---:|:---:|:---:|
+|*Initial State*|*Typing & Filtering*|*Suggestion Selection*|*Selected Item Display*|
 
-#### MacCatalyst
+### MacCatalyst
 
 |![](docs/MacCatalyst_1.png)|![](docs/MacCatalyst_2.png)|![](docs/MacCatalyst_3.png)|![](docs/MacCatalyst_4.png)|
 |:---:|:---:|:---:|:---:|
+|*Initial State*|*Typing & Filtering*|*Suggestion Selection*|*Selected Item Display*|
+
+## 🎨 Advanced Customization
+
+### Custom Item Templates
+
+Create rich, interactive suggestion lists with custom DataTemplates:
+
+```xml
+<zoft:AutoCompleteEntry.ItemTemplate>
+    <DataTemplate x:DataType="models:Product">
+        <Grid ColumnDefinitions="60,*,Auto" 
+              RowDefinitions="Auto,Auto"
+              Padding="16,12">
+            
+            <!-- Product Image -->
+            <Image Grid.RowSpan="2"
+                   Source="{Binding ImageUrl}"
+                   WidthRequest="50"
+                   HeightRequest="50"
+                   Aspect="AspectFill" />
+            
+            <!-- Product Info -->
+            <Label Grid.Column="1"
+                   Text="{Binding Name}"
+                   FontSize="16"
+                   FontAttributes="Bold" />
+            
+            <Label Grid.Column="1" Grid.Row="1"
+                   Text="{Binding Category}"
+                   FontSize="12"
+                   TextColor="Gray" />
+            
+            <!-- Price -->
+            <Label Grid.Column="2" Grid.RowSpan="2"
+                   Text="{Binding Price, StringFormat='${0:F2}'}"
+                   FontSize="14"
+                   FontAttributes="Bold"
+                   VerticalOptions="Center"
+                   HorizontalOptions="End" />
+        </Grid>
+    </DataTemplate>
+</zoft:AutoCompleteEntry.ItemTemplate>
+```
+
+### Styling and Theming
+
+```xml
+<Style x:Key="CustomAutoCompleteStyle" TargetType="zoft:AutoCompleteEntry">
+    <Setter Property="BackgroundColor" Value="{DynamicResource SurfaceColor}" />
+    <Setter Property="TextColor" Value="{DynamicResource OnSurfaceColor}" />
+    <Setter Property="PlaceholderColor" Value="{DynamicResource OnSurfaceVariantColor}" />
+    <Setter Property="FontSize" Value="16" />
+    <Setter Property="HeightRequest" Value="56" />
+    <Setter Property="Margin" Value="16,8" />
+    <Setter Property="ShowBottomBorder" Value="True" />
+</Style>
+```
+
+### Performance Tips
+
+1. **Efficient Filtering**: Use proper indexing and async operations for large datasets
+2. **Template Complexity**: Keep ItemTemplates lightweight for smooth scrolling  
+3. **Data Virtualization**: Consider implementing virtualization for very large lists
+4. **Debouncing**: Implement debouncing in your TextChangedCommand for better UX
+
+```csharp
+// Example: Debounced filtering
+private CancellationTokenSource _filterCancellation;
+
+[RelayCommand]
+private async Task TextChanged(string text)
+{
+    _filterCancellation?.Cancel();
+    _filterCancellation = new CancellationTokenSource();
+    
+    try
+    {
+        await Task.Delay(300, _filterCancellation.Token); // Debounce
+        await FilterItemsAsync(text);
+    }
+    catch (TaskCanceledException)
+    {
+        // Filtering was cancelled by newer input
+    }
+}
+```
+
+## 🐛 Troubleshooting
+
+### Common Issues
+
+**Issue**: Suggestions not appearing
+- ✅ Ensure `ItemsSource` is properly bound and contains data
+- ✅ Check `DisplayMemberPath` matches your data model properties
+- ✅ Verify the control has sufficient height to display suggestions
+
+**Issue**: Selection not working
+- ✅ Confirm `SelectedSuggestion` binding is two-way
+- ✅ Check `TextMemberPath` property is correctly set
+- ✅ Ensure the selected item exists in the current `ItemsSource`
+
+**Issue**: Custom templates not rendering (Windows)
+- ⚠️ ItemTemplate is not yet implemented on Windows platform
+- ✅ Use DisplayMemberPath for basic text display on Windows
+
+**Issue**: Performance issues with large datasets
+- ✅ Implement efficient filtering logic
+- ✅ Use proper async/await patterns
+- ✅ Consider pagination or virtual scrolling
+
+## 🤝 Contributing
+
+Contributions are welcome! Please feel free to submit a Pull Request. For major changes, please open an issue first to discuss what you would like to change.
+
+## 📄 License
+
+This project is licensed under the MIT License - see the [LICENSE.md](LICENSE.md) file for details.
+
+## 🙏 Acknowledgments
+
+- Based on [dotMorten/XamarinFormsControls](https://github.com/dotMorten/XamarinFormsControls) AutoSuggestBox
+- Inspired by platform-native autocomplete controls
+- Built with ❤️ for the .NET MAUI community
