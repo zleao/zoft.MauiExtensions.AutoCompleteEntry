@@ -1,7 +1,7 @@
-﻿using Microsoft.Maui.Controls.Internals;
+﻿using CommunityToolkit.WinUI;
+using Microsoft.Maui.Controls.Internals;
 using Microsoft.Maui.Platform;
 using Microsoft.UI.Xaml.Controls;
-using Uno.UI.Extensions;
 using zoft.MauiExtensions.Core.Extensions;
 
 namespace zoft.MauiExtensions.Controls.Platform;
@@ -21,7 +21,7 @@ public static class AutoCompleteEntryExtensions
 
     public static void UpdateClearButtonVisibility(this AutoSuggestBox platformControl, AutoCompleteEntry autoCompleteEntry)
     {
-        platformControl.FindFirstDescendant<TextBox>()?.UpdateClearButtonVisibility(autoCompleteEntry);
+        platformControl.FindDescendant<TextBox>()?.UpdateClearButtonVisibility(autoCompleteEntry);
     }
 
     /// <summary>
@@ -126,7 +126,7 @@ public static class AutoCompleteEntryExtensions
     /// <param name="entry"></param>
     public static void UpdateReturnType(this AutoSuggestBox platformControl, IEntry entry)
     {
-        platformControl.FindFirstDescendant<TextBox>()?.UpdateReturnType(entry);
+        platformControl.FindDescendant<TextBox>()?.UpdateReturnType(entry);
     }
 
     /// <summary>
