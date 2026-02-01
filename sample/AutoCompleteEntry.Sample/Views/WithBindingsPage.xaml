@@ -13,7 +13,6 @@
     </ContentPage.Resources>
 
     <Grid>
-
         <Image
             HeightRequest="200"
             HorizontalOptions="Center"
