@@ -32,7 +32,7 @@ internal class AutoCompleteEntryTableSource : UITableViewSource
                     label.SetBinding(Label.TextProperty, _displayMemberPath ?? ".");
                     label.HorizontalTextAlignment = Microsoft.Maui.TextAlignment.Center;
                     label.VerticalTextAlignment = Microsoft.Maui.TextAlignment.Center;
-                    label.MinimumHeightRequest = 35;
+                    label.MinimumHeightRequest = 44;
 
                     return label;
                 });
@@ -51,6 +51,9 @@ internal class AutoCompleteEntryTableSource : UITableViewSource
         _mauiContext = mauiContext;
         //_cellIdentifier = Guid.NewGuid().ToString();
         _listViewContainer = Application.Current.Windows[0].Page;
+
+        _view.EstimatedRowHeight = 60f;
+        _view.RowHeight = UITableView.AutomaticDimension;
 
         CheckIfItemsSourceIsNotifiable();
     }
@@ -103,8 +106,15 @@ internal class AutoCompleteEntryTableSource : UITableViewSource
         var templateView = templateToUse.CreateContent() as View;
         templateView.BindingContext = item;
 
-        // Convert MAUI view to native iOS view with proper MauiContext
+        // Convert MAUI view to native iOS view first (creates the handler)
         var nativeView = templateView.ToPlatform(_mauiContext);
+
+        // Measure AFTER handler creation so MAUI's layout system can resolve sizes.
+        // MAUI views don't expose intrinsic content size to UIKit Auto Layout,
+        // so we measure explicitly and add a height constraint to inform
+        // UITableView.AutomaticDimension of the desired row height.
+        var widthConstraint = tableView.Bounds.Width > 0 ? (double)tableView.Bounds.Width : double.PositiveInfinity;
+        var measure = ((IView)templateView).Measure(widthConstraint, double.PositiveInfinity);
 
         // Clear previous content to avoid overlapping
         foreach (var subview in cell.ContentView.Subviews)
@@ -112,10 +122,23 @@ internal class AutoCompleteEntryTableSource : UITableViewSource
             subview.RemoveFromSuperview();
         }
 
-        nativeView.Frame = cell.ContentView.Bounds;
-        nativeView.AutoresizingMask = UIViewAutoresizing.FlexibleDimensions;
-
+        nativeView.TranslatesAutoresizingMaskIntoConstraints = false;
         cell.ContentView.AddSubview(nativeView);
+
+        // Pin to all 4 edges for auto-sizing cell support
+        NSLayoutConstraint.ActivateConstraints(
+        [
+            nativeView.LeadingAnchor.ConstraintEqualTo(cell.ContentView.LeadingAnchor),
+            nativeView.TrailingAnchor.ConstraintEqualTo(cell.ContentView.TrailingAnchor),
+            nativeView.TopAnchor.ConstraintEqualTo(cell.ContentView.TopAnchor),
+            nativeView.BottomAnchor.ConstraintEqualTo(cell.ContentView.BottomAnchor)
+        ]);
+
+        // Height at priority 999 (below required 1000) so it informs auto-sizing
+        // without conflicting with the top+bottom edge constraints.
+        var heightConstraint = nativeView.HeightAnchor.ConstraintEqualTo((nfloat)measure.Height);
+        heightConstraint.Priority = 999;
+        heightConstraint.Active = true;
 
         return cell;
     }
@@ -128,11 +151,6 @@ internal class AutoCompleteEntryTableSource : UITableViewSource
     public override nint RowsInSection(UITableView tableview, nint section)
     {
         return _items.Count;
-    }
-
-    public override nfloat GetHeightForRow(UITableView tableView, NSIndexPath indexPath)
-    {
-        return 35f;
     }
 
     public event EventHandler<TableRowSelectedEventArgs<object>> TableRowSelected;

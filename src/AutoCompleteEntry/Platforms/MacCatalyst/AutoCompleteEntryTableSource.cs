@@ -32,7 +32,7 @@ internal class AutoCompleteEntryTableSource : UITableViewSource
                     label.SetBinding(Label.TextProperty, _displayMemberPath ?? ".");
                     label.HorizontalTextAlignment = Microsoft.Maui.TextAlignment.Center;
                     label.VerticalTextAlignment = Microsoft.Maui.TextAlignment.Center;
-                    label.MinimumHeightRequest = 35;
+                    label.MinimumHeightRequest = 44;
 
                     return label;
                 });
@@ -51,6 +51,9 @@ internal class AutoCompleteEntryTableSource : UITableViewSource
         _mauiContext = mauiContext;
         //_cellIdentifier = Guid.NewGuid().ToString();
         _listViewContainer = Application.Current.Windows[0].Page;
+
+        _view.EstimatedRowHeight = 60f;
+        _view.RowHeight = UITableView.AutomaticDimension;
 
         CheckIfItemsSourceIsNotifiable();
     }
@@ -112,10 +115,15 @@ internal class AutoCompleteEntryTableSource : UITableViewSource
             subview.RemoveFromSuperview();
         }
 
-        nativeView.Frame = cell.ContentView.Bounds;
-        nativeView.AutoresizingMask = UIViewAutoresizing.FlexibleDimensions;
-
+        nativeView.TranslatesAutoresizingMaskIntoConstraints = false;
         cell.ContentView.AddSubview(nativeView);
+        NSLayoutConstraint.ActivateConstraints(new[]
+        {
+            nativeView.LeadingAnchor.ConstraintEqualTo(cell.ContentView.LeadingAnchor),
+            nativeView.TrailingAnchor.ConstraintEqualTo(cell.ContentView.TrailingAnchor),
+            nativeView.TopAnchor.ConstraintEqualTo(cell.ContentView.TopAnchor),
+            nativeView.BottomAnchor.ConstraintEqualTo(cell.ContentView.BottomAnchor)
+        });
 
         return cell;
     }
@@ -128,11 +136,6 @@ internal class AutoCompleteEntryTableSource : UITableViewSource
     public override nint RowsInSection(UITableView tableview, nint section)
     {
         return _items.Count;
-    }
-
-    public override nfloat GetHeightForRow(UITableView tableView, NSIndexPath indexPath)
-    {
-        return 35f;
     }
 
     public event EventHandler<TableRowSelectedEventArgs<object>> TableRowSelected;
