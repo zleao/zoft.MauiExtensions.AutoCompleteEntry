@@ -14,8 +14,6 @@ internal class AutoCompleteEntryTableSource : UITableViewSource
     private readonly string _displayMemberPath;
     private readonly DataTemplate _itemTemplate;
     private readonly IMauiContext _mauiContext;
-
-    //private readonly string _cellIdentifier;
     private readonly Page _listViewContainer;
 
     private DataTemplate _defaultItemTemplate;
@@ -23,9 +21,7 @@ internal class AutoCompleteEntryTableSource : UITableViewSource
     {
         get
         {
-            if (_defaultItemTemplate == null)
-            {
-                _defaultItemTemplate = new DataTemplate(() =>
+            _defaultItemTemplate ??= new DataTemplate(() =>
                 {
                     var label = new Label();
 
@@ -36,7 +32,6 @@ internal class AutoCompleteEntryTableSource : UITableViewSource
 
                     return label;
                 });
-            }
 
             return _defaultItemTemplate;
         }
@@ -49,7 +44,6 @@ internal class AutoCompleteEntryTableSource : UITableViewSource
         _displayMemberPath = displayMemberPath;
         _itemTemplate = itemTemplate;
         _mauiContext = mauiContext;
-        //_cellIdentifier = Guid.NewGuid().ToString();
         _listViewContainer = Application.Current.Windows[0].Page;
 
         _view.EstimatedRowHeight = 60f;
@@ -98,47 +92,51 @@ internal class AutoCompleteEntryTableSource : UITableViewSource
         var item = _items[indexPath.Row];
         var templateToUse = _itemTemplate ?? DefaultItemTemplate;
 
+        // cellId is derived from the resolved DataTemplate, so UITableView naturally
+        // maintains a separate recycling pool per template type — DataTemplateSelector works for free.
         var cellId = ((IDataTemplateController)templateToUse.SelectDataTemplate(item, _listViewContainer)).IdString;
 
-        var cell = tableView.DequeueReusableCell(cellId) ?? new UITableViewCell(UITableViewCellStyle.Default, cellId);
+        var cell = tableView.DequeueReusableCell(cellId) as AutoCompleteCell;
 
-        // Create the MAUI view from the DataTemplate
-        var templateView = templateToUse.CreateContent() as View;
-        templateView.BindingContext = item;
-
-        // Convert MAUI view to native iOS view first (creates the handler)
-        var nativeView = templateView.ToPlatform(_mauiContext);
-
-        // Measure AFTER handler creation so MAUI's layout system can resolve sizes.
-        // MAUI views don't expose intrinsic content size to UIKit Auto Layout,
-        // so we measure explicitly and add a height constraint to inform
-        // UITableView.AutomaticDimension of the desired row height.
-        var widthConstraint = tableView.Bounds.Width > 0 ? (double)tableView.Bounds.Width : double.PositiveInfinity;
-        var measure = ((IView)templateView).Measure(widthConstraint, double.PositiveInfinity);
-
-        // Clear previous content to avoid overlapping
-        foreach (var subview in cell.ContentView.Subviews)
+        if (cell == null)
         {
-            subview.RemoveFromSuperview();
+            // First time for this template type — create the MAUI view and its handler
+            cell = new AutoCompleteCell(cellId);
+
+            var templateView = templateToUse.CreateContent() as View;
+            templateView.BindingContext = item;
+            cell.MauiView = templateView;
+
+            var nativeView = templateView.ToPlatform(_mauiContext);
+            nativeView.TranslatesAutoresizingMaskIntoConstraints = false;
+            cell.ContentView.AddSubview(nativeView);
+
+            // Pin to all 4 edges — done once per cell, never repeated on recycle
+            NSLayoutConstraint.ActivateConstraints(
+            [
+                nativeView.LeadingAnchor.ConstraintEqualTo(cell.ContentView.LeadingAnchor),
+                nativeView.TrailingAnchor.ConstraintEqualTo(cell.ContentView.TrailingAnchor),
+                nativeView.TopAnchor.ConstraintEqualTo(cell.ContentView.TopAnchor),
+                nativeView.BottomAnchor.ConstraintEqualTo(cell.ContentView.BottomAnchor)
+            ]);
+
+            // Stash a reusable height constraint at priority 999 so it informs
+            // AutomaticDimension without conflicting with the edge constraints.
+            // We update only its Constant on recycle — no new constraint objects.
+            cell.HeightConstraint = nativeView.HeightAnchor.ConstraintEqualTo(44f);
+            cell.HeightConstraint.Priority = 999;
+            cell.HeightConstraint.Active = true;
+        }
+        else
+        {
+            // Recycled cell — skip handler creation, just swap the data
+            cell.MauiView.BindingContext = item;
         }
 
-        nativeView.TranslatesAutoresizingMaskIntoConstraints = false;
-        cell.ContentView.AddSubview(nativeView);
-
-        // Pin to all 4 edges for auto-sizing cell support
-        NSLayoutConstraint.ActivateConstraints(
-        [
-            nativeView.LeadingAnchor.ConstraintEqualTo(cell.ContentView.LeadingAnchor),
-            nativeView.TrailingAnchor.ConstraintEqualTo(cell.ContentView.TrailingAnchor),
-            nativeView.TopAnchor.ConstraintEqualTo(cell.ContentView.TopAnchor),
-            nativeView.BottomAnchor.ConstraintEqualTo(cell.ContentView.BottomAnchor)
-        ]);
-
-        // Height at priority 999 (below required 1000) so it informs auto-sizing
-        // without conflicting with the top+bottom edge constraints.
-        var heightConstraint = nativeView.HeightAnchor.ConstraintEqualTo((nfloat)measure.Height);
-        heightConstraint.Priority = 999;
-        heightConstraint.Active = true;
+        // Measure on every GetCell call because recycled rows may bind to data of a different height
+        var widthConstraint = tableView.Bounds.Width > 0 ? (double)tableView.Bounds.Width : double.PositiveInfinity;
+        var measure = ((IView)cell.MauiView).Measure(widthConstraint, double.PositiveInfinity);
+        cell.HeightConstraint.Constant = (nfloat)measure.Height;
 
         return cell;
     }
@@ -160,4 +158,16 @@ internal class AutoCompleteEntryTableSource : UITableViewSource
         var item = _items[itemIndexPath.Row];
         TableRowSelected?.Invoke(this, new TableRowSelectedEventArgs<object>(item, itemIndexPath));
     }
+}
+
+/// <summary>
+/// Custom cell that holds MAUI view and height constraint references across recycles,
+/// avoiding repeated handler creation and constraint leaks.
+/// </summary>
+internal sealed class AutoCompleteCell : UITableViewCell
+{
+    internal View MauiView { get; set; }
+    internal NSLayoutConstraint HeightConstraint { get; set; }
+
+    internal AutoCompleteCell(string cellId) : base(UITableViewCellStyle.Default, cellId) { }
 }
