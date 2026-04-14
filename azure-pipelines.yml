@@ -1,8 +1,9 @@
 variables:
-  
+
   DotNetVersion: '9.0.300'
   PathToProjectFolder: 'src\AutoCompleteEntry'
   PathToProjectFile: '$(PathToProjectFolder)\AutoCompleteEntry.csproj'
+  PathToTestProjectFile: 'src\Tests\AutoCompleteEntry.Tests\AutoCompleteEntry.Tests.csproj'
   BuildConfiguration: Release
 
 # Disable generic automatic trigger for now. To publish a new nuget manage, a manual build must be triggered
@@ -53,12 +54,39 @@ jobs:
           ArtifactName: 'drop'
           publishLocation: 'Container'
 
+  - job: run_unit_tests
+    displayName: Run Unit Tests
+    pool:
+      vmImage: windows-latest
+    steps:
+
+      - task: UseDotNet@2
+        displayName: Install .NET $(DotNetVersion)
+        inputs:
+          packageType: 'sdk'
+          version: '$(DotNetVersion)'
+
+      - task: CmdLine@2
+        displayName: 'Install .NET MAUI Workload'
+        inputs:
+          script: dotnet workload restore $(PathToProjectFile)
+
+      - task: DotNetCoreCLI@2
+        displayName: 'Run Unit Tests'
+        inputs:
+          command: test
+          projects: '$(PathToTestProjectFile)'
+          arguments: '--configuration $(BuildConfiguration)'
+          publishTestResults: true
+
   - job: 'publish_nuget_package'
     displayName: 'Publish NuGet Package'
     pool:
       vmImage: windows-latest
     condition: and(succeeded(), ne(variables['Build.Reason'], 'PullRequest'))
-    dependsOn: build_library
+    dependsOn:
+      - build_library
+      - run_unit_tests
     steps:
 
       - task: DownloadBuildArtifacts@0
