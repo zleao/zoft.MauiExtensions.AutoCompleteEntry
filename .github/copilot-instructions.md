@@ -1,0 +1,43 @@
+# Copilot instructions
+
+This repository is a **.NET MAUI control library** for `zoft.MauiExtensions.Controls.AutoCompleteEntry`, plus a sample app that demonstrates intended usage patterns.
+
+## Repository shape
+- `src\AutoCompleteEntry` contains the reusable control library that is shipped as the NuGet package.
+- `sample\AutoCompleteEntry.Sample` is the reference app used to exercise the control on real MAUI targets.
+- `src\.github\copilot-instructions.md` contains older library guidance; keep repo-wide guidance in this top-level file and use `.github\instructions\*.instructions.md` for narrower rules.
+
+## Build and run commands
+- Restore MAUI workloads before the first build:
+  - `dotnet workload restore src\AutoCompleteEntry\AutoCompleteEntry.csproj`
+- Build the library the same way CI does:
+  - `dotnet build src\AutoCompleteEntry\AutoCompleteEntry.csproj -c Release`
+- Build the sample app on Windows:
+  - `dotnet build sample\AutoCompleteEntry.Sample\AutoCompleteEntry.Sample.csproj -f net9.0-windows10.0.19041.0`
+- Run the sample app on Windows:
+  - `dotnet run --project sample\AutoCompleteEntry.Sample\AutoCompleteEntry.Sample.csproj -f net9.0-windows10.0.19041.0`
+
+There is **no dedicated automated test project** in the repository right now, so there is no single-test command to use. The sample app is the main integration surface for behavior changes.
+
+## Architecture
+- `AutoCompleteEntry.cs` is the shared public surface: bindable properties, events, and the control-side state transitions.
+- `Initialization.cs` exposes `UseZoftAutoCompleteEntry()`, which is the required MAUI registration hook for consumers and for the sample app.
+- `Handlers\AutoCompleteEntryHandler.cs` defines the shared property mapper and command mapper. Platform-specific behavior is implemented in partial handler files under `Platforms\<Platform>\`.
+- `Handlers\AutoCompleteEntryHandler.Standard.cs` is the no-op fallback for unsupported targets; do not put real behavior there.
+- Each platform wraps a native control:
+  - Android uses `AndroidAutoCompleteEntry`
+  - Windows uses `AutoSuggestBox`
+  - iOS and MacCatalyst use a custom `IOSAutoCompleteEntry` view with a text field plus suggestion table
+- The control does **not** own filtering logic. Consumers update `ItemsSource` in response to `TextChangedCommand` or the `TextChanged` event.
+
+## Repo-specific conventions
+- Treat the public API as stable. This is a published NuGet package, so prefer additive or opt-in changes over renaming or changing existing behavior.
+- Keep shared behavior in `AutoCompleteEntry.cs`; keep native wiring, event subscriptions, and platform rendering in `Platforms\<Platform>\` partial handlers and native views.
+- Avoid adding new scattered `#if` blocks in shared files when a platform partial can express the same change.
+- When text handling changes, preserve the `AutoCompleteEntryTextChangeReason` flow:
+  - `UserInput` is the trigger for filtering
+  - `ProgrammaticChange` is raised when code updates `Text`
+  - `SuggestionChosen` is raised when a selection updates the control
+- `SelectedSuggestion` is the two-way selection state; `TextMemberPath` and `DisplayMemberPath` are used to map item objects into text/list display.
+- If UI behavior changes and there is still no automated test coverage, update the sample app so the change is exercised in either `WithBindingsPage` or `WithEventsPage`.
+- Keep documented platform gaps consistent with the README. Windows still has known limitations around `ItemTemplate` and `ShowBottomBorder`.
