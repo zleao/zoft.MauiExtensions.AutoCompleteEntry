@@ -19,7 +19,21 @@ internal class AutoCompleteEntryAdapter : BaseAdapter, IFilterable
 
     internal IMauiContext MauiContext => _listViewContainer.Handler.MauiContext;
 
-    public DataTemplate ItemTemplate { get; internal set; }
+    private DataTemplate _itemTemplate;
+    public DataTemplate ItemTemplate
+    {
+        get => _itemTemplate;
+        internal set
+        {
+            if (_itemTemplate == value)
+                return;
+
+            _itemTemplate = value;
+            // Clear stale IDs — old template instances are no longer valid keys
+            // and a new selector may produce a completely different set of templates.
+            _templateToIdMap.Clear();
+        }
+    }
 
     internal DataTemplate DefaultTemplate
     {
@@ -89,9 +103,9 @@ internal class AutoCompleteEntryAdapter : BaseAdapter, IFilterable
     }
 
     // Returns the number of distinct recycling pools Android should maintain.
-    // One pool for a plain DataTemplate; up to 10 for a DataTemplateSelector.
+    // One pool for a plain DataTemplate; up to MaxViewTypes for a DataTemplateSelector.
     public override int ViewTypeCount
-        => ItemTemplate is DataTemplateSelector ? 10 : 1;
+        => ItemTemplate is DataTemplateSelector ? TemplateIdMapper.MaxViewTypes : 1;
 
     // Maps each resolved DataTemplate to a stable integer pool ID so Android
     // never hands GetView a recycled view of the wrong template type.
@@ -112,6 +126,10 @@ internal class AutoCompleteEntryAdapter : BaseAdapter, IFilterable
             ? selector.SelectTemplate(item, _listViewContainer)
             : template;
 
+        if (resolvedTemplate is null)
+            throw new InvalidOperationException(
+                $"The item template selector returned null. Template source type: {template.GetType().FullName}.");
+
         Microsoft.Maui.Controls.View templateView;
         AView nativeView;
 
@@ -125,7 +143,14 @@ internal class AutoCompleteEntryAdapter : BaseAdapter, IFilterable
         else
         {
             // First few visible rows: create MAUI view + native handler from scratch
-            templateView = (Microsoft.Maui.Controls.View)resolvedTemplate.CreateContent();
+            var createdContent = resolvedTemplate.CreateContent();
+            if (createdContent is not Microsoft.Maui.Controls.View createdView)
+                throw new InvalidOperationException(
+                    $"The resolved item template '{resolvedTemplate.GetType().FullName}' must create a " +
+                    $"{typeof(Microsoft.Maui.Controls.View).FullName}, but created " +
+                    $"'{createdContent?.GetType().FullName ?? "null"}'.");
+
+            templateView = createdView;
             templateView.BindingContext = item;
 
             nativeView = templateView.ToPlatform(MauiContext);

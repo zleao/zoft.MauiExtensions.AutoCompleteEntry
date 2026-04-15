@@ -52,9 +52,14 @@ public class TemplateIdMapperTests
         var template = NewTemplate();
         var idMap = new Dictionary<DataTemplate, int>();
 
-        var result = TemplateIdMapper.GetViewType(template, item, null, idMap);
+        var firstResult = TemplateIdMapper.GetViewType(template, item, null, idMap);
+        var secondResult = TemplateIdMapper.GetViewType(template, item, null, idMap);
+        var thirdResult = TemplateIdMapper.GetViewType(template, item, null, idMap);
 
-        Assert.Equal(0, result);
+        Assert.Equal(0, firstResult);
+        Assert.Equal(0, secondResult);
+        Assert.Equal(0, thirdResult);
+        Assert.Empty(idMap);
     }
 
     #endregion
@@ -173,6 +178,44 @@ public class TemplateIdMapperTests
         TemplateIdMapper.GetViewType(selector, "z", null, idMap);
 
         Assert.Single(idMap);
+    }
+
+    #endregion
+
+    #region MaxViewTypes cap enforcement
+
+    [Fact]
+    public void GetViewType_Selector_ExceedsMaxViewTypes_Throws()
+    {
+        var templates = Enumerable.Range(0, TemplateIdMapper.MaxViewTypes + 1)
+                                  .Select(_ => NewTemplate())
+                                  .ToArray();
+        var selector = new TestSelector(item => templates[(int)item]);
+        var idMap = new Dictionary<DataTemplate, int>();
+
+        // Fill up to the limit — all should succeed
+        for (var i = 0; i < TemplateIdMapper.MaxViewTypes; i++)
+            TemplateIdMapper.GetViewType(selector, i, null, idMap);
+
+        // One more distinct template must throw
+        Assert.Throws<InvalidOperationException>(
+            () => TemplateIdMapper.GetViewType(selector, TemplateIdMapper.MaxViewTypes, null, idMap));
+    }
+
+    [Fact]
+    public void GetViewType_Selector_AtExactLimit_DoesNotThrow()
+    {
+        var templates = Enumerable.Range(0, TemplateIdMapper.MaxViewTypes)
+                                  .Select(_ => NewTemplate())
+                                  .ToArray();
+        var selector = new TestSelector(item => templates[(int)item]);
+        var idMap = new Dictionary<DataTemplate, int>();
+
+        // Exactly MaxViewTypes distinct templates must all succeed
+        for (var i = 0; i < TemplateIdMapper.MaxViewTypes; i++)
+            TemplateIdMapper.GetViewType(selector, i, null, idMap);
+
+        Assert.Equal(TemplateIdMapper.MaxViewTypes, idMap.Count);
     }
 
     #endregion

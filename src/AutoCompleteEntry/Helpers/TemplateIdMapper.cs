@@ -7,6 +7,12 @@ namespace zoft.MauiExtensions.Controls.Platform;
 internal static class TemplateIdMapper
 {
     /// <summary>
+    /// Maximum number of distinct view types supported when using a <see cref="DataTemplateSelector"/>.
+    /// This value must match the pool count declared in the platform adapter's <c>ViewTypeCount</c>.
+    /// </summary>
+    internal const int MaxViewTypes = 10;
+
+    /// <summary>
     /// Returns the integer view-type ID for the given item.
     /// <para>
     /// For a plain <see cref="DataTemplate"/>, always returns <c>0</c> (single pool).
@@ -14,6 +20,9 @@ internal static class TemplateIdMapper
     /// a stable sequential ID, registering new templates in <paramref name="idMap"/> as encountered.
     /// </para>
     /// </summary>
+    /// <exception cref="InvalidOperationException">
+    /// Thrown when a <see cref="DataTemplateSelector"/> produces more than <see cref="MaxViewTypes"/> distinct templates.
+    /// </exception>
     internal static int GetViewType(
         DataTemplate template,
         object item,
@@ -24,10 +33,20 @@ internal static class TemplateIdMapper
         {
             var resolved = selector.SelectTemplate(item, container);
 
-            if (!idMap.ContainsKey(resolved))
-                idMap[resolved] = idMap.Count;
+            if (!idMap.TryGetValue(resolved, out int value))
+            {
+                if (idMap.Count >= MaxViewTypes)
+                {
+                    throw new InvalidOperationException(
+                        $"DataTemplateSelector returned more than {MaxViewTypes} distinct templates. " +
+                        $"Increase {nameof(TemplateIdMapper)}.{nameof(MaxViewTypes)} to support more.");
+                }
 
-            return idMap[resolved];
+                value = idMap.Count;
+                idMap[resolved] = value;
+            }
+
+            return value;
         }
 
         return 0;

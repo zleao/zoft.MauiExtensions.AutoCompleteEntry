@@ -60,7 +60,7 @@ internal class AutoCompleteEntryTableSource : UITableViewSource
         }
     }
 
-    private void NotifiableItems_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
+    private void NotifiableItems_CollectionChanged(object? sender, NotifyCollectionChangedEventArgs e)
     {
         if (!MainThread.IsMainThread)
         {
@@ -92,18 +92,19 @@ internal class AutoCompleteEntryTableSource : UITableViewSource
         var item = _items[indexPath.Row];
         var templateToUse = _itemTemplate ?? DefaultItemTemplate;
 
-        // cellId is derived from the resolved DataTemplate, so UITableView naturally
-        // maintains a separate recycling pool per template type — DataTemplateSelector works for free.
-        var cellId = ((IDataTemplateController)templateToUse.SelectDataTemplate(item, _listViewContainer)).IdString;
+        // Resolve the concrete DataTemplate (returns self for a plain DataTemplate,
+        // selects one when templateToUse is a DataTemplateSelector).
+        var resolvedTemplate = templateToUse.SelectDataTemplate(item, _listViewContainer);
+        var cellId = ((IDataTemplateController)resolvedTemplate).IdString;
 
-        var cell = tableView.DequeueReusableCell(cellId) as AutoCompleteCell;
-
-        if (cell == null)
+        if (tableView.DequeueReusableCell(cellId) is not AutoCompleteCell cell)
         {
             // First time for this template type — create the MAUI view and its handler
             cell = new AutoCompleteCell(cellId);
 
-            var templateView = templateToUse.CreateContent() as View;
+            var templateView = resolvedTemplate.CreateContent() as View
+                ?? throw new InvalidOperationException(
+                    $"DataTemplate did not produce a View for item '{item}'.");
             templateView.BindingContext = item;
             cell.MauiView = templateView;
 
@@ -130,13 +131,13 @@ internal class AutoCompleteEntryTableSource : UITableViewSource
         else
         {
             // Recycled cell — skip handler creation, just swap the data
-            cell.MauiView.BindingContext = item;
+            cell.MauiView!.BindingContext = item;
         }
 
         // Measure on every GetCell call because recycled rows may bind to data of a different height
         var widthConstraint = tableView.Bounds.Width > 0 ? (double)tableView.Bounds.Width : double.PositiveInfinity;
-        var measure = ((IView)cell.MauiView).Measure(widthConstraint, double.PositiveInfinity);
-        cell.HeightConstraint.Constant = (nfloat)measure.Height;
+        var measure = ((IView)cell.MauiView!).Measure(widthConstraint, double.PositiveInfinity);
+        cell.HeightConstraint!.Constant = (nfloat)measure.Height;
 
         return cell;
     }
@@ -166,8 +167,8 @@ internal class AutoCompleteEntryTableSource : UITableViewSource
 /// </summary>
 internal sealed class AutoCompleteCell : UITableViewCell
 {
-    internal View MauiView { get; set; }
-    internal NSLayoutConstraint HeightConstraint { get; set; }
+    internal View? MauiView { get; set; }
+    internal NSLayoutConstraint? HeightConstraint { get; set; }
 
     internal AutoCompleteCell(string cellId) : base(UITableViewCellStyle.Default, cellId) { }
 }
