@@ -1,0 +1,57 @@
+name: CI
+
+on:
+  pull_request:
+    branches:
+      - main
+    paths:
+      - 'src/**/*.cs'
+      - 'src/**/*.xaml'
+      - 'src/**/*.csproj'
+      - 'src/**/*.props'
+      - 'src/**/*.targets'
+      - 'src/**/*.sln'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+env:
+  DOTNET_VERSION: 9.0.300
+  BUILD_CONFIGURATION: Release
+  PROJECT_FILE: src\AutoCompleteEntry\AutoCompleteEntry.csproj
+
+jobs:
+  build-library:
+    name: Build library
+    runs-on: windows-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup .NET SDK
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: ${{ env.DOTNET_VERSION }}
+
+      - name: Restore MAUI workloads
+        shell: pwsh
+        run: dotnet workload restore $env:PROJECT_FILE
+
+      - name: Build library
+        shell: pwsh
+        run: dotnet build $env:PROJECT_FILE -c $env:BUILD_CONFIGURATION --nologo
+
+      - name: Upload NuGet artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: nuget-packages
+          path: |
+            src/AutoCompleteEntry/bin/Release/*.nupkg
+            src/AutoCompleteEntry/bin/Release/*.snupkg
+          if-no-files-found: error
