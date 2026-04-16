@@ -547,7 +547,7 @@ This repository uses **manual GitHub Releases** plus a **manual GitHub Actions p
 
 ### Notes
 
-- Pull requests to `main` only run CI; they do **not** create releases or publish packages.
+- Pull requests to `main` only run CI when code or project files change; they do **not** create releases or publish packages.
 - GitHub's generated release notes are grouped by `.github\release.yml`.
 - Publishing to NuGet requires the `NUGET_API_KEY` repository secret.
 - `CHANGELOG.md` is the long-lived human changelog; GitHub Releases are the release-specific summary.

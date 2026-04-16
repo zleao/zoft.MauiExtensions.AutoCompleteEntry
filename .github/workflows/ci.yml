@@ -4,6 +4,16 @@ on:
   pull_request:
     branches:
       - main
+    paths:
+      - 'src/**/*.cs'
+      - 'src/**/*.xaml'
+      - 'src/**/*.csproj'
+      - 'src/**/*.props'
+      - 'src/**/*.targets'
+      - 'src/**/*.sln'
+      - 'sample/**/*.cs'
+      - 'sample/**/*.xaml'
+      - 'sample/**/*.csproj'
   workflow_dispatch:
 
 permissions:
