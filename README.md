@@ -15,6 +15,7 @@ A powerful AutoCompleteEntry control for .NET MAUI that makes suggestions to use
 - [📱 Platform Screenshots](#-platform-screenshots)
 - [🎨 Advanced Customization](#-advanced-customization)
 - [🐛 Troubleshooting](#-troubleshooting)
+- [🚀 Releasing](#-releasing)
 - [💖 Support](#-support)
 - [🤝 Contributing](#-contributing)
 - [📄 License](#-license)
@@ -465,6 +466,32 @@ If you find this project helpful, please consider supporting its development:
 [![Sponsor](https://img.shields.io/badge/Sponsor-❤️-blue?style=for-the-badge&logo=github-sponsors)](https://github.com/sponsors/zleao)
 
 Your support helps maintain and improve this project for the entire .NET MAUI community. Thank you! 🙏
+
+## 🚀 Releasing
+
+This repository uses **manual GitHub Releases** plus a **manual GitHub Actions publish workflow**.
+
+### Maintainer release flow
+
+1. Update the package version in `src\Directory.build.props`.
+2. Move the pending notes from `CHANGELOG.md` into a new version section.
+3. Merge the release changes to `main`.
+4. Create a **draft GitHub Release** with tag `vX.Y.Z`.
+5. Click **Generate release notes** and refine the result into a short human-friendly summary.
+6. Run the **Publish package** workflow manually from the Actions tab.
+7. Provide:
+   - `ref`: the branch or tag to build
+   - `release_tag`: the existing GitHub release tag if you want validation and release asset upload
+   - `publish_to_nuget`: enable only when you want to push to NuGet.org
+   - `attach_to_release`: enable only when you want the built `.nupkg` / `.snupkg` attached to the release
+8. Publish the GitHub Release after the notes and assets look correct.
+
+### Notes
+
+- Pull requests to `main` only run CI; they do **not** create releases or publish packages.
+- GitHub's generated release notes are grouped by `.github\release.yml`.
+- Publishing to NuGet requires the `NUGET_API_KEY` repository secret.
+- `CHANGELOG.md` is the long-lived human changelog; GitHub Releases are the release-specific summary.
 
 ## 🤝 Contributing
 

@@ -1,0 +1,119 @@
+name: Publish package
+
+on:
+  workflow_dispatch:
+    inputs:
+      ref:
+        description: Git ref to build
+        required: false
+        default: main
+      release_tag:
+        description: Existing release tag to validate against and optionally attach packages to
+        required: false
+        default: ""
+      publish_to_nuget:
+        description: Push packages to NuGet.org
+        required: false
+        default: false
+        type: boolean
+      attach_to_release:
+        description: Upload built packages to the existing GitHub release for release_tag
+        required: false
+        default: false
+        type: boolean
+
+permissions:
+  contents: write
+
+env:
+  DOTNET_VERSION: 9.0.300
+  BUILD_CONFIGURATION: Release
+  PROJECT_FILE: src\AutoCompleteEntry\AutoCompleteEntry.csproj
+  PACKAGE_OUTPUT: src\AutoCompleteEntry\bin\Release
+  NUGET_SOURCE: https://api.nuget.org/v3/index.json
+
+jobs:
+  publish-package:
+    name: Build and publish package
+    runs-on: windows-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ inputs.ref }}
+
+      - name: Setup .NET SDK
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: ${{ env.DOTNET_VERSION }}
+
+      - name: Validate manual workflow inputs
+        if: inputs.attach_to_release && inputs.release_tag == ''
+        shell: pwsh
+        run: throw "The 'release_tag' input is required when 'attach_to_release' is enabled."
+
+      - name: Validate tag matches package version
+        if: inputs.release_tag != ''
+        shell: pwsh
+        run: |
+          [xml]$buildProps = Get-Content 'src\Directory.build.props'
+          $packageVersion = $buildProps.Project.PropertyGroup.Version
+          $tagVersion = '${{ inputs.release_tag }}'.TrimStart('v')
+
+          if ($packageVersion -ne $tagVersion) {
+              throw "Release tag version '$tagVersion' does not match package version '$packageVersion' in src\Directory.build.props."
+          }
+
+      - name: Restore MAUI workloads
+        shell: pwsh
+        run: dotnet workload restore $env:PROJECT_FILE
+
+      - name: Build package
+        shell: pwsh
+        run: dotnet build $env:PROJECT_FILE -c $env:BUILD_CONFIGURATION --nologo
+
+      - name: Upload workflow artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: release-packages
+          path: |
+            src/AutoCompleteEntry/bin/Release/*.nupkg
+            src/AutoCompleteEntry/bin/Release/*.snupkg
+          if-no-files-found: error
+
+      - name: Push package to NuGet.org
+        if: inputs.publish_to_nuget
+        shell: pwsh
+        env:
+          NUGET_API_KEY: ${{ secrets.NUGET_API_KEY }}
+        run: |
+          if ([string]::IsNullOrWhiteSpace($env:NUGET_API_KEY)) {
+              throw "Repository secret 'NUGET_API_KEY' is required to publish packages."
+          }
+
+          Get-ChildItem $env:PACKAGE_OUTPUT -Filter *.nupkg |
+            Where-Object { $_.Name -notlike '*.snupkg' } |
+            ForEach-Object {
+              dotnet nuget push $_.FullName `
+                --source $env:NUGET_SOURCE `
+                --api-key $env:NUGET_API_KEY `
+                --skip-duplicate
+            }
+
+          Get-ChildItem $env:PACKAGE_OUTPUT -Filter *.snupkg |
+            ForEach-Object {
+              dotnet nuget push $_.FullName `
+                --source $env:NUGET_SOURCE `
+                --api-key $env:NUGET_API_KEY `
+                --skip-duplicate
+            }
+
+      - name: Attach packages to GitHub release
+        if: inputs.attach_to_release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ inputs.release_tag }}
+          files: |
+            src/AutoCompleteEntry/bin/Release/*.nupkg
+            src/AutoCompleteEntry/bin/Release/*.snupkg
