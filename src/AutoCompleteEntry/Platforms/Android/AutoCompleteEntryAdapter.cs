@@ -109,6 +109,26 @@ internal class AutoCompleteEntryAdapter : BaseAdapter, IFilterable
     public override int ViewTypeCount
         => ItemTemplate is DataTemplateSelector ? TemplateIdMapper.MaxViewTypes : 1;
 
+    /// <summary>
+    /// Resolves the concrete DataTemplate for the given position, using the cached
+    /// result from a previous call if available, otherwise resolving fresh.
+    /// </summary>
+    private DataTemplate ResolveTemplate(int position, object item)
+    {
+        if (_resolvedTemplateCache.TryGetValue(position, out var cached))
+        {
+            _resolvedTemplateCache.Remove(position);
+            return cached;
+        }
+
+        var template = ItemTemplate ?? DefaultTemplate;
+        return template is DataTemplateSelector selector
+            ? selector.SelectTemplate(item, _listViewContainer)
+                ?? throw new InvalidOperationException(
+                    $"DataTemplateSelector '{template.GetType().FullName}' returned null for item at position {position}.")
+            : template;
+    }
+
     // Maps each resolved DataTemplate to a stable integer pool ID so Android
     // never hands GetView a recycled view of the wrong template type.
     // Also caches the resolved template so GetView uses the exact same one.
@@ -118,11 +138,7 @@ internal class AutoCompleteEntryAdapter : BaseAdapter, IFilterable
         var template = ItemTemplate ?? DefaultTemplate;
 
         // Resolve and cache the template for this position
-        var resolvedTemplate = template is DataTemplateSelector selector
-            ? selector.SelectTemplate(item, _listViewContainer)
-                ?? throw new InvalidOperationException(
-                    $"DataTemplateSelector '{template.GetType().FullName}' returned null for item at position {position}.")
-            : template;
+        var resolvedTemplate = ResolveTemplate(position, item);
         _resolvedTemplateCache[position] = resolvedTemplate;
 
         return TemplateIdMapper.GetViewType(template, item, _listViewContainer, _templateToIdMap);
@@ -133,19 +149,7 @@ internal class AutoCompleteEntryAdapter : BaseAdapter, IFilterable
         var item = GetObject(position);
 
         // Use the cached resolved template from GetItemViewType to guarantee consistency
-        if (!_resolvedTemplateCache.TryGetValue(position, out var resolvedTemplate))
-        {
-            var template = ItemTemplate ?? DefaultTemplate;
-            resolvedTemplate = template is DataTemplateSelector selector
-                ? selector.SelectTemplate(item, _listViewContainer)
-                    ?? throw new InvalidOperationException(
-                        $"DataTemplateSelector '{template.GetType().FullName}' returned null for item at position {position}.")
-                : template;
-        }
-        else
-        {
-            _resolvedTemplateCache.Remove(position);
-        }
+        var resolvedTemplate = ResolveTemplate(position, item);
 
         Microsoft.Maui.Controls.View templateView;
         AView nativeView;
