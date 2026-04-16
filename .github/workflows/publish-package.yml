@@ -58,7 +58,7 @@ jobs:
         shell: pwsh
         run: |
           [xml]$buildProps = Get-Content 'src\Directory.build.props'
-          $packageVersion = $buildProps.Project.PropertyGroup.Version
+          $packageVersion = $buildProps.SelectSingleNode('//Version').InnerText
           $tagVersion = '${{ inputs.release_tag }}'.TrimStart('v')
 
           if ($packageVersion -ne $tagVersion) {
