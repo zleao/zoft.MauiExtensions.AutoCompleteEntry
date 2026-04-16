@@ -48,6 +48,7 @@ dotnet add package zoft.MauiExtensions.Controls.AutoCompleteEntry
 Register the control in `MauiProgram.cs`:
 
 ```csharp
+using CommunityToolkit.Maui;
 using zoft.MauiExtensions.Controls;
 
 namespace AutoCompleteEntry.Sample
@@ -59,7 +60,8 @@ namespace AutoCompleteEntry.Sample
             var builder = MauiApp.CreateBuilder();
             builder
                 .UseMauiApp<App>()
-                .UseZoftAutoCompleteEntry()
+                .UseMauiCommunityToolkit()
+                .UseZoftAutoCompleteEntry() // 👈 Add this line
                 .ConfigureFonts(fonts =>
                 {
                     fonts.AddFont("OpenSans-Regular.ttf", "OpenSansRegular");
@@ -71,6 +73,11 @@ namespace AutoCompleteEntry.Sample
     }
 }
 ```
+
+> **Note**
+> `UseZoftAutoCompleteEntry()` is the only registration required for this control.
+> The sample app also calls `UseMauiCommunityToolkit()` because the sample uses CommunityToolkit features in other places.
+> If your app already uses CommunityToolkit, keep that call; otherwise it is not required just to use `AutoCompleteEntry`.
 
 ### XAML Namespace
 
