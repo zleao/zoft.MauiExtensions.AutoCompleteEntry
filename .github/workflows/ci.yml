@@ -15,6 +15,7 @@ on:
 
 permissions:
   contents: read
+  checks: write
 
 concurrency:
   group: ci-${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
@@ -24,6 +25,7 @@ env:
   DOTNET_VERSION: 9.0.300
   BUILD_CONFIGURATION: Release
   PROJECT_FILE: src\AutoCompleteEntry\AutoCompleteEntry.csproj
+  TEST_PROJECT_FILE: src\Tests\AutoCompleteEntry.Tests\AutoCompleteEntry.Tests.csproj
 
 jobs:
   build-library:
@@ -55,3 +57,41 @@ jobs:
             src/AutoCompleteEntry/bin/Release/*.nupkg
             src/AutoCompleteEntry/bin/Release/*.snupkg
           if-no-files-found: error
+
+  unit-tests:
+    name: Unit tests
+    runs-on: windows-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup .NET SDK
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: ${{ env.DOTNET_VERSION }}
+
+      - name: Restore MAUI workloads
+        shell: pwsh
+        run: dotnet workload restore $env:PROJECT_FILE
+
+      - name: Restore test project
+        shell: pwsh
+        run: dotnet restore $env:TEST_PROJECT_FILE
+
+      - name: Run unit tests
+        shell: pwsh
+        run: >
+          dotnet test $env:TEST_PROJECT_FILE
+          --no-restore
+          --configuration $env:BUILD_CONFIGURATION
+          --logger "trx;LogFileName=results.trx"
+          --results-directory TestResults
+
+      - name: Publish test results
+        if: always()
+        uses: dorny/test-reporter@v1
+        with:
+          name: Unit Tests (.NET 9)
+          path: TestResults/results.trx
+          reporter: dotnet-trx
