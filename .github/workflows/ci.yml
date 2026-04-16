@@ -11,9 +11,6 @@ on:
       - 'src/**/*.props'
       - 'src/**/*.targets'
       - 'src/**/*.sln'
-      - 'sample/**/*.cs'
-      - 'sample/**/*.xaml'
-      - 'sample/**/*.csproj'
   workflow_dispatch:
 
 permissions:
