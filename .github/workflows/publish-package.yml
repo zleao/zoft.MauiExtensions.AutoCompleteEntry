@@ -110,9 +110,18 @@ jobs:
 
       - name: Attach packages to GitHub release
         if: inputs.attach_to_release
-        uses: softprops/action-gh-release@v2
-        with:
-          tag_name: ${{ inputs.release_tag }}
-          files: |
-            src/AutoCompleteEntry/bin/Release/*.nupkg
-            src/AutoCompleteEntry/bin/Release/*.snupkg
+        shell: pwsh
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          Push-Location $env:PACKAGE_OUTPUT
+
+          try {
+              Get-ChildItem . -Include *.nupkg,*.snupkg -File |
+                ForEach-Object {
+                  gh release upload '${{ inputs.release_tag }}' $_.Name --clobber
+                }
+          }
+          finally {
+              Pop-Location
+          }
