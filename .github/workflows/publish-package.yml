@@ -92,22 +92,21 @@ jobs:
               throw "Repository secret 'NUGET_API_KEY' is required to publish packages."
           }
 
-          Get-ChildItem $env:PACKAGE_OUTPUT -Filter *.nupkg |
-            Where-Object { $_.Name -notlike '*.snupkg' } |
-            ForEach-Object {
-              dotnet nuget push $_.FullName `
-                --source $env:NUGET_SOURCE `
-                --api-key $env:NUGET_API_KEY `
-                --skip-duplicate
-            }
+          Push-Location $env:PACKAGE_OUTPUT
 
-          Get-ChildItem $env:PACKAGE_OUTPUT -Filter *.snupkg |
-            ForEach-Object {
-              dotnet nuget push $_.FullName `
-                --source $env:NUGET_SOURCE `
-                --api-key $env:NUGET_API_KEY `
-                --skip-duplicate
-            }
+          try {
+              Get-ChildItem . -Filter *.nupkg |
+                Where-Object { $_.Name -notlike '*.snupkg' } |
+                ForEach-Object {
+                  dotnet nuget push $_.Name `
+                    --source $env:NUGET_SOURCE `
+                    --api-key $env:NUGET_API_KEY `
+                    --skip-duplicate
+                }
+          }
+          finally {
+              Pop-Location
+          }
 
       - name: Attach packages to GitHub release
         if: inputs.attach_to_release
