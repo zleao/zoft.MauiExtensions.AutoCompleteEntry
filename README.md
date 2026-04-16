@@ -358,6 +358,9 @@ private void AutoCompleteEntry_Completed(object sender, EventArgs e)
 {
     if (sender is AutoCompleteEntry autoCompleteEntry)
     {
+        // `GetExactMatch` is an app-provided helper, not part of AutoCompleteEntry.
+        // For example, your ViewModel could implement it by returning the first item
+        // whose display text exactly matches the current entry text.
         ViewModel.SelectedItem = ViewModel.GetExactMatch(autoCompleteEntry.Text);
     }
 }
