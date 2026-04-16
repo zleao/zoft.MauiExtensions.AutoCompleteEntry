@@ -31,7 +31,9 @@ internal static class TemplateIdMapper
     {
         if (template is DataTemplateSelector selector)
         {
-            var resolved = selector.SelectTemplate(item, container);
+            var resolved = selector.SelectTemplate(item, container)
+                ?? throw new InvalidOperationException(
+                    $"DataTemplateSelector '{selector.GetType().FullName}' returned null for item '{item}'.");
 
             if (!idMap.TryGetValue(resolved, out int value))
             {

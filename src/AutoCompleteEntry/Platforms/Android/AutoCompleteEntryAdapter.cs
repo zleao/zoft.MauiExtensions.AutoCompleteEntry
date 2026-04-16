@@ -14,13 +14,14 @@ internal class AutoCompleteEntryAdapter : BaseAdapter, IFilterable
     private string _displayMemberPath;
     private DataTemplate _defaultTemplate;
     private readonly Dictionary<DataTemplate, int> _templateToIdMap = new();
+    private readonly Dictionary<int, DataTemplate> _resolvedTemplateCache = new();
     Page _listViewContainer;
     private bool _disposed = false;
 
     internal IMauiContext MauiContext => _listViewContainer.Handler.MauiContext;
 
-    private DataTemplate _itemTemplate;
-    public DataTemplate ItemTemplate
+    private DataTemplate? _itemTemplate;
+    public DataTemplate? ItemTemplate
     {
         get => _itemTemplate;
         internal set
@@ -85,6 +86,7 @@ internal class AutoCompleteEntryAdapter : BaseAdapter, IFilterable
         _displayMemberPath = displayMemberPath;
 
         resultList = list.ToList();
+        _resolvedTemplateCache.Clear();
 
         NotifyDataSetChanged();
     }
@@ -109,26 +111,41 @@ internal class AutoCompleteEntryAdapter : BaseAdapter, IFilterable
 
     // Maps each resolved DataTemplate to a stable integer pool ID so Android
     // never hands GetView a recycled view of the wrong template type.
+    // Also caches the resolved template so GetView uses the exact same one.
     public override int GetItemViewType(int position)
     {
         var item = GetObject(position);
         var template = ItemTemplate ?? DefaultTemplate;
+
+        // Resolve and cache the template for this position
+        var resolvedTemplate = template is DataTemplateSelector selector
+            ? selector.SelectTemplate(item, _listViewContainer)
+                ?? throw new InvalidOperationException(
+                    $"DataTemplateSelector '{template.GetType().FullName}' returned null for item at position {position}.")
+            : template;
+        _resolvedTemplateCache[position] = resolvedTemplate;
+
         return TemplateIdMapper.GetViewType(template, item, _listViewContainer, _templateToIdMap);
     }
 
     public override AView GetView(int position, AView convertView, ViewGroup parent)
     {
         var item = GetObject(position);
-        var template = ItemTemplate ?? DefaultTemplate;
 
-        // Resolve DataTemplateSelector if needed
-        var resolvedTemplate = template is DataTemplateSelector selector
-            ? selector.SelectTemplate(item, _listViewContainer)
-            : template;
-
-        if (resolvedTemplate is null)
-            throw new InvalidOperationException(
-                $"The item template selector returned null. Template source type: {template.GetType().FullName}.");
+        // Use the cached resolved template from GetItemViewType to guarantee consistency
+        if (!_resolvedTemplateCache.TryGetValue(position, out var resolvedTemplate))
+        {
+            var template = ItemTemplate ?? DefaultTemplate;
+            resolvedTemplate = template is DataTemplateSelector selector
+                ? selector.SelectTemplate(item, _listViewContainer)
+                    ?? throw new InvalidOperationException(
+                        $"DataTemplateSelector '{template.GetType().FullName}' returned null for item at position {position}.")
+                : template;
+        }
+        else
+        {
+            _resolvedTemplateCache.Remove(position);
+        }
 
         Microsoft.Maui.Controls.View templateView;
         AView nativeView;

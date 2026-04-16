@@ -219,4 +219,18 @@ public class TemplateIdMapperTests
     }
 
     #endregion
+
+    #region Null template from selector
+
+    [Fact]
+    public void GetViewType_Selector_ReturnsNull_Throws()
+    {
+        var selector = new TestSelector(_ => null!);
+        var idMap = new Dictionary<DataTemplate, int>();
+
+        Assert.Throws<InvalidOperationException>(
+            () => TemplateIdMapper.GetViewType(selector, "item", null, idMap));
+    }
+
+    #endregion
 }

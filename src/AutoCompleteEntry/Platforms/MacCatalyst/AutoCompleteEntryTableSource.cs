@@ -94,7 +94,9 @@ internal class AutoCompleteEntryTableSource : UITableViewSource
 
         // Resolve the concrete DataTemplate (returns self for a plain DataTemplate,
         // selects one when templateToUse is a DataTemplateSelector).
-        var resolvedTemplate = templateToUse.SelectDataTemplate(item, _listViewContainer);
+        var resolvedTemplate = templateToUse.SelectDataTemplate(item, _listViewContainer)
+            ?? throw new InvalidOperationException(
+                $"DataTemplateSelector '{templateToUse.GetType().FullName}' returned null for item '{item}'.");
         var cellId = ((IDataTemplateController)resolvedTemplate).IdString;
 
         if (tableView.DequeueReusableCell(cellId) is not AutoCompleteCell cell)
@@ -137,7 +139,7 @@ internal class AutoCompleteEntryTableSource : UITableViewSource
         // Measure on every GetCell call because recycled rows may bind to data of a different height
         var widthConstraint = tableView.Bounds.Width > 0 ? (double)tableView.Bounds.Width : double.PositiveInfinity;
         var measure = ((IView)cell.MauiView!).Measure(widthConstraint, double.PositiveInfinity);
-        cell.HeightConstraint!.Constant = (nfloat)measure.Height;
+        cell.HeightConstraint!.Constant = (nfloat)System.Math.Max(measure.Height, 44);
 
         return cell;
     }

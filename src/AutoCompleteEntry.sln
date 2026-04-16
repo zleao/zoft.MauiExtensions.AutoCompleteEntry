@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 18
-VisualStudioVersion = 18.4.11626.88 stable
+VisualStudioVersion = 18.4.11626.88
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AutoCompleteEntry", "AutoCompleteEntry\AutoCompleteEntry.csproj", "{8B6AB4EC-A828-4831-91D7-21491CC2A2B7}"
 EndProject
@@ -17,7 +17,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AutoCompleteEntry.Sample", 
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tests", "Tests", "{1FD0F6FB-436B-4655-BB1E-D4A2BDEB2A66}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AutoCompleteEntry.Tests", "Tests\AutoCompleteEntry.Tests\AutoCompleteEntry.Tests.csproj", "{A7D36355-ECDF-F32D-90BA-62FEADDA9016}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AutoCompleteEntry.Tests", "Tests\AutoCompleteEntry.Tests\AutoCompleteEntry.Tests.csproj", "{A7D36355-ECDF-F32D-90BA-62FEADDA9016}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

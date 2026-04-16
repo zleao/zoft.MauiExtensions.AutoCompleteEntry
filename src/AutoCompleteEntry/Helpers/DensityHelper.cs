@@ -26,6 +26,7 @@ internal static class DensityHelper
         if (density <= 0)
             return 0;
 
-        return (int)System.Math.Ceiling(heightDip * density);
+        var px = (int)System.Math.Ceiling(heightDip * density);
+        return System.Math.Max(px, 0);
     }
 }

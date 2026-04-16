@@ -100,5 +100,17 @@ public class DensityHelperTests
         Assert.Equal(1, result);
     }
 
+    [Theory]
+    [InlineData(-1.0, 2.0)]
+    [InlineData(-44.0, 3.0)]
+    [InlineData(-0.1, 1.0)]
+    public void HeightDipToPixels_NegativeHeight_ClampedToZero(
+        double heightDip, double density)
+    {
+        var result = DensityHelper.HeightDipToPixels(heightDip, density);
+
+        Assert.Equal(0, result);
+    }
+
     #endregion
 }
