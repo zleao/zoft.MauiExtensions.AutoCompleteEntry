@@ -1,4 +1,3 @@
-using CoreAnimation;
 using CoreGraphics;
 using Foundation;
 using ObjCRuntime;

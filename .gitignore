@@ -351,3 +351,5 @@ MigrationBackup/
 src/.idea/
 src/.DS_Store
 .DS_Store
+
+.vshistory/

@@ -16,7 +16,7 @@ public class AutoCompleteEntry : Entry
     public AutoCompleteEntry()
     {
     }
-    
+
     /// <summary>
     /// Gets or sets the property path that is used to get the value for display in the
     /// text box portion of the <see cref="AutoCompleteEntry"/> control, when an item is selected.
@@ -179,7 +179,7 @@ public class AutoCompleteEntry : Entry
     public void OnCursorPositionChanged(int cursorPosition)
     {
         if (CursorPosition == cursorPosition) return;
-            
+
         CursorPosition = cursorPosition;
         CursorPositionChanged?.Invoke(this, new AutoCompleteEntryCursorPositionChangedEventArgs(cursorPosition));
     }
