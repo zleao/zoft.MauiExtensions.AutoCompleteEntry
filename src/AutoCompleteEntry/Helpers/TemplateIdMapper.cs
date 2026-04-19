@@ -13,6 +13,32 @@ internal static class TemplateIdMapper
     internal const int MaxViewTypes = 10;
 
     /// <summary>
+    /// Returns the integer view-type ID for the given resolved <see cref="DataTemplate"/>.
+    /// </summary>
+    /// <exception cref="InvalidOperationException">
+    /// Thrown when more than <see cref="MaxViewTypes"/> distinct templates are registered.
+    /// </exception>
+    internal static int GetViewType(
+        DataTemplate resolvedTemplate,
+        Dictionary<DataTemplate, int> idMap)
+    {
+        if (!idMap.TryGetValue(resolvedTemplate, out int value))
+        {
+            if (idMap.Count >= MaxViewTypes)
+            {
+                throw new InvalidOperationException(
+                    $"DataTemplateSelector returned more than {MaxViewTypes} distinct templates. " +
+                    $"Increase {nameof(TemplateIdMapper)}.{nameof(MaxViewTypes)} to support more.");
+            }
+
+            value = idMap.Count;
+            idMap[resolvedTemplate] = value;
+        }
+
+        return value;
+    }
+
+    /// <summary>
     /// Returns the integer view-type ID for the given item.
     /// <para>
     /// For a plain <see cref="DataTemplate"/>, always returns <c>0</c> (single pool).
@@ -26,7 +52,7 @@ internal static class TemplateIdMapper
     internal static int GetViewType(
         DataTemplate template,
         object item,
-        BindableObject container,
+        BindableObject? container,
         Dictionary<DataTemplate, int> idMap)
     {
         if (template is DataTemplateSelector selector)
@@ -34,21 +60,7 @@ internal static class TemplateIdMapper
             var resolved = selector.SelectTemplate(item, container)
                 ?? throw new InvalidOperationException(
                     $"DataTemplateSelector '{selector.GetType().FullName}' returned null for item '{item}'.");
-
-            if (!idMap.TryGetValue(resolved, out int value))
-            {
-                if (idMap.Count >= MaxViewTypes)
-                {
-                    throw new InvalidOperationException(
-                        $"DataTemplateSelector returned more than {MaxViewTypes} distinct templates. " +
-                        $"Increase {nameof(TemplateIdMapper)}.{nameof(MaxViewTypes)} to support more.");
-                }
-
-                value = idMap.Count;
-                idMap[resolved] = value;
-            }
-
-            return value;
+            return GetViewType(resolved, idMap);
         }
 
         return 0;

@@ -43,6 +43,20 @@ public class TemplateIdMapperTests
         Assert.Empty(idMap);
     }
 
+    [Fact]
+    public void GetViewType_ResolvedTemplate_AssignsStableId()
+    {
+        var template = NewTemplate();
+        var idMap = new Dictionary<DataTemplate, int>();
+
+        var first = TemplateIdMapper.GetViewType(template, idMap);
+        var second = TemplateIdMapper.GetViewType(template, idMap);
+
+        Assert.Equal(0, first);
+        Assert.Equal(first, second);
+        Assert.Single(idMap);
+    }
+
     [Theory]
     [InlineData("a")]
     [InlineData("b")]

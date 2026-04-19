@@ -15,7 +15,6 @@ on:
 
 permissions:
   contents: read
-  checks: write
 
 concurrency:
   group: ci-${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
@@ -62,6 +61,9 @@ jobs:
     name: Unit tests
     runs-on: windows-latest
     needs: build-library
+    permissions:
+      contents: read
+      checks: write
 
     steps:
       - name: Checkout repository

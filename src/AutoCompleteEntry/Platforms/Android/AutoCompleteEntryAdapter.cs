@@ -33,6 +33,7 @@ internal class AutoCompleteEntryAdapter : BaseAdapter, IFilterable
             // Clear stale IDs — old template instances are no longer valid keys
             // and a new selector may produce a completely different set of templates.
             _templateToIdMap.Clear();
+            _resolvedTemplateCache.Clear();
         }
     }
 
@@ -141,7 +142,9 @@ internal class AutoCompleteEntryAdapter : BaseAdapter, IFilterable
         var resolvedTemplate = ResolveTemplate(position, item);
         _resolvedTemplateCache[position] = resolvedTemplate;
 
-        return TemplateIdMapper.GetViewType(template, item, _listViewContainer, _templateToIdMap);
+        return template is DataTemplateSelector
+            ? TemplateIdMapper.GetViewType(resolvedTemplate, _templateToIdMap)
+            : 0;
     }
 
     public override AView GetView(int position, AView convertView, ViewGroup parent)
@@ -185,8 +188,9 @@ internal class AutoCompleteEntryAdapter : BaseAdapter, IFilterable
         var density = (double)parent.Context.Resources.DisplayMetrics.Density;
         var widthConstraint = DensityHelper.WidthPixelsToDipConstraint(parent.Width, density);
         var measure = ((IView)templateView).Measure(widthConstraint, double.PositiveInfinity);
+        var heightDip = System.Math.Max(measure.Height, 44);
 
-        var heightPx = DensityHelper.HeightDipToPixels(measure.Height, density);
+        var heightPx = DensityHelper.HeightDipToPixels(heightDip, density);
         nativeView.LayoutParameters = new ViewGroup.LayoutParams(
             ViewGroup.LayoutParams.MatchParent,
             heightPx);

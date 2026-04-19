@@ -234,6 +234,19 @@ public class AutoCompleteEntryControlTests
         Assert.Null(entry.SelectedSuggestion);
     }
 
+    [Fact]
+    public void OnSuggestionSelected_WithNull_FiresEventArgsWithNullSelectedItem()
+    {
+        var entry = CreateEntry();
+        AutoCompleteEntrySuggestionChosenEventArgs? receivedArgs = null;
+        entry.SuggestionChosen += (_, e) => receivedArgs = e;
+
+        entry.OnSuggestionSelected(null);
+
+        Assert.NotNull(receivedArgs);
+        Assert.Null(receivedArgs.SelectedItem);
+    }
+
     #endregion
 
     #region OnCursorPositionChanged
