@@ -44,7 +44,9 @@ internal class AutoCompleteEntryTableSource : UITableViewSource
         _displayMemberPath = displayMemberPath;
         _itemTemplate = itemTemplate;
         _mauiContext = mauiContext;
-        _listViewContainer = Application.Current.Windows[0].Page;
+        _listViewContainer = Application.Current?.Windows.FirstOrDefault()?.Page
+            ?? throw new InvalidOperationException(
+                $"{nameof(AutoCompleteEntryTableSource)} cannot be created before the MAUI application has an active window with a root page.");
 
         _view.EstimatedRowHeight = 60f;
         _view.RowHeight = UITableView.AutomaticDimension;
@@ -60,7 +62,7 @@ internal class AutoCompleteEntryTableSource : UITableViewSource
         }
     }
 
-    private void NotifiableItems_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
+    private void NotifiableItems_CollectionChanged(object? sender, NotifyCollectionChangedEventArgs e)
     {
         if (!MainThread.IsMainThread)
         {
@@ -154,7 +156,7 @@ internal class AutoCompleteEntryTableSource : UITableViewSource
         return _items.Count;
     }
 
-    public event EventHandler<TableRowSelectedEventArgs<object>> TableRowSelected;
+    public event EventHandler<TableRowSelectedEventArgs<object>>? TableRowSelected;
 
     private void OnTableRowSelected(NSIndexPath itemIndexPath)
     {
