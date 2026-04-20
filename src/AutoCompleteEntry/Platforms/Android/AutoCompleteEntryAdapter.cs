@@ -99,7 +99,20 @@ internal class AutoCompleteEntryAdapter : BaseAdapter, IFilterable
         resultList = list.ToList();
         _resolvedTemplateCache.Clear();
 
-        NotifyDataSetChanged();
+        // When using a DataTemplateSelector the map can accumulate entries from
+        // previous suggestion sets.  Reset it on every list replacement so
+        // view-type IDs stay in sync with the *current* items and the adapter
+        // never hits MaxViewTypes due to stale entries.
+        if (ItemTemplate is DataTemplateSelector)
+        {
+            _templateToIdMap.Clear();
+            _templateGeneration++;
+            NotifyDataSetInvalidated();
+        }
+        else
+        {
+            NotifyDataSetChanged();
+        }
     }
 
     public override int Count => resultList.Count;
