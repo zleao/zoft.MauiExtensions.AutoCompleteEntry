@@ -59,7 +59,7 @@ internal class AutoCompleteEntryAdapter : BaseAdapter, IFilterable
     {
         _listViewContainer = Application.Current?.Windows.FirstOrDefault()?.Page
             ?? throw new InvalidOperationException(
-                $"{nameof(AutoCompleteEntryAdapter)} requires an active application window with a root page.");
+                $"{nameof(AutoCompleteEntryAdapter)} cannot be created before the MAUI application has an active window with a root page.");
 
         NotifyDataSetChanged();
     }
