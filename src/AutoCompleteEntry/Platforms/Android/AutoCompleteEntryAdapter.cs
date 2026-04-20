@@ -17,6 +17,7 @@ internal class AutoCompleteEntryAdapter : BaseAdapter, IFilterable
     private readonly Dictionary<int, DataTemplate> _resolvedTemplateCache = new();
     private readonly Page _listViewContainer;
     private bool _disposed = false;
+    private int _templateGeneration;
 
     internal IMauiContext MauiContext => _listViewContainer.Handler.MauiContext;
 
@@ -34,6 +35,11 @@ internal class AutoCompleteEntryAdapter : BaseAdapter, IFilterable
             // and a new selector may produce a completely different set of templates.
             _templateToIdMap.Clear();
             _resolvedTemplateCache.Clear();
+            _templateGeneration++;
+
+            // Tell the widget to discard all recycled views so stale layouts
+            // from the previous template set are never handed to GetView.
+            NotifyDataSetInvalidated();
         }
     }
 
@@ -157,8 +163,10 @@ internal class AutoCompleteEntryAdapter : BaseAdapter, IFilterable
         Microsoft.Maui.Controls.View templateView;
         AView nativeView;
 
-        // Recycle if possible — only update the binding context, skip handler + native view creation
-        if (convertView != null && convertView.Tag is ViewWrapperTag tag)
+        // Recycle if possible — only update the binding context, skip handler + native view creation.
+        // Refuse views from an older template generation to avoid layout mismatches.
+        if (convertView != null && convertView.Tag is ViewWrapperTag tag
+            && tag.TemplateGeneration == _templateGeneration)
         {
             nativeView = convertView;
             templateView = tag.MauiView;
@@ -180,7 +188,7 @@ internal class AutoCompleteEntryAdapter : BaseAdapter, IFilterable
             nativeView = templateView.ToPlatform(MauiContext);
 
             // Stash the MAUI view in the native view's Tag so it can be retrieved on recycle
-            nativeView.Tag = new ViewWrapperTag(templateView);
+            nativeView.Tag = new ViewWrapperTag(templateView, _templateGeneration);
         }
 
         // Measure after handler creation so MAUI's layout system can resolve sizes.
@@ -200,12 +208,14 @@ internal class AutoCompleteEntryAdapter : BaseAdapter, IFilterable
 
     internal sealed class ViewWrapperTag : Java.Lang.Object
     {
-        internal ViewWrapperTag(Microsoft.Maui.Controls.View mauiView)
+        internal ViewWrapperTag(Microsoft.Maui.Controls.View mauiView, int templateGeneration)
         {
             MauiView = mauiView;
+            TemplateGeneration = templateGeneration;
         }
 
         internal Microsoft.Maui.Controls.View MauiView { get; }
+        internal int TemplateGeneration { get; }
     }
 
     private class CustomFilter : Filter

@@ -125,7 +125,7 @@ public class TemplateIdMapperTests
         var idC = TemplateIdMapper.GetViewType(selector, "c", null, idMap);
 
         Assert.Equal(3, new[] { idA, idB, idC }.Distinct().Count());
-        Assert.Equivalent(new[] { 0, 1, 2 }, new[] { idA, idB, idC });
+        Assert.Equal(new[] { 0, 1, 2 }, new[] { idA, idB, idC });
     }
 
     #endregion

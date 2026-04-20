@@ -27,4 +27,10 @@
     <ProjectReference Include="..\..\AutoCompleteEntry\AutoCompleteEntry.csproj" />
   </ItemGroup>
 
+  <!-- Link Android-only helpers so tests can exercise them on the net9.0 target -->
+  <ItemGroup>
+    <Compile Include="..\..\AutoCompleteEntry\Platforms\Android\DensityHelper.cs" Link="Linked\DensityHelper.cs" />
+    <Compile Include="..\..\AutoCompleteEntry\Platforms\Android\TemplateIdMapper.cs" Link="Linked\TemplateIdMapper.cs" />
+  </ItemGroup>
+
 </Project>
