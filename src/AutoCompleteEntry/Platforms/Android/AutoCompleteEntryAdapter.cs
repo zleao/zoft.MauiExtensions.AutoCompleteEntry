@@ -9,14 +9,14 @@ namespace zoft.MauiExtensions.Controls.Platform;
 
 internal class AutoCompleteEntryAdapter : BaseAdapter, IFilterable
 {
-    private CustomFilter _filter;
-    private List<object> resultList;
-    private string _displayMemberPath;
-    private DataTemplate _defaultTemplate;
+    private CustomFilter? _filter;
+    private List<object> resultList = new();
+    private string? _displayMemberPath;
+    private DataTemplate? _defaultTemplate;
     private readonly Dictionary<DataTemplate, int> _templateToIdMap = new();
     private readonly Dictionary<int, DataTemplate> _resolvedTemplateCache = new();
-    Page _listViewContainer;
-    private bool _disposed = false;
+    private readonly Page _listViewContainer;
+    private bool _disposed;
 
     internal IMauiContext MauiContext => _listViewContainer.Handler.MauiContext;
 
@@ -58,8 +58,6 @@ internal class AutoCompleteEntryAdapter : BaseAdapter, IFilterable
     public AutoCompleteEntryAdapter(Context context) : base()
     {
         _listViewContainer = Application.Current.Windows[0].Page;
-
-        resultList = new List<object>();
 
         NotifyDataSetChanged();
     }
@@ -180,7 +178,7 @@ internal class AutoCompleteEntryAdapter : BaseAdapter, IFilterable
             nativeView = templateView.ToPlatform(MauiContext);
 
             // Stash the MAUI view in the native view's Tag so it can be retrieved on recycle
-            nativeView.Tag = new ViewWrapperTag { MauiView = templateView };
+            nativeView.Tag = new ViewWrapperTag(templateView);
         }
 
         // Measure after handler creation so MAUI's layout system can resolve sizes.
@@ -200,7 +198,12 @@ internal class AutoCompleteEntryAdapter : BaseAdapter, IFilterable
 
     internal sealed class ViewWrapperTag : Java.Lang.Object
     {
-        internal Microsoft.Maui.Controls.View MauiView { get; set; }
+        internal ViewWrapperTag(Microsoft.Maui.Controls.View mauiView)
+        {
+            MauiView = mauiView;
+        }
+
+        internal Microsoft.Maui.Controls.View MauiView { get; }
     }
 
     private class CustomFilter : Filter
