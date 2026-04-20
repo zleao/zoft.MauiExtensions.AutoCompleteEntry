@@ -12,11 +12,11 @@ internal class AutoCompleteEntryTableSource : UITableViewSource
     private readonly UITableView _view;
     private readonly IList _items;
     private readonly string _displayMemberPath;
-    private readonly DataTemplate _itemTemplate;
+    private readonly DataTemplate? _itemTemplate;
     private readonly IMauiContext _mauiContext;
     private readonly Page _listViewContainer;
 
-    private DataTemplate _defaultItemTemplate;
+    private DataTemplate? _defaultItemTemplate;
     internal DataTemplate DefaultItemTemplate
     {
         get
@@ -37,7 +37,7 @@ internal class AutoCompleteEntryTableSource : UITableViewSource
         }
     }
 
-    public AutoCompleteEntryTableSource(UITableView view, IList items, string displayMemberPath, DataTemplate itemTemplate, IMauiContext mauiContext)
+    public AutoCompleteEntryTableSource(UITableView view, IList items, string displayMemberPath, DataTemplate? itemTemplate, IMauiContext mauiContext)
     {
         _view = view;
         _items = items;
