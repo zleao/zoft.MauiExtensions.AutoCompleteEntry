@@ -16,7 +16,7 @@ internal class AutoCompleteEntryAdapter : BaseAdapter, IFilterable
     private readonly Dictionary<DataTemplate, int> _templateToIdMap = new();
     private readonly Dictionary<int, DataTemplate> _resolvedTemplateCache = new();
     private readonly Page _listViewContainer;
-    private bool _disposed;
+    private bool _disposed = false;
 
     internal IMauiContext MauiContext => _listViewContainer.Handler.MauiContext;
 
@@ -57,7 +57,9 @@ internal class AutoCompleteEntryAdapter : BaseAdapter, IFilterable
 
     public AutoCompleteEntryAdapter(Context context) : base()
     {
-        _listViewContainer = Application.Current.Windows[0].Page;
+        _listViewContainer = Application.Current?.Windows.FirstOrDefault()?.Page
+            ?? throw new InvalidOperationException(
+                $"{nameof(AutoCompleteEntryAdapter)} requires an active application window with a root page.");
 
         NotifyDataSetChanged();
     }
