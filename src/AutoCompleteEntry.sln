@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio Version 17
-VisualStudioVersion = 17.4.33103.184
+# Visual Studio Version 18
+VisualStudioVersion = 18.4.11626.88
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AutoCompleteEntry", "AutoCompleteEntry\AutoCompleteEntry.csproj", "{8B6AB4EC-A828-4831-91D7-21491CC2A2B7}"
 EndProject
@@ -14,6 +14,10 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Sample", "Sample", "{994A39DE-0C69-48B0-885F-1967D8CA4EC5}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AutoCompleteEntry.Sample", "..\sample\AutoCompleteEntry.Sample\AutoCompleteEntry.Sample.csproj", "{EB1F0CEB-7461-4321-AB19-DCE825B0D19A}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tests", "Tests", "{1FD0F6FB-436B-4655-BB1E-D4A2BDEB2A66}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AutoCompleteEntry.Tests", "Tests\AutoCompleteEntry.Tests\AutoCompleteEntry.Tests.csproj", "{A7D36355-ECDF-F32D-90BA-62FEADDA9016}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -29,12 +33,17 @@ Global
 		{EB1F0CEB-7461-4321-AB19-DCE825B0D19A}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{EB1F0CEB-7461-4321-AB19-DCE825B0D19A}.Debug|Any CPU.Deploy.0 = Debug|Any CPU
 		{EB1F0CEB-7461-4321-AB19-DCE825B0D19A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A7D36355-ECDF-F32D-90BA-62FEADDA9016}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A7D36355-ECDF-F32D-90BA-62FEADDA9016}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A7D36355-ECDF-F32D-90BA-62FEADDA9016}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A7D36355-ECDF-F32D-90BA-62FEADDA9016}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{EB1F0CEB-7461-4321-AB19-DCE825B0D19A} = {994A39DE-0C69-48B0-885F-1967D8CA4EC5}
+		{A7D36355-ECDF-F32D-90BA-62FEADDA9016} = {1FD0F6FB-436B-4655-BB1E-D4A2BDEB2A66}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {AC048AEF-1BA3-4DD2-BE83-0B5F5F1F1DC8}

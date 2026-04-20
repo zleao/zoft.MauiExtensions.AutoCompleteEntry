@@ -16,7 +16,7 @@ public class AutoCompleteEntry : Entry
     public AutoCompleteEntry()
     {
     }
-    
+
     /// <summary>
     /// Gets or sets the property path that is used to get the value for display in the
     /// text box portion of the <see cref="AutoCompleteEntry"/> control, when an item is selected.
@@ -97,7 +97,7 @@ public class AutoCompleteEntry : Entry
     /// Gets or sets the ItemsSource list with the suggestions to diplay.
     /// </summary>
     /// <value>The header object for the text box portion of this control.</value>
-    public System.Collections.IList ItemsSource
+    public System.Collections.IList? ItemsSource
     {
         get => GetValue(ItemsSourceProperty) as System.Collections.IList;
         set => SetValue(ItemsSourceProperty, value);
@@ -114,9 +114,9 @@ public class AutoCompleteEntry : Entry
     /// Gets or Sets the TextChangedCommand, that is trigered everytime the text changes.
     /// The command receives as parameter the changed text.
     /// </summary>
-    public ICommand TextChangedCommand
+    public ICommand? TextChangedCommand
     {
-        get => (ICommand)GetValue(TextChangedCommandProperty);
+        get => (ICommand?)GetValue(TextChangedCommandProperty);
         set => SetValue(TextChangedCommandProperty, value);
     }
 
@@ -133,7 +133,7 @@ public class AutoCompleteEntry : Entry
     /// </summary>
     /// <param name="text"></param>
     /// <param name="reason"></param>
-    public void OnTextChanged(string text, AutoCompleteEntryTextChangeReason reason)
+    public void OnTextChanged(string? text, AutoCompleteEntryTextChangeReason reason)
     {
         // Called by the native control when users enter text
 
@@ -153,7 +153,7 @@ public class AutoCompleteEntry : Entry
     /// <summary>
     /// Raised after the text content of the editable control component is updated.
     /// </summary>
-    public new event EventHandler<AutoCompleteEntryTextChangedEventArgs> TextChanged;
+    public new event EventHandler<AutoCompleteEntryTextChangedEventArgs>? TextChanged;
 
     /// <inheritdoc/>
     protected override void OnTextChanged(string oldValue, string newValue)
@@ -170,7 +170,7 @@ public class AutoCompleteEntry : Entry
     /// <summary>
     /// Raised after the cursor position changes
     /// </summary>
-    public event EventHandler<AutoCompleteEntryCursorPositionChangedEventArgs> CursorPositionChanged;
+    public event EventHandler<AutoCompleteEntryCursorPositionChangedEventArgs>? CursorPositionChanged;
 
     /// <summary>
     /// Method used to signal the platform control, that the cursor position changed
@@ -179,7 +179,7 @@ public class AutoCompleteEntry : Entry
     public void OnCursorPositionChanged(int cursorPosition)
     {
         if (CursorPosition == cursorPosition) return;
-            
+
         CursorPosition = cursorPosition;
         CursorPositionChanged?.Invoke(this, new AutoCompleteEntryCursorPositionChangedEventArgs(cursorPosition));
     }
@@ -188,7 +188,7 @@ public class AutoCompleteEntry : Entry
     /// <summary>
     /// Get or Set the currently selected suggestion, from the items source list
     /// </summary>
-    public object SelectedSuggestion
+    public object? SelectedSuggestion
     {
         get => GetValue(SelectedSuggestionProperty);
         set => SetValue(SelectedSuggestionProperty, value);
@@ -206,7 +206,7 @@ public class AutoCompleteEntry : Entry
     /// Method used to signal the platform control, that a suggestion was selected.
     /// </summary>
     /// <param name="selectedItem">Item selected</param>
-    public void OnSuggestionSelected(object selectedItem)
+    public void OnSuggestionSelected(object? selectedItem)
     {
         SelectedSuggestion = selectedItem;
 
@@ -216,7 +216,7 @@ public class AutoCompleteEntry : Entry
     /// <summary>
     /// Raised before the text content of the editable control component is updated.
     /// </summary>
-    public event EventHandler<AutoCompleteEntrySuggestionChosenEventArgs> SuggestionChosen;
+    public event EventHandler<AutoCompleteEntrySuggestionChosenEventArgs>? SuggestionChosen;
 
     /// <summary>
     /// Gets or sets whether to show the bottom border, default is true.
@@ -238,9 +238,9 @@ public class AutoCompleteEntry : Entry
     /// <summary>
     /// Get or Set the item template to apply to the list of results
     /// </summary>
-    public DataTemplate ItemTemplate
+    public DataTemplate? ItemTemplate
     {
-        get => (DataTemplate)GetValue(ItemTemplateProperty);
+        get => (DataTemplate?)GetValue(ItemTemplateProperty);
         set => SetValue(ItemTemplateProperty, value);
     }
 
