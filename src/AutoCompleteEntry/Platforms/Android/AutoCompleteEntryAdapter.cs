@@ -203,9 +203,17 @@ internal class AutoCompleteEntryAdapter : BaseAdapter, IFilterable
         var heightDip = System.Math.Max(measure.Height, 44);
 
         var heightPx = DensityHelper.HeightDipToPixels(heightDip, density);
-        nativeView.LayoutParameters = new ViewGroup.LayoutParams(
-            ViewGroup.LayoutParams.MatchParent,
-            heightPx);
+        if (nativeView.LayoutParameters is { } lp)
+        {
+            lp.Width = ViewGroup.LayoutParams.MatchParent;
+            lp.Height = heightPx;
+        }
+        else
+        {
+            nativeView.LayoutParameters = new AbsListView.LayoutParams(
+                ViewGroup.LayoutParams.MatchParent,
+                heightPx);
+        }
 
         return nativeView;
     }
