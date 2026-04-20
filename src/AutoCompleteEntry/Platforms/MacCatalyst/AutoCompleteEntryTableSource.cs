@@ -46,7 +46,7 @@ internal class AutoCompleteEntryTableSource : UITableViewSource
         _mauiContext = mauiContext;
         _listViewContainer = Application.Current?.Windows.FirstOrDefault()?.Page
             ?? throw new InvalidOperationException(
-                $"{nameof(AutoCompleteEntryTableSource)} cannot be created before the MAUI application has an active window with a root page.");
+                $"{nameof(AutoCompleteEntryTableSource)} requires an active window with a root page.");
 
         _view.EstimatedRowHeight = 60f;
         _view.RowHeight = UITableView.AutomaticDimension;

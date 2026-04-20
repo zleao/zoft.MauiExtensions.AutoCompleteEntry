@@ -21,7 +21,7 @@ internal class AutoCompleteEntryAdapter : BaseAdapter, IFilterable
 
     internal IMauiContext MauiContext => _listViewContainer.Handler?.MauiContext
         ?? throw new InvalidOperationException(
-            $"{nameof(AutoCompleteEntryAdapter)} requires the container page to have an active handler with a valid {nameof(IMauiContext)}.");
+            $"{nameof(AutoCompleteEntryAdapter)} requires the container page to have a handler with a valid {nameof(IMauiContext)}.");
 
     private DataTemplate? _itemTemplate;
     public DataTemplate? ItemTemplate
