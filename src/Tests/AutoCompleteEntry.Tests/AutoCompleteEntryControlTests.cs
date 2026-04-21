@@ -78,6 +78,14 @@ public class AutoCompleteEntryControlTests
         Assert.Null(entry.ItemTemplate);
     }
 
+    [Fact]
+    public void TextChangedCommand_DefaultValue_IsNull()
+    {
+        var entry = CreateEntry();
+
+        Assert.Null(entry.TextChangedCommand);
+    }
+
     #endregion
 
     #region OnTextChanged
@@ -194,6 +202,98 @@ public class AutoCompleteEntryControlTests
         Assert.Null(exception);
     }
 
+    [Fact]
+    public void OnTextChanged_WithUserInput_ExactlyOneTextChangedEventFires()
+    {
+        // Guards the _suppressTextChangedEvent flag: without it, setting Text internally
+        // would trigger a second TextChanged via the protected OnTextChanged override.
+        var entry = CreateEntry();
+        int eventCount = 0;
+        entry.TextChanged += (_, _) => eventCount++;
+
+        entry.OnTextChanged("hello", AutoCompleteEntryTextChangeReason.UserInput);
+
+        Assert.Equal(1, eventCount);
+    }
+
+    [Fact]
+    public void OnTextChanged_TextPropertyIsUpdatedBeforeEventFires()
+    {
+        var entry = CreateEntry();
+        string? textDuringEvent = "sentinel";
+        entry.TextChanged += (_, _) => textDuringEvent = entry.Text;
+
+        entry.OnTextChanged("hello", AutoCompleteEntryTextChangeReason.UserInput);
+
+        Assert.Equal("hello", textDuringEvent);
+    }
+
+    [Fact]
+    public void OnTextChanged_WithNullText_SetsTextToNull()
+    {
+        var entry = CreateEntry();
+        entry.OnTextChanged("initial", AutoCompleteEntryTextChangeReason.UserInput);
+
+        entry.OnTextChanged(null, AutoCompleteEntryTextChangeReason.UserInput);
+
+        Assert.Null(entry.Text);
+    }
+
+    [Fact]
+    public void OnTextChanged_WithNullText_UserInput_FiresEventAndExecutesCommandWithNull()
+    {
+        var entry = CreateEntry();
+        AutoCompleteEntryTextChangedEventArgs? receivedArgs = null;
+        entry.TextChanged += (_, e) => receivedArgs = e;
+        var command = Substitute.For<ICommand>();
+        command.CanExecute(Arg.Any<object?>()).Returns(true);
+        entry.TextChangedCommand = command;
+
+        entry.OnTextChanged(null, AutoCompleteEntryTextChangeReason.UserInput);
+
+        Assert.NotNull(receivedArgs);
+        command.Received(1).Execute(null);
+    }
+
+    [Fact]
+    public void OnTextChanged_WithUserInput_CanExecuteIsCalledWithCurrentText()
+    {
+        var entry = CreateEntry();
+        var command = Substitute.For<ICommand>();
+        command.CanExecute(Arg.Any<object?>()).Returns(true);
+        entry.TextChangedCommand = command;
+
+        entry.OnTextChanged("test", AutoCompleteEntryTextChangeReason.UserInput);
+
+        command.Received(1).CanExecute("test");
+    }
+
+    [Fact]
+    public void OnTextChanged_WithProgrammaticChange_CanExecuteIsNotCalled()
+    {
+        var entry = CreateEntry();
+        var command = Substitute.For<ICommand>();
+        command.CanExecute(Arg.Any<object?>()).Returns(true);
+        entry.TextChangedCommand = command;
+
+        entry.OnTextChanged("test", AutoCompleteEntryTextChangeReason.ProgrammaticChange);
+
+        command.DidNotReceive().CanExecute(Arg.Any<object?>());
+    }
+
+    [Fact]
+    public void OnTextChanged_WithSuggestionChosen_CanExecuteIsNotCalled()
+    {
+        var entry = CreateEntry();
+        var command = Substitute.For<ICommand>();
+        command.CanExecute(Arg.Any<object?>()).Returns(true);
+        entry.TextChangedCommand = command;
+
+        entry.OnTextChanged("test", AutoCompleteEntryTextChangeReason.SuggestionChosen);
+
+        command.DidNotReceive().CanExecute(Arg.Any<object?>());
+    }
+
     #endregion
 
     #region OnSuggestionSelected
@@ -245,6 +345,19 @@ public class AutoCompleteEntryControlTests
 
         Assert.NotNull(receivedArgs);
         Assert.Null(receivedArgs.SelectedItem);
+    }
+
+    [Fact]
+    public void OnSuggestionSelected_SelectedSuggestionIsSetBeforeEventFires()
+    {
+        var entry = CreateEntry();
+        object? suggestionDuringEvent = null;
+        entry.SuggestionChosen += (_, _) => suggestionDuringEvent = entry.SelectedSuggestion;
+        var item = new { Name = "Test" };
+
+        entry.OnSuggestionSelected(item);
+
+        Assert.Same(item, suggestionDuringEvent);
     }
 
     #endregion
@@ -303,6 +416,31 @@ public class AutoCompleteEntryControlTests
         Assert.Equal(10, receivedArgs.CursorPosition);
     }
 
+    [Fact]
+    public void OnCursorPositionChanged_FromDefault_WithZero_DoesNotFireEvent()
+    {
+        // The default CursorPosition on Entry is 0. Calling with 0 is a no-op.
+        var entry = CreateEntry();
+        int eventCount = 0;
+        entry.CursorPositionChanged += (_, _) => eventCount++;
+
+        entry.OnCursorPositionChanged(0);
+
+        Assert.Equal(0, eventCount);
+    }
+
+    [Fact]
+    public void OnCursorPositionChanged_UpdatesPropertyBeforeEventFires()
+    {
+        var entry = CreateEntry();
+        int positionDuringEvent = -1;
+        entry.CursorPositionChanged += (_, _) => positionDuringEvent = entry.CursorPosition;
+
+        entry.OnCursorPositionChanged(7);
+
+        Assert.Equal(7, positionDuringEvent);
+    }
+
     #endregion
 
     #region Property Setting
@@ -346,6 +484,99 @@ public class AutoCompleteEntryControlTests
         entry.ItemsSource = items;
 
         Assert.Same(items, entry.ItemsSource);
+    }
+
+    [Fact]
+    public void TextMemberPath_CanBeSetToNonEmptyString()
+    {
+        var entry = CreateEntry();
+
+        entry.TextMemberPath = "Name";
+
+        Assert.Equal("Name", entry.TextMemberPath);
+    }
+
+    [Fact]
+    public void DisplayMemberPath_CanBeSetToNonEmptyString()
+    {
+        var entry = CreateEntry();
+
+        entry.DisplayMemberPath = "Label";
+
+        Assert.Equal("Label", entry.DisplayMemberPath);
+    }
+
+    [Fact]
+    public void ItemTemplate_CanBeSetToNonNullTemplate()
+    {
+        var entry = CreateEntry();
+        var template = new DataTemplate();
+
+        entry.ItemTemplate = template;
+
+        Assert.Same(template, entry.ItemTemplate);
+    }
+
+    #endregion
+
+    #region Text Property (programmatic assignment)
+
+    [Fact]
+    public void Text_SetDirectly_FiresTextChangedWithProgrammaticChangeReason()
+    {
+        var entry = CreateEntry();
+        AutoCompleteEntryTextChangedEventArgs? receivedArgs = null;
+        entry.TextChanged += (_, e) => receivedArgs = e;
+
+        entry.Text = "hello";
+
+        Assert.NotNull(receivedArgs);
+        Assert.Equal(AutoCompleteEntryTextChangeReason.ProgrammaticChange, receivedArgs.Reason);
+    }
+
+    [Fact]
+    public void Text_SetDirectly_DoesNotExecuteTextChangedCommand()
+    {
+        // TextChangedCommand is only executed when OnTextChanged is called with UserInput.
+        // Direct property assignment must not trigger the command.
+        var entry = CreateEntry();
+        var command = Substitute.For<ICommand>();
+        command.CanExecute(Arg.Any<object?>()).Returns(true);
+        entry.TextChangedCommand = command;
+
+        entry.Text = "hello";
+
+        command.DidNotReceive().Execute(Arg.Any<object?>());
+    }
+
+    [Fact]
+    public void Text_SetDirectlyTwice_WithDifferentValues_FiresEventTwice()
+    {
+        var entry = CreateEntry();
+        int eventCount = 0;
+        entry.TextChanged += (_, _) => eventCount++;
+
+        entry.Text = "hello";
+        entry.Text = "world";
+
+        Assert.Equal(2, eventCount);
+    }
+
+    #endregion
+
+    #region SelectedSuggestion Property
+
+    [Fact]
+    public void SelectedSuggestion_SetDirectly_DoesNotFireSuggestionChosenEvent()
+    {
+        // SuggestionChosen fires only via OnSuggestionSelected, not via direct property assignment.
+        var entry = CreateEntry();
+        int eventCount = 0;
+        entry.SuggestionChosen += (_, _) => eventCount++;
+
+        entry.SelectedSuggestion = new object();
+
+        Assert.Equal(0, eventCount);
     }
 
     #endregion
