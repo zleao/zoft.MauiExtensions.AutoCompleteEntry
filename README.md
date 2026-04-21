@@ -545,7 +545,7 @@ This repository uses **manual GitHub Releases** plus a **manual GitHub Actions p
 1. Update the package version in `src\Directory.build.props`.
 2. Move the pending notes from `CHANGELOG.md` into a new version section.
 3. Merge the release changes to `main`.
-4. Create a **draft GitHub Release** with tag `vX.Y.Z`.
+4. Create a **draft GitHub Release** with tag `X.Y.Z`.
 5. Click **Generate release notes** and refine the result into a short human-friendly summary.
 6. Run the **Publish package** workflow manually from the Actions tab.
 7. Provide:
