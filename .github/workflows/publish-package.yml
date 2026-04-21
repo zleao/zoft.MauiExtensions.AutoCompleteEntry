@@ -60,6 +60,33 @@ jobs:
             src/AutoCompleteEntry/bin/Release/*.snupkg
           if-no-files-found: error
 
+      - name: Validate tag and package version
+        if: github.event_name == 'push'
+        shell: pwsh
+        run: |
+          $tag = '${{ github.ref_name }}'
+
+          if ($tag -notmatch '^\d+\.\d+\.\d+$') {
+              throw "Tag '$tag' does not match the required MAJOR.MINOR.PATCH format. Only stable release tags trigger publishing."
+          }
+
+          $nupkg = Get-ChildItem -Path "$env:PACKAGE_OUTPUT" -Filter *.nupkg |
+                     Where-Object { $_.Name -notlike '*.snupkg' } |
+                     Select-Object -First 1
+
+          if (-not $nupkg) {
+              throw "No .nupkg file found in '$env:PACKAGE_OUTPUT'."
+          }
+
+          $packageId = 'zoft.MauiExtensions.Controls.AutoCompleteEntry'
+          $packageVersion = $nupkg.BaseName.Substring($packageId.Length + 1)
+
+          if ($packageVersion -ne $tag) {
+              throw "Package version '$packageVersion' does not match tag '$tag'. Aborting publish."
+          }
+
+          Write-Host "Tag and package version both match: $tag"
+
       - name: Push package to NuGet.org
         if: github.event_name == 'push' || fromJSON(github.event.inputs.publish_to_nuget || 'false')
         shell: pwsh
@@ -102,7 +129,7 @@ jobs:
           Push-Location $env:PACKAGE_OUTPUT
 
           try {
-              Get-ChildItem . -Include *.nupkg,*.snupkg -File |
+              @(Get-ChildItem -Filter *.nupkg; Get-ChildItem -Filter *.snupkg -ErrorAction SilentlyContinue) |
                 ForEach-Object {
                   gh release upload $tag $_.Name --clobber
                 }
