@@ -1,23 +1,17 @@
 name: Publish package
 
 on:
+  push:
+    tags:
+      - '[0-9]+.[0-9]+.[0-9]+'
   workflow_dispatch:
     inputs:
       ref:
-        description: Git ref to build
+        description: Git ref to build (branch, tag, or SHA)
         required: false
         default: main
-      release_tag:
-        description: Existing release tag to validate against and optionally attach packages to
-        required: false
-        default: ""
       publish_to_nuget:
         description: Push packages to NuGet.org
-        required: false
-        default: false
-        type: boolean
-      attach_to_release:
-        description: Upload built packages to the existing GitHub release for release_tag
         required: false
         default: false
         type: boolean
@@ -41,29 +35,13 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
         with:
-          ref: ${{ inputs.ref }}
+          ref: ${{ inputs.ref || github.ref }}
+          fetch-depth: 0
 
       - name: Setup .NET SDK
         uses: actions/setup-dotnet@v4
         with:
           dotnet-version: ${{ env.DOTNET_VERSION }}
-
-      - name: Validate manual workflow inputs
-        if: inputs.attach_to_release && inputs.release_tag == ''
-        shell: pwsh
-        run: throw "The 'release_tag' input is required when 'attach_to_release' is enabled."
-
-      - name: Validate tag matches package version
-        if: inputs.release_tag != ''
-        shell: pwsh
-        run: |
-          [xml]$buildProps = Get-Content 'src\Directory.build.props'
-          $packageVersion = $buildProps.SelectSingleNode('//Version').InnerText
-          $tagVersion = '${{ inputs.release_tag }}'.TrimStart('v')
-
-          if ($packageVersion -ne $tagVersion) {
-              throw "Release tag version '$tagVersion' does not match package version '$packageVersion' in src\Directory.build.props."
-          }
 
       - name: Restore MAUI workloads
         shell: pwsh
@@ -83,7 +61,7 @@ jobs:
           if-no-files-found: error
 
       - name: Push package to NuGet.org
-        if: inputs.publish_to_nuget
+        if: github.event_name == 'push' || inputs.publish_to_nuget
         shell: pwsh
         env:
           NUGET_API_KEY: ${{ secrets.NUGET_API_KEY }}
@@ -108,18 +86,25 @@ jobs:
               Pop-Location
           }
 
-      - name: Attach packages to GitHub release
-        if: inputs.attach_to_release
+      - name: Create or update GitHub release and attach packages
+        if: github.event_name == 'push'
         shell: pwsh
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
+          $tag = '${{ github.ref_name }}'
+
+          $releaseExists = gh release view $tag --json tagName 2>$null
+          if (-not $releaseExists) {
+              gh release create $tag --title "Release $tag" --generate-notes
+          }
+
           Push-Location $env:PACKAGE_OUTPUT
 
           try {
               Get-ChildItem . -Include *.nupkg,*.snupkg -File |
                 ForEach-Object {
-                  gh release upload '${{ inputs.release_tag }}' $_.Name --clobber
+                  gh release upload $tag $_.Name --clobber
                 }
           }
           finally {
