@@ -13,10 +13,6 @@
     <NeutralLanguage>en</NeutralLanguage>
     <Description>.Net MAUI Entry control that provides a list of suggestions as the user types.</Description>
     <PackageTags>net9 maui zoft AutoCompleteEntry AutoCompleteBox AutoCompleteView AutoComplete</PackageTags>
-    <PackageReleaseNotes>
-		[MACCATALYST] Improve support to MAcCatalyst, including ItemTemplate, Width/Height handling, and more.
-		[BUGFIX] Fire base TextChanged event
-	</PackageReleaseNotes>
     <PackageReadmeFile>README.md</PackageReadmeFile>
 
     <LangVersion>latest</LangVersion>
@@ -37,6 +33,9 @@
     <DebugType>portable</DebugType>
     <DebugSymbols>true</DebugSymbols>
   </PropertyGroup>
+
+  <!-- Release notes are injected at publish time from CHANGELOG.md via ReleaseNotes.g.props (CI-generated, git-ignored) -->
+  <Import Project="$(MSBuildThisFileDirectory)ReleaseNotes.g.props" Condition="Exists('$(MSBuildThisFileDirectory)ReleaseNotes.g.props')" />
 
   <!-- Nuget package included files -->
   <ItemGroup>

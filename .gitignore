@@ -353,3 +353,6 @@ src/.DS_Store
 .DS_Store
 
 .vshistory/
+
+# CI-generated release notes props file (created by publish-package.yml, never committed)
+src/ReleaseNotes.g.props
