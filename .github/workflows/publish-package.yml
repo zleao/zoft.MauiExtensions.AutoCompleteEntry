@@ -35,7 +35,7 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
         with:
-          ref: ${{ inputs.ref || github.ref }}
+          ref: ${{ github.event.inputs.ref || github.ref }}
           fetch-depth: 0
 
       - name: Setup .NET SDK
@@ -61,7 +61,7 @@ jobs:
           if-no-files-found: error
 
       - name: Push package to NuGet.org
-        if: github.event_name == 'push' || inputs.publish_to_nuget
+        if: github.event_name == 'push' || fromJSON(github.event.inputs.publish_to_nuget || 'false')
         shell: pwsh
         env:
           NUGET_API_KEY: ${{ secrets.NUGET_API_KEY }}
