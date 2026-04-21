@@ -17,7 +17,10 @@ This repository is a **.NET MAUI control library** for `zoft.MauiExtensions.Cont
 - Run the sample app on Windows:
   - `dotnet run --project sample\AutoCompleteEntry.Sample\AutoCompleteEntry.Sample.csproj -f net9.0-windows10.0.19041.0`
 
-There is **no dedicated automated test project** in the repository right now, so there is no single-test command to use. The sample app is the main integration surface for behavior changes.
+- Run the unit tests:
+  - `dotnet test src\Tests\AutoCompleteEntry.Tests\AutoCompleteEntry.Tests.csproj`
+
+The sample app remains the main integration surface for platform behavior changes.
 
 ## Architecture
 - `AutoCompleteEntry.cs` is the shared public surface: bindable properties, events, and the control-side state transitions.
@@ -29,6 +32,12 @@ There is **no dedicated automated test project** in the repository right now, so
   - Windows uses `AutoSuggestBox`
   - iOS and MacCatalyst use a custom `IOSAutoCompleteEntry` view with a text field plus suggestion table
 - The control does **not** own filtering logic. Consumers update `ItemsSource` in response to `TextChangedCommand` or the `TextChanged` event.
+
+## Changelog
+- Every user-visible change (new feature, bug fix, behavior change, deprecation) must be recorded in `CHANGELOG.md` before the work is committed.
+- Add entries under the `## [Unreleased]` section using [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) subsections: `Added`, `Changed`, `Fixed`, `Removed`, `Deprecated`, `Security`.
+- Pure internal changes (refactoring with no observable effect, test additions, CI/tooling updates) do not require a changelog entry.
+- `CHANGELOG.md` is the source of truth for NuGet `PackageReleaseNotes`: the publish workflow extracts the matching version section automatically on each tag push, so an accurate changelog is essential.
 
 ## Repo-specific conventions
 - Treat the public API as stable. This is a published NuGet package, so prefer additive or opt-in changes over renaming or changing existing behavior.
