@@ -79,7 +79,13 @@ jobs:
           }
 
           $packageId = 'zoft.MauiExtensions.Controls.AutoCompleteEntry'
-          $packageVersion = $nupkg.BaseName.Substring($packageId.Length + 1)
+          $expectedPrefix = "$packageId."
+
+          if (-not $nupkg.BaseName.StartsWith($expectedPrefix, [System.StringComparison]::Ordinal)) {
+              throw "Package file '$($nupkg.Name)' does not match the expected package ID '$packageId'. Expected file name to start with '$expectedPrefix'."
+          }
+
+          $packageVersion = $nupkg.BaseName.Substring($expectedPrefix.Length)
 
           if ($packageVersion -ne $tag) {
               throw "Package version '$packageVersion' does not match tag '$tag'. Aborting publish."
