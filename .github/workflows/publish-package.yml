@@ -4,6 +4,7 @@ on:
   push:
     tags:
       - '[0-9]*.[0-9]*.[0-9]*'
+      - '[0-9]*.[0-9]*.[0-9]*-*'
   workflow_dispatch:
     inputs:
       ref:
@@ -103,8 +104,8 @@ jobs:
         run: |
           $tag = '${{ github.ref_name }}'
 
-          if ($tag -notmatch '^\d+\.\d+\.\d+$') {
-              throw "Tag '$tag' does not match the required MAJOR.MINOR.PATCH format. Only stable release tags trigger publishing."
+          if ($tag -notmatch '^\d+\.\d+\.\d+(-[a-zA-Z0-9._-]+)?$') {
+              throw "Tag '$tag' does not match the required MAJOR.MINOR.PATCH or MAJOR.MINOR.PATCH-prerelease format."
           }
 
           $nupkg = Get-ChildItem -Path "$env:PACKAGE_OUTPUT" -Filter *.nupkg |

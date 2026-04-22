@@ -41,7 +41,7 @@ Add the NuGet package to your project:
 dotnet add package zoft.MauiExtensions.Controls.AutoCompleteEntry
 ```
 
-📦 [View on NuGet](https://www.nuget.org/packages/zoft.MauiExtensions.Controls.AutoCompleteEntry/)
+📦 [View on NuBrowse](https://nubrowse.com/packages/zoft.MauiExtensions.Controls.AutoCompleteEntry)
 
 ### Setup
 
@@ -538,27 +538,49 @@ Your support helps maintain and improve this project for the entire .NET MAUI co
 
 ## 🚀 Releasing
 
-This repository uses **manual GitHub Releases** plus a **manual GitHub Actions publish workflow**.
+The package version is derived automatically from git tags via [MinVer](https://github.com/adamralph/minver). There is no version property to edit manually. Pushing a tag triggers the **Publish package** workflow automatically.
 
-### Maintainer release flow
+### Stable release flow
 
-1. Update the package version in `src\Directory.build.props`.
-2. Move the pending notes from `CHANGELOG.md` into a new version section.
-3. Merge the release changes to `main`.
-4. Create a **draft GitHub Release** with tag `X.Y.Z`.
-5. Click **Generate release notes** and refine the result into a short human-friendly summary.
-6. Run the **Publish package** workflow manually from the Actions tab.
-7. Provide:
-   - `ref`: the branch or tag to build
-   - `release_tag`: the existing GitHub release tag if you want validation and release asset upload
-   - `publish_to_nuget`: enable only when you want to push to NuGet.org
-   - `attach_to_release`: enable only when you want the built `.nupkg` / `.snupkg` attached to the release
-8. Publish the GitHub Release after the notes and assets look correct.
+1. Update `CHANGELOG.md`: move the pending entries from `[Unreleased]` into a new `[X.Y.Z]` section.
+2. Commit and push (or merge a PR) to `main`.
+3. Push a git tag matching the version:
+   ```bash
+   git tag 1.2.3
+   git push origin 1.2.3
+   ```
+4. The **Publish package** workflow runs automatically and:
+   - Extracts the matching `[X.Y.Z]` release notes from `CHANGELOG.md` and injects them into the NuGet package.
+   - Builds the package (MinVer reads the exact tag as the version).
+   - Validates that the tag and the built package version match.
+   - Pushes the package to NuGet.org.
+   - Creates a GitHub Release and attaches the `.nupkg` / `.snupkg` files.
+
+### Preview release flow
+
+For pre-release packages between stable tags, use a pre-release suffix on the tag:
+
+```bash
+git tag 1.2.3-preview.1
+git push origin 1.2.3-preview.1
+```
+
+MinVer uses the tag as-is, producing a NuGet pre-release package (e.g., `1.2.3-preview.1`).  
+A matching CHANGELOG section is not required; if none is found the package will simply have no release notes.
+
+### Manual dispatch
+
+The **Publish package** workflow can also be triggered manually from the Actions tab:
+
+- `ref` — branch, tag, or SHA to build (default: `main`).
+- `publish_to_nuget` — push the built package to NuGet.org.
+
+When triggered manually, the GitHub Release creation and asset upload steps are skipped.
 
 ### Notes
 
+- The package version comes **only** from git tags via MinVer — never from a property in `.csproj` or `.props` files.
 - Pull requests to `main` only run CI when code or project files change; they do **not** create releases or publish packages.
-- GitHub's generated release notes are grouped by `.github\release.yml`.
 - Publishing to NuGet requires the `NUGET_API_KEY` repository secret.
 - `CHANGELOG.md` is the long-lived human changelog; GitHub Releases are the release-specific summary.
 
