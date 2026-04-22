@@ -28,7 +28,7 @@ Thank you for your interest in contributing to `zoft.MauiExtensions.Controls.Aut
    ```
 5. Build the sample app on Windows:
    ```
-   dotnet build sample\AutoCompleteEntry.Sample\AutoCompleteEntry.Sample.csproj -f net10.0-windows10.0.19041.0
+   dotnet build sample/AutoCompleteEntry.Sample/AutoCompleteEntry.Sample.csproj -f net10.0-windows10.0.19041.0
    ```
 
 ## Changelog
