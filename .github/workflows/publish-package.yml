@@ -21,7 +21,6 @@ permissions:
   contents: write
 
 env:
-  DOTNET_VERSION: 10.0.x
   BUILD_CONFIGURATION: Release
   PROJECT_FILE: src\AutoCompleteEntry\AutoCompleteEntry.csproj
   PACKAGE_OUTPUT: src\AutoCompleteEntry\bin\Release
@@ -42,7 +41,7 @@ jobs:
       - name: Setup .NET SDK
         uses: actions/setup-dotnet@v4
         with:
-          dotnet-version: ${{ env.DOTNET_VERSION }}
+          global-json-file: global.json
 
       - name: Extract release notes from CHANGELOG.md
         if: github.event_name == 'push' || (github.event_name == 'workflow_dispatch' && github.event.inputs.publish_to_nuget == 'true')

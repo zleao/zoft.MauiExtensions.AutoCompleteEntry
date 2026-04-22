@@ -15,6 +15,7 @@ on:
       - 'sample/**/*.xaml'
       - 'sample/**/*.csproj'
       - '.github/workflows/**'
+      - 'global.json'
   workflow_dispatch:
 
 permissions:
@@ -25,7 +26,6 @@ concurrency:
   cancel-in-progress: true
 
 env:
-  DOTNET_VERSION: 10.0.x
   BUILD_CONFIGURATION: Release
   PROJECT_FILE: src\AutoCompleteEntry\AutoCompleteEntry.csproj
   TEST_PROJECT_FILE: src\Tests\AutoCompleteEntry.Tests\AutoCompleteEntry.Tests.csproj
@@ -45,7 +45,7 @@ jobs:
       - name: Setup .NET SDK
         uses: actions/setup-dotnet@v4
         with:
-          dotnet-version: ${{ env.DOTNET_VERSION }}
+          global-json-file: global.json
 
       - name: Restore MAUI workloads
         shell: pwsh
@@ -81,7 +81,7 @@ jobs:
       - name: Setup .NET SDK
         uses: actions/setup-dotnet@v4
         with:
-          dotnet-version: ${{ env.DOTNET_VERSION }}
+          global-json-file: global.json
 
       - name: Restore MAUI workloads
         shell: pwsh
@@ -122,7 +122,7 @@ jobs:
       - name: Setup .NET SDK
         uses: actions/setup-dotnet@v4
         with:
-          dotnet-version: ${{ env.DOTNET_VERSION }}
+          global-json-file: global.json
 
       - name: Restore MAUI workloads
         shell: pwsh
