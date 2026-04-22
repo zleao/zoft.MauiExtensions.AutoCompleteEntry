@@ -3,30 +3,30 @@
 This repository is a **.NET MAUI control library** for `zoft.MauiExtensions.Controls.AutoCompleteEntry`, plus a sample app that demonstrates intended usage patterns.
 
 ## Repository shape
-- `src\AutoCompleteEntry` contains the reusable control library that is shipped as the NuGet package.
-- `sample\AutoCompleteEntry.Sample` is the reference app used to exercise the control on real MAUI targets.
-- `src\.github\copilot-instructions.md` contains older library guidance; keep repo-wide guidance in this top-level file and use `.github\instructions\*.instructions.md` for narrower rules.
+- `src/AutoCompleteEntry` contains the reusable control library that is shipped as the NuGet package.
+- `sample/AutoCompleteEntry.Sample` is the reference app used to exercise the control on real MAUI targets.
+- `.github/copilot-instructions.md` is this file; keep repo-wide guidance here and use `.github/instructions/*.instructions.md` for narrower rules.
 
 ## Build and run commands
 - Restore MAUI workloads before the first build:
-  - `dotnet workload restore src\AutoCompleteEntry\AutoCompleteEntry.csproj`
+  - `dotnet workload restore src/AutoCompleteEntry/AutoCompleteEntry.csproj`
 - Build the library the same way CI does:
-  - `dotnet build src\AutoCompleteEntry\AutoCompleteEntry.csproj -c Release`
+  - `dotnet build src/AutoCompleteEntry/AutoCompleteEntry.csproj -c Release`
 - Build the sample app on Windows:
-  - `dotnet build sample\AutoCompleteEntry.Sample\AutoCompleteEntry.Sample.csproj -f net10.0-windows10.0.19041.0`
+  - `dotnet build sample/AutoCompleteEntry.Sample/AutoCompleteEntry.Sample.csproj -f net10.0-windows10.0.19041.0`
 - Run the sample app on Windows:
-  - `dotnet run --project sample\AutoCompleteEntry.Sample\AutoCompleteEntry.Sample.csproj -f net10.0-windows10.0.19041.0`
+  - `dotnet run --project sample/AutoCompleteEntry.Sample/AutoCompleteEntry.Sample.csproj -f net10.0-windows10.0.19041.0`
 
 - Run the unit tests:
-  - `dotnet test src\Tests\AutoCompleteEntry.Tests\AutoCompleteEntry.Tests.csproj`
+  - `dotnet test src/Tests/AutoCompleteEntry.Tests/AutoCompleteEntry.Tests.csproj`
 
 The sample app remains the main integration surface for platform behavior changes.
 
 ## Architecture
 - `AutoCompleteEntry.cs` is the shared public surface: bindable properties, events, and the control-side state transitions.
 - `Initialization.cs` exposes `UseZoftAutoCompleteEntry()`, which is the required MAUI registration hook for consumers and for the sample app.
-- `Handlers\AutoCompleteEntryHandler.cs` defines the shared property mapper and command mapper. Platform-specific behavior is implemented in partial handler files under `Platforms\<Platform>\`.
-- `Handlers\AutoCompleteEntryHandler.Standard.cs` is the no-op fallback for unsupported targets; do not put real behavior there.
+- `Handlers/AutoCompleteEntryHandler.cs` defines the shared property mapper and command mapper. Platform-specific behavior is implemented in partial handler files under `Platforms/<Platform>/`.
+- `Handlers/AutoCompleteEntryHandler.Standard.cs` is the no-op fallback for unsupported targets; do not put real behavior there.
 - Each platform wraps a native control:
   - Android uses `AndroidAutoCompleteEntry`
   - Windows uses `AutoSuggestBox`
@@ -47,7 +47,7 @@ The sample app remains the main integration surface for platform behavior change
 
 ## Repo-specific conventions
 - Treat the public API as stable. This is a published NuGet package, so prefer additive or opt-in changes over renaming or changing existing behavior.
-- Keep shared behavior in `AutoCompleteEntry.cs`; keep native wiring, event subscriptions, and platform rendering in `Platforms\<Platform>\` partial handlers and native views.
+- Keep shared behavior in `AutoCompleteEntry.cs`; keep native wiring, event subscriptions, and platform rendering in `Platforms/<Platform>/` partial handlers and native views.
 - Avoid adding new scattered `#if` blocks in shared files when a platform partial can express the same change.
 - When text handling changes, preserve the `AutoCompleteEntryTextChangeReason` flow:
   - `UserInput` is the trigger for filtering
