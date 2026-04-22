@@ -21,7 +21,7 @@ permissions:
   contents: write
 
 env:
-  DOTNET_VERSION: 9.0.300
+  DOTNET_VERSION: 10.0.x
   BUILD_CONFIGURATION: Release
   PROJECT_FILE: src\AutoCompleteEntry\AutoCompleteEntry.csproj
   PACKAGE_OUTPUT: src\AutoCompleteEntry\bin\Release

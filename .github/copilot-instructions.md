@@ -13,9 +13,9 @@ This repository is a **.NET MAUI control library** for `zoft.MauiExtensions.Cont
 - Build the library the same way CI does:
   - `dotnet build src\AutoCompleteEntry\AutoCompleteEntry.csproj -c Release`
 - Build the sample app on Windows:
-  - `dotnet build sample\AutoCompleteEntry.Sample\AutoCompleteEntry.Sample.csproj -f net9.0-windows10.0.19041.0`
+  - `dotnet build sample\AutoCompleteEntry.Sample\AutoCompleteEntry.Sample.csproj -f net10.0-windows10.0.19041.0`
 - Run the sample app on Windows:
-  - `dotnet run --project sample\AutoCompleteEntry.Sample\AutoCompleteEntry.Sample.csproj -f net9.0-windows10.0.19041.0`
+  - `dotnet run --project sample\AutoCompleteEntry.Sample\AutoCompleteEntry.Sample.csproj -f net10.0-windows10.0.19041.0`
 
 - Run the unit tests:
   - `dotnet test src\Tests\AutoCompleteEntry.Tests\AutoCompleteEntry.Tests.csproj`
@@ -38,6 +38,12 @@ The sample app remains the main integration surface for platform behavior change
 - Add entries under the `## [Unreleased]` section using [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) subsections: `Added`, `Changed`, `Fixed`, `Removed`, `Deprecated`, `Security`.
 - Pure internal changes (refactoring with no observable effect, test additions, CI/tooling updates) do not require a changelog entry.
 - `CHANGELOG.md` is the source of truth for NuGet `PackageReleaseNotes`: the publish workflow extracts the matching version section automatically on each tag push, so an accurate changelog is essential.
+
+## Branching workflow
+- **Never commit directly to `main`.** All development must happen in a dedicated feature/fix branch.
+- Branch naming convention: `feature/<short-description>` for new features, `fix/<short-description>` for bug fixes.
+- When work is ready for review, open a Pull Request targeting `main`. CI runs automatically on every PR.
+- The `main` branch should always represent the last released (or release-ready) state.
 
 ## Repo-specific conventions
 - Treat the public API as stable. This is a published NuGet package, so prefer additive or opt-in changes over renaming or changing existing behavior.

@@ -12,7 +12,7 @@
     <Product>$(AssemblyName) ($(TargetFramework))</Product>
     <NeutralLanguage>en</NeutralLanguage>
     <Description>.Net MAUI Entry control that provides a list of suggestions as the user types.</Description>
-    <PackageTags>net9 maui zoft AutoCompleteEntry AutoCompleteBox AutoCompleteView AutoComplete</PackageTags>
+    <PackageTags>net10 maui zoft AutoCompleteEntry AutoCompleteBox AutoCompleteView AutoComplete</PackageTags>
     <PackageReadmeFile>README.md</PackageReadmeFile>
 
     <LangVersion>latest</LangVersion>
