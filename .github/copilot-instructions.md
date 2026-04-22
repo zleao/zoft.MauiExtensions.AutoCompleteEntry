@@ -44,6 +44,10 @@ The sample app remains the main integration surface for platform behavior change
 - Branch naming convention: `feature/<short-description>` for new features, `fix/<short-description>` for bug fixes.
 - When work is ready for review, open a Pull Request targeting `main`. CI runs automatically on every PR.
 - The `main` branch should always represent the last released (or release-ready) state.
+- **Branch selection for new work:**
+  - If the current branch is `main`, create a new feature/fix branch before making any changes.
+  - If the current branch is already a feature or fix branch, continue committing to that branch. Do **not** create a new branch or open a new PR unless the developer explicitly requests it.
+  - When continuing on an existing branch, push the new commits and note that they are added to the open PR for that branch.
 
 ## Repo-specific conventions
 - Treat the public API as stable. This is a published NuGet package, so prefer additive or opt-in changes over renaming or changing existing behavior.
