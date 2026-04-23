@@ -11,6 +11,11 @@ on:
       - 'src/**/*.props'
       - 'src/**/*.targets'
       - 'src/**/*.sln'
+      - 'sample/**/*.cs'
+      - 'sample/**/*.xaml'
+      - 'sample/**/*.csproj'
+      - '.github/workflows/**'
+      - 'global.json'
   workflow_dispatch:
 
 permissions:
@@ -21,10 +26,10 @@ concurrency:
   cancel-in-progress: true
 
 env:
-  DOTNET_VERSION: 9.0.300
   BUILD_CONFIGURATION: Release
   PROJECT_FILE: src\AutoCompleteEntry\AutoCompleteEntry.csproj
   TEST_PROJECT_FILE: src\Tests\AutoCompleteEntry.Tests\AutoCompleteEntry.Tests.csproj
+  SAMPLE_PROJECT_FILE: sample\AutoCompleteEntry.Sample\AutoCompleteEntry.Sample.csproj
 
 jobs:
   build-library:
@@ -40,7 +45,7 @@ jobs:
       - name: Setup .NET SDK
         uses: actions/setup-dotnet@v4
         with:
-          dotnet-version: ${{ env.DOTNET_VERSION }}
+          global-json-file: global.json
 
       - name: Restore MAUI workloads
         shell: pwsh
@@ -76,7 +81,7 @@ jobs:
       - name: Setup .NET SDK
         uses: actions/setup-dotnet@v4
         with:
-          dotnet-version: ${{ env.DOTNET_VERSION }}
+          global-json-file: global.json
 
       - name: Restore MAUI workloads
         shell: pwsh
@@ -99,6 +104,30 @@ jobs:
         if: always()
         uses: dorny/test-reporter@v1
         with:
-          name: Unit Tests (.NET 9)
+          name: Unit Tests (.NET 10)
           path: TestResults/results.trx
           reporter: dotnet-trx
+
+  build-sample:
+    name: Build sample app (Windows)
+    runs-on: windows-latest
+    needs: build-library
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup .NET SDK
+        uses: actions/setup-dotnet@v4
+        with:
+          global-json-file: global.json
+
+      - name: Restore MAUI workloads
+        shell: pwsh
+        run: dotnet workload restore $env:SAMPLE_PROJECT_FILE
+
+      - name: Build sample app
+        shell: pwsh
+        run: dotnet build $env:SAMPLE_PROJECT_FILE -f net10.0-windows10.0.19041.0 -c $env:BUILD_CONFIGURATION --nologo
