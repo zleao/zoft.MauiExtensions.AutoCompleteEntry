@@ -10,7 +10,7 @@ namespace zoft.MauiExtensions.Controls.Handlers;
 
 public partial class AutoCompleteEntryHandler : ViewHandler<AutoCompleteEntry, AndroidAutoCompleteEntry>
 {
-    Drawable _clearButtonDrawable;
+    Drawable? _clearButtonDrawable;
     bool _clearButtonVisible;
 
    
@@ -47,13 +47,13 @@ public partial class AutoCompleteEntryHandler : ViewHandler<AutoCompleteEntry, A
     }
 
 
-    private void PlatformView_OnCursorPositionChanged(object sender, AutoCompleteEntryCursorPositionChangedEventArgs e)
+    private void PlatformView_OnCursorPositionChanged(object? sender, AutoCompleteEntryCursorPositionChangedEventArgs e)
     {
         VirtualView?.OnCursorPositionChanged(e.CursorPosition);
     }
 
     // Note: this is copied from MAUI's EntryHandler.Android.cs > OnEditorAction
-    private void PlatformView_OnEditorAction(object sender, Android.Widget.TextView.EditorActionEventArgs e)
+    private void PlatformView_OnEditorAction(object? sender, Android.Widget.TextView.EditorActionEventArgs e)
     {
         var returnType = VirtualView?.ReturnType;
 
@@ -93,41 +93,59 @@ public partial class AutoCompleteEntryHandler : ViewHandler<AutoCompleteEntry, A
         e.Handled = handled;
     }
 
-    private void PlatformView_OnSuggestionChosen(object sender, AutoCompleteEntrySuggestionChosenEventArgs e)
+    private void PlatformView_OnSuggestionChosen(object? sender, AutoCompleteEntrySuggestionChosenEventArgs e)
     {
-        VirtualView?.OnSuggestionSelected(e.SelectedItem);
+        var virtualView = VirtualView;
+        if (virtualView is null)
+        {
+            return;
+        }
+
+        virtualView.OnSuggestionSelected(e.SelectedItem);
     }
 
-    private void PlatformView_OnTextChanged(object sender, AutoCompleteEntryTextChangedEventArgs e)
+    private void PlatformView_OnTextChanged(object? sender, AutoCompleteEntryTextChangedEventArgs e)
     {
-        VirtualView?.OnTextChanged(PlatformView.Text, e.Reason);
+        var virtualView = VirtualView;
+        if (virtualView is null)
+        {
+            return;
+        }
 
-        PlatformView.UpdateClearButtonVisibility(VirtualView);
+        virtualView.OnTextChanged(PlatformView.Text, e.Reason);
+        PlatformView.UpdateClearButtonVisibility(virtualView);
     }
 
-    private void PlatformView_OnTouch(object sender, Android.Views.View.TouchEventArgs e)
+    private void PlatformView_OnTouch(object? sender, Android.Views.View.TouchEventArgs e)
     {
+        var virtualView = VirtualView;
         e.Handled = _clearButtonVisible
                     &&
-                    VirtualView != null
+                    virtualView is not null
                     &&
                     PlatformView.HandleClearButtonTouched(e, GetClearButtonDrawable);
     }
 
-    private void PlatformView_OnViewAttachedToWindow(object sender, Android.Views.View.ViewAttachedToWindowEventArgs e)
+    private void PlatformView_OnViewAttachedToWindow(object? sender, Android.Views.View.ViewAttachedToWindowEventArgs e)
     {
-        PlatformView.UpdateClearButtonVisibility(VirtualView);
-        PlatformView.UpdateTextColor(VirtualView);
-        PlatformView.UpdatePlaceholder(VirtualView);
-        PlatformView.UpdatePlaceholderColor(VirtualView);
-        PlatformView.UpdateHorizontalTextAlignment(VirtualView);
-        PlatformView.UpdateMaxLength(VirtualView.MaxLength);
-        PlatformView.UpdateIsReadOnly(VirtualView);
-        PlatformView.UpdateDisplayMemberPath(VirtualView);
-        PlatformView.UpdateIsEnabled(VirtualView);
-        PlatformView.UpdateUpdateTextOnSelect(VirtualView);
-        PlatformView.UpdateIsSuggestionListOpen(VirtualView);
-        PlatformView.UpdateItemsSource(VirtualView);
+        var virtualView = VirtualView;
+        if (virtualView is null)
+        {
+            return;
+        }
+
+        PlatformView.UpdateClearButtonVisibility(virtualView);
+        PlatformView.UpdateTextColor(virtualView);
+        PlatformView.UpdatePlaceholder(virtualView);
+        PlatformView.UpdatePlaceholderColor(virtualView);
+        PlatformView.UpdateHorizontalTextAlignment(virtualView);
+        PlatformView.UpdateMaxLength(virtualView.MaxLength);
+        PlatformView.UpdateIsReadOnly(virtualView);
+        PlatformView.UpdateDisplayMemberPath(virtualView);
+        PlatformView.UpdateIsEnabled(virtualView);
+        PlatformView.UpdateUpdateTextOnSelect(virtualView);
+        PlatformView.UpdateIsSuggestionListOpen(virtualView);
+        PlatformView.UpdateItemsSource(virtualView);
     }
 
 
@@ -357,7 +375,7 @@ public partial class AutoCompleteEntryHandler : ViewHandler<AutoCompleteEntry, A
     /// <param name="autoCompleteEntry"></param>
     public static void MapSelectedSuggestion(IAutoCompleteEntryHandler handler, AutoCompleteEntry autoCompleteEntry) 
     {
-        handler?.PlatformView.UpdateSelectedSuggestion(autoCompleteEntry);
+        handler.PlatformView?.UpdateSelectedSuggestion(autoCompleteEntry);
     }
 
     /// <summary>
@@ -367,7 +385,7 @@ public partial class AutoCompleteEntryHandler : ViewHandler<AutoCompleteEntry, A
     /// <param name="autoCompleteEntry"></param>
     public static void MapItemTemplate(IAutoCompleteEntryHandler handler, AutoCompleteEntry autoCompleteEntry)
     {
-        handler?.PlatformView.UpdateItemTemplate(autoCompleteEntry);
+        handler.PlatformView?.UpdateItemTemplate(autoCompleteEntry);
     }
 
     /// <summary>
@@ -377,11 +395,11 @@ public partial class AutoCompleteEntryHandler : ViewHandler<AutoCompleteEntry, A
     /// <param name="autoCompleteEntry"></param>
     public static void MapShowBottomBorder(IAutoCompleteEntryHandler handler, AutoCompleteEntry autoCompleteEntry)
     {
-        handler?.PlatformView.UpdateShowBottomBorder(autoCompleteEntry);
+        handler.PlatformView?.UpdateShowBottomBorder(autoCompleteEntry);
     }
 
     // Returns the default 'X' char drawable in the AppCompatEditText.
-    protected virtual Drawable GetClearButtonDrawable() =>
+    protected virtual Drawable? GetClearButtonDrawable() =>
         _clearButtonDrawable ??= ContextCompat.GetDrawable(Context, Resource.Drawable.abc_ic_clear_material);
 
     internal void ShowClearButton()
@@ -392,11 +410,15 @@ public partial class AutoCompleteEntryHandler : ViewHandler<AutoCompleteEntry, A
         }
 
         var drawable = GetClearButtonDrawable();
+        if (drawable is null)
+        {
+            return;
+        }
 
         if (VirtualView?.TextColor is not null)
-            drawable?.SetColorFilter(VirtualView.TextColor.ToPlatform(), FilterMode.SrcIn);
+            drawable.SetColorFilter(VirtualView.TextColor.ToPlatform(), FilterMode.SrcIn);
         else
-            drawable?.ClearColorFilter();
+            drawable.ClearColorFilter();
 
         if (PlatformView.LayoutDirection == Android.Views.LayoutDirection.Rtl)
             PlatformView.SetCompoundDrawablesWithIntrinsicBounds(drawable, null, null, null);

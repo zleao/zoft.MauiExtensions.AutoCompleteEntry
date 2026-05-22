@@ -15,12 +15,14 @@ public static class AutoCompleteEntryExtensions
     /// </summary>
     /// <param name="iosAutoCompleteEntry"></param>
     /// <param name="autoCompleteEntry"></param>
+    /// <param name="mauiContext"></param>
     public static void UpdateDisplayMemberPath(this IOSAutoCompleteEntry iosAutoCompleteEntry, AutoCompleteEntry autoCompleteEntry, IMauiContext mauiContext)
     {
-        iosAutoCompleteEntry.SetItems(autoCompleteEntry.ItemsSource,
-                                      autoCompleteEntry?.DisplayMemberPath,
-                                      (o) => !string.IsNullOrEmpty(autoCompleteEntry?.TextMemberPath) ? o.GetPropertyValueAsString(autoCompleteEntry?.TextMemberPath) : o?.ToString(),
-                                      mauiContext);
+        iosAutoCompleteEntry.SetItems(
+            autoCompleteEntry.ItemsSource,
+            autoCompleteEntry.DisplayMemberPath,
+            CreateTextSelector(autoCompleteEntry),
+            mauiContext);
     }
 
     /// <summary>
@@ -58,12 +60,14 @@ public static class AutoCompleteEntryExtensions
     /// </summary>
     /// <param name="iosAutoCompleteEntry"></param>
     /// <param name="autoCompleteEntry"></param>
+    /// <param name="mauiContext"></param>
     public static void UpdateItemsSource(this IOSAutoCompleteEntry iosAutoCompleteEntry, AutoCompleteEntry autoCompleteEntry, IMauiContext mauiContext)
     {
-        iosAutoCompleteEntry.SetItems(autoCompleteEntry?.ItemsSource,
-                                      autoCompleteEntry?.DisplayMemberPath,
-                                      (o) => !string.IsNullOrEmpty(autoCompleteEntry?.TextMemberPath) ? o.GetPropertyValueAsString(autoCompleteEntry?.TextMemberPath) : o?.ToString(),
-                                      mauiContext);
+        iosAutoCompleteEntry.SetItems(
+            autoCompleteEntry.ItemsSource,
+            autoCompleteEntry.DisplayMemberPath,
+            CreateTextSelector(autoCompleteEntry),
+            mauiContext);
     }
 
     /// <summary>
@@ -86,7 +90,7 @@ public static class AutoCompleteEntryExtensions
     /// <param name="iosAutoCompleteEntry"></param>
     /// <param name="autoCompleteEntry"></param>
     /// <param name="defaultPlaceholderColor"></param>
-    public static void UpdatePlaceholder(this IOSAutoCompleteEntry iosAutoCompleteEntry, AutoCompleteEntry autoCompleteEntry, Color defaultPlaceholderColor = null)
+    public static void UpdatePlaceholder(this IOSAutoCompleteEntry iosAutoCompleteEntry, AutoCompleteEntry autoCompleteEntry, Color? defaultPlaceholderColor = null)
     {
         var placeholder = autoCompleteEntry.Placeholder;
         if (placeholder == null)
@@ -127,11 +131,7 @@ public static class AutoCompleteEntryExtensions
             return;
         }
 
-        iosAutoCompleteEntry.Text = 
-            !string.IsNullOrEmpty(autoCompleteEntry.TextMemberPath) ?
-            autoCompleteEntry.SelectedSuggestion.GetPropertyValueAsString(autoCompleteEntry.TextMemberPath) 
-            :
-            autoCompleteEntry.SelectedSuggestion.ToString();
+        iosAutoCompleteEntry.Text = CreateTextSelector(autoCompleteEntry)(autoCompleteEntry.SelectedSuggestion);
     }
 
     /// <summary>
@@ -170,10 +170,18 @@ public static class AutoCompleteEntryExtensions
     /// <summary>
     /// Update the ItemTemplate
     /// </summary>
-    /// <param name="platformView"></param>
-    /// <param name="virtualView"></param>
+    /// <param name="iosAutoCompleteEntry"></param>
+    /// <param name="autoCompleteEntry"></param>
     public static void UpdateItemTemplate(this IOSAutoCompleteEntry iosAutoCompleteEntry, AutoCompleteEntry autoCompleteEntry)
     {
         iosAutoCompleteEntry.ItemTemplate = autoCompleteEntry.ItemTemplate;
+    }
+
+    private static Func<object, string> CreateTextSelector(AutoCompleteEntry autoCompleteEntry)
+    {
+        var textMemberPath = autoCompleteEntry.TextMemberPath;
+        return item => !string.IsNullOrEmpty(textMemberPath)
+            ? item.GetPropertyValueAsString(textMemberPath)
+            : item?.ToString() ?? string.Empty;
     }
 }
