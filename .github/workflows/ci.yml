@@ -11,9 +11,7 @@ on:
       - 'src/**/*.props'
       - 'src/**/*.targets'
       - 'src/**/*.sln'
-      - 'sample/**/*.cs'
-      - 'sample/**/*.xaml'
-      - 'sample/**/*.csproj'
+      - 'sample/**'
       - '.github/workflows/**'
       - 'global.json'
   workflow_dispatch:
