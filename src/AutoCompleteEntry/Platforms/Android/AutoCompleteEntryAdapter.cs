@@ -92,7 +92,7 @@ internal class AutoCompleteEntryAdapter : BaseAdapter, IFilterable
         base.Dispose(disposing);
     }
 
-    public void UpdateList(IEnumerable<object> list, string displayMemberPath)
+    public void UpdateList(IEnumerable<object> list, string? displayMemberPath)
     {
         _displayMemberPath = displayMemberPath;
 
@@ -170,7 +170,7 @@ internal class AutoCompleteEntryAdapter : BaseAdapter, IFilterable
             : 0;
     }
 
-    public override AView GetView(int position, AView convertView, ViewGroup parent)
+    public override AView GetView(int position, AView? convertView, ViewGroup? parent)
     {
         var item = GetObject(position);
 
@@ -210,8 +210,14 @@ internal class AutoCompleteEntryAdapter : BaseAdapter, IFilterable
 
         // Measure after handler creation so MAUI's layout system can resolve sizes.
         // Re-measure on every GetView call because recycled rows may bind to data of a different height.
-        var density = (double)parent.Context.Resources.DisplayMetrics.Density;
-        var widthConstraint = DensityHelper.WidthPixelsToDipConstraint(parent.Width, density);
+        var parentView = parent
+            ?? throw new InvalidOperationException($"{nameof(AutoCompleteEntryAdapter)} requires a non-null parent view.");
+        var resources = parentView.Context?.Resources
+            ?? throw new InvalidOperationException($"{nameof(AutoCompleteEntryAdapter)} requires the parent view to expose Resources.");
+        var displayMetrics = resources.DisplayMetrics
+            ?? throw new InvalidOperationException($"{nameof(AutoCompleteEntryAdapter)} requires Android display metrics.");
+        var density = (double)displayMetrics.Density;
+        var widthConstraint = DensityHelper.WidthPixelsToDipConstraint(parentView.Width, density);
         var measure = ((IView)templateView).Measure(widthConstraint, double.PositiveInfinity);
         var heightDip = System.Math.Max(measure.Height, 44);
 
@@ -252,7 +258,7 @@ internal class AutoCompleteEntryAdapter : BaseAdapter, IFilterable
             _adapter = adapter;
         }
 
-        protected override FilterResults PerformFiltering(ICharSequence constraint)
+        protected override FilterResults PerformFiltering(ICharSequence? constraint)
         {
             var results = new FilterResults();
 
@@ -260,7 +266,7 @@ internal class AutoCompleteEntryAdapter : BaseAdapter, IFilterable
             return results;
         }
 
-        protected override void PublishResults(ICharSequence constraint, FilterResults results)
+        protected override void PublishResults(ICharSequence? constraint, FilterResults? results)
         {
             _adapter.NotifyDataSetChanged();
         }

@@ -20,9 +20,9 @@ public sealed partial class AndroidAutoCompleteEntry : AppCompatAutoCompleteText
 {
     private bool _suppressTextChangedEvent;
     private bool _showBottomBorder = true;
-    private Func<object, string> _textMemberPathFunc;
+    private Func<object, string> _textMemberPathFunc = static item => item?.ToString() ?? string.Empty;
     private readonly AutoCompleteEntryAdapter _adapter;
-    private Drawable _originalBackground;
+    private Drawable? _originalBackground;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="AndroidAutoCompleteEntry"/>.
@@ -40,7 +40,7 @@ public sealed partial class AndroidAutoCompleteEntry : AppCompatAutoCompleteText
         //Listen to when a suggestion is selected
         ItemClick += OnItemClick;
 
-        Adapter = _adapter = new AutoCompleteEntryAdapter(Context);
+        Adapter = _adapter = new AutoCompleteEntryAdapter(Context ?? context);
 
         _originalBackground = Background;
 
@@ -60,14 +60,14 @@ public sealed partial class AndroidAutoCompleteEntry : AppCompatAutoCompleteText
     public override bool EnoughToFilter() => true;
 
     /// <inheritdoc />
-    protected override void OnFocusChanged(bool gainFocus, [GeneratedEnum] FocusSearchDirection direction, global::Android.Graphics.Rect previouslyFocusedRect)
+    protected override void OnFocusChanged(bool gainFocus, [GeneratedEnum] FocusSearchDirection direction, global::Android.Graphics.Rect? previouslyFocusedRect)
     {
         IsSuggestionListOpen = gainFocus;
 
         base.OnFocusChanged(gainFocus, direction, previouslyFocusedRect);
     }
 
-    internal void SetItems(IList items, string displayMemberPath, Func<object, string> textMemberPathFunc)
+    internal void SetItems(IList? items, string? displayMemberPath, Func<object, string> textMemberPathFunc)
     {
         _textMemberPathFunc = textMemberPathFunc;
         _adapter.UpdateList(items is null ? Enumerable.Empty<string>() : items.OfType<object>(), displayMemberPath);
@@ -76,7 +76,7 @@ public sealed partial class AndroidAutoCompleteEntry : AppCompatAutoCompleteText
     /// <summary>
     /// Gets or sets the text displayed in the entry field
     /// </summary>
-    public new string Text
+    public new string? Text
     {
         get => base.Text;
         set
@@ -102,7 +102,7 @@ public sealed partial class AndroidAutoCompleteEntry : AppCompatAutoCompleteText
     /// </summary>
     public string PlaceholderText
     {
-        set => HintFormatted = new Java.Lang.String(value as string ?? "");
+        set => HintFormatted = new Java.Lang.String(value ?? string.Empty);
     }
 
     /// <summary>
@@ -160,7 +160,7 @@ public sealed partial class AndroidAutoCompleteEntry : AppCompatAutoCompleteText
     }
 
     /// <inheritdoc />
-    protected override void OnTextChanged(ICharSequence text, int start, int lengthBefore, int lengthAfter)
+    protected override void OnTextChanged(ICharSequence? text, int start, int lengthBefore, int lengthAfter)
     {
         if (!_suppressTextChangedEvent)
         {
@@ -183,7 +183,7 @@ public sealed partial class AndroidAutoCompleteEntry : AppCompatAutoCompleteText
         imm?.HideSoftInputFromWindow(WindowToken, 0);
     }
 
-    private void OnItemClick(object sender, AdapterView.ItemClickEventArgs e)
+    private void OnItemClick(object? sender, AdapterView.ItemClickEventArgs e)
     {
         DismissKeyboard();
         var obj = _adapter.GetObject(e.Position);
@@ -197,7 +197,7 @@ public sealed partial class AndroidAutoCompleteEntry : AppCompatAutoCompleteText
         SuggestionChosen?.Invoke(this, new AutoCompleteEntrySuggestionChosenEventArgs(obj));
     }
 
-    private void OnClick(object sender, EventArgs e)
+    private void OnClick(object? sender, EventArgs e)
     {
         Text = string.Empty;
     }
@@ -215,12 +215,12 @@ public sealed partial class AndroidAutoCompleteEntry : AppCompatAutoCompleteText
     }
 
     /// <inheritdoc />
-    protected override void ReplaceText(ICharSequence text)
+    protected override void ReplaceText(ICharSequence? text)
     {
         //Override to avoid updating textbox on itemclick. We'll do this later using TextMemberPath and raise the proper TextChanged event then
     }
 
-    internal void SetItemTemplate(DataTemplate itemTemplate)
+    internal void SetItemTemplate(DataTemplate? itemTemplate)
     {
         _adapter.ItemTemplate = itemTemplate;
     }
@@ -228,12 +228,12 @@ public sealed partial class AndroidAutoCompleteEntry : AppCompatAutoCompleteText
     /// <summary>
     /// Raised after the text content of the editable control component is updated.
     /// </summary>
-    public new event EventHandler<AutoCompleteEntryTextChangedEventArgs> TextChanged;
+    public new event EventHandler<AutoCompleteEntryTextChangedEventArgs>? TextChanged;
 
-    public event EventHandler<AutoCompleteEntryCursorPositionChangedEventArgs> CursorPositionChanged;
+    public event EventHandler<AutoCompleteEntryCursorPositionChangedEventArgs>? CursorPositionChanged;
 
     /// <summary>
     /// Raised before the text content of the editable control component is updated.
     /// </summary>
-    public event EventHandler<AutoCompleteEntrySuggestionChosenEventArgs> SuggestionChosen;
+    public event EventHandler<AutoCompleteEntrySuggestionChosenEventArgs>? SuggestionChosen;
 }

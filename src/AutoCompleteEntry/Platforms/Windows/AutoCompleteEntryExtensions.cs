@@ -19,6 +19,11 @@ public static class AutoCompleteEntryExtensions
         "TextControlPlaceholderForegroundDisabled"
     };
 
+    /// <summary>
+    /// Update the ClearButtonVisibility.
+    /// </summary>
+    /// <param name="platformControl"></param>
+    /// <param name="autoCompleteEntry"></param>
     public static void UpdateClearButtonVisibility(this AutoSuggestBox platformControl, AutoCompleteEntry autoCompleteEntry)
     {
         platformControl.FindDescendant<TextBox>()?.UpdateClearButtonVisibility(autoCompleteEntry);
@@ -136,8 +141,15 @@ public static class AutoCompleteEntryExtensions
     /// <param name="autoCompleteEntry"></param>
     public static void UpdateSelectedSuggestion(this AutoSuggestBox platformControl, AutoCompleteEntry autoCompleteEntry)
     {
-        object o = autoCompleteEntry.SelectedSuggestion;
-        platformControl.Text = !string.IsNullOrEmpty(autoCompleteEntry.TextMemberPath) ? o.GetPropertyValueAsString(autoCompleteEntry.TextMemberPath) : o?.ToString();
+        var selectedSuggestion = autoCompleteEntry.SelectedSuggestion;
+        if (selectedSuggestion is null)
+        {
+            return;
+        }
+
+        platformControl.Text = !string.IsNullOrEmpty(autoCompleteEntry.TextMemberPath)
+            ? selectedSuggestion.GetPropertyValueAsString(autoCompleteEntry.TextMemberPath)
+            : selectedSuggestion.ToString() ?? string.Empty;
     }
 
     /// <summary>
@@ -147,7 +159,7 @@ public static class AutoCompleteEntryExtensions
     /// <param name="autoCompleteEntry"></param>
     public static void UpdateText(this AutoSuggestBox platformControl, AutoCompleteEntry autoCompleteEntry)
     {
-        var text = TextTransformUtilites.GetTransformedText(autoCompleteEntry.Text, autoCompleteEntry.TextTransform);
+        var text = TextTransformUtilities.GetTransformedText(autoCompleteEntry.Text, autoCompleteEntry.TextTransform);
         if (platformControl.Text != text)
         {
             platformControl.Text = text;
@@ -204,7 +216,7 @@ public static class AutoCompleteEntryExtensions
         //TODO: Implement for Windows
     }
 
-    private static void UpdateColors(Microsoft.UI.Xaml.ResourceDictionary resource, string[] keys, Microsoft.UI.Xaml.Media.Brush brush)
+    private static void UpdateColors(Microsoft.UI.Xaml.ResourceDictionary resource, string[] keys, Microsoft.UI.Xaml.Media.Brush? brush)
     {
         if (brush is null)
         {

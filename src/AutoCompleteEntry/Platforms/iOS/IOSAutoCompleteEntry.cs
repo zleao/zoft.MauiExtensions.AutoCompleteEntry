@@ -2,7 +2,6 @@ using CoreGraphics;
 using Foundation;
 using ObjCRuntime;
 using System.Collections;
-using System.Drawing;
 using UIKit;
 
 namespace zoft.MauiExtensions.Controls.Platform;
@@ -15,50 +14,53 @@ public sealed class IOSAutoCompleteEntry : UIView
     /// <summary>
     /// Raised after the text content of the editable control component is updated.
     /// </summary>
-    public event EventHandler<AutoCompleteEntryTextChangedEventArgs> TextChanged;
+    public event EventHandler<AutoCompleteEntryTextChangedEventArgs>? TextChanged;
 
     /// <summary>
     /// Raised after the cursor position of the editable control component is updated.
     /// </summary>
-    public event EventHandler<AutoCompleteEntryCursorPositionChangedEventArgs> CursorPositionChanged;
+    public event EventHandler<AutoCompleteEntryCursorPositionChangedEventArgs>? CursorPositionChanged;
 
     /// <summary>
     /// Raised before the text content of the editable control component is updated.
     /// </summary>
-    public event EventHandler<AutoCompleteEntrySuggestionChosenEventArgs> SuggestionChosen;
+    public event EventHandler<AutoCompleteEntrySuggestionChosenEventArgs>? SuggestionChosen;
 
-    internal EventHandler Loaded;
+    internal EventHandler? Loaded;
 
-    internal EventHandler EditingDidBegin;
+    internal EventHandler? EditingDidBegin;
 
-    internal EventHandler EditingDidEnd;
+    internal EventHandler? EditingDidEnd;
 
-    internal EventHandler ShouldReturn;
+    internal EventHandler? ShouldReturn;
 
     private nfloat _keyboardHeight;
-    private NSLayoutConstraint _bottomConstraint;
-    private Func<object, string> _textFunc;
-    private CoreAnimation.CALayer _border = null;
+    private NSLayoutConstraint? _bottomConstraint;
+    private Func<object, string> _textFunc = static item => item?.ToString() ?? string.Empty;
+    private CoreAnimation.CALayer? _border;
     private bool _showBottomBorder = true;
-    private readonly NSObject _keyboardShownObserverToken;
-    private readonly NSObject _keyboardHiddenObserverToken;
+    private NSObject? _keyboardShownObserverToken;
+    private NSObject? _keyboardHiddenObserverToken;
 
-    public DataTemplate ItemTemplate { get; set; }
+    /// <summary>
+    /// Gets or sets the template used to render suggestion rows.
+    /// </summary>
+    public DataTemplate? ItemTemplate { get; set; }
 
     /// <summary>
     /// Gets a reference to the text field in the view
     /// </summary>
-    public MyUITextField InputTextField { get; }
+    public MyUITextField InputTextField { get; } = CreateInputTextField();
 
     /// <summary>
     /// Gets a reference to the drop down selection list in the view
     /// </summary>
-    public UITableView SelectionList { get; }
+    public UITableView SelectionList { get; } = new() { TranslatesAutoresizingMaskIntoConstraints = false };
 
     /// <summary>
     /// Gets or sets the text displayed in the <see cref="InputTextField"/>
     /// </summary>
-    public string Text
+    public string? Text
     {
         get => InputTextField.Text;
         set
@@ -107,42 +109,11 @@ public sealed class IOSAutoCompleteEntry : UIView
     /// <summary>
     /// Initializes a new instance of the <see cref="IOSAutoCompleteEntry"/>.
     /// </summary>
-    public IOSAutoCompleteEntry() : this(RectangleF.Empty)
-    {
-        InputTextField = new MyUITextField
-        {
-            TranslatesAutoresizingMaskIntoConstraints = false,
-            BorderStyle = UITextBorderStyle.None,
-            ReturnKeyType = UIReturnKeyType.Done,
-            AutocorrectionType = UITextAutocorrectionType.No,
-            ShouldReturn = field =>
-            {
-                field.ResignFirstResponder();
-                return false;
-            }
-        };
-        InputTextField.EditingDidBegin += InputText_OnEditingDidBegin;
-        InputTextField.EditingDidEnd += InputText_OnEditingDidEnd;
-        InputTextField.EditingChanged += InputText_OnEditingChanged;
-        InputTextField.SelectedTextRangeChanged += InputText_OnTextRangeChanged;
-        InputTextField.ShouldReturn += InputText_OnShouldReturn;
+    public IOSAutoCompleteEntry() : this(CGRect.Empty) { }
 
-        AddSubview(InputTextField);
-
-        NSLayoutConstraint.ActivateConstraints(new[]
-        {
-            InputTextField.TopAnchor.ConstraintEqualTo(TopAnchor),
-            InputTextField.LeftAnchor.ConstraintEqualTo(LeftAnchor),
-            InputTextField.RightAnchor.ConstraintEqualTo(RightAnchor),
-            InputTextField.BottomAnchor.ConstraintEqualTo(BottomAnchor),
-        });
-
-        SelectionList = new UITableView { TranslatesAutoresizingMaskIntoConstraints = false };
-
-        _keyboardShownObserverToken = UIKeyboard.Notifications.ObserveDidShow(OnKeyboardShow);
-        _keyboardHiddenObserverToken = UIKeyboard.Notifications.ObserveWillHide(OnKeyboardHide);
-    }
-
+    /// <summary>
+    /// Releases event subscriptions and native resources held by this view.
+    /// </summary>
     public void FreeResources()
     {
         InputTextField.EditingDidBegin -= InputText_OnEditingDidBegin;
@@ -168,6 +139,7 @@ public sealed class IOSAutoCompleteEntry : UIView
     /// <param name="coder"></param>
     public IOSAutoCompleteEntry(NSCoder coder) : base(coder)
     {
+        InitializeView();
     }
 
     /// <summary>
@@ -176,6 +148,7 @@ public sealed class IOSAutoCompleteEntry : UIView
     /// <param name="t"></param>
     private IOSAutoCompleteEntry(NSObjectFlag t) : base(t)
     {
+        InitializeView();
     }
 
     /// <summary>
@@ -184,6 +157,7 @@ public sealed class IOSAutoCompleteEntry : UIView
     /// <param name="handle"></param>
     internal IOSAutoCompleteEntry(NativeHandle handle) : base(handle)
     {
+        InitializeView();
     }
 
     /// <summary>
@@ -192,6 +166,43 @@ public sealed class IOSAutoCompleteEntry : UIView
     /// <param name="frame"></param>
     public IOSAutoCompleteEntry(CGRect frame) : base(frame)
     {
+        InitializeView();
+    }
+
+    private static MyUITextField CreateInputTextField() =>
+        new()
+        {
+            TranslatesAutoresizingMaskIntoConstraints = false,
+            BorderStyle = UITextBorderStyle.None,
+            ReturnKeyType = UIReturnKeyType.Done,
+            AutocorrectionType = UITextAutocorrectionType.No,
+            ShouldReturn = field =>
+            {
+                field.ResignFirstResponder();
+                return false;
+            }
+        };
+
+    private void InitializeView()
+    {
+        InputTextField.EditingDidBegin += InputText_OnEditingDidBegin;
+        InputTextField.EditingDidEnd += InputText_OnEditingDidEnd;
+        InputTextField.EditingChanged += InputText_OnEditingChanged;
+        InputTextField.SelectedTextRangeChanged += InputText_OnTextRangeChanged;
+        InputTextField.ShouldReturn += InputText_OnShouldReturn;
+
+        AddSubview(InputTextField);
+
+        NSLayoutConstraint.ActivateConstraints(new[]
+        {
+            InputTextField.TopAnchor.ConstraintEqualTo(TopAnchor),
+            InputTextField.LeftAnchor.ConstraintEqualTo(LeftAnchor),
+            InputTextField.RightAnchor.ConstraintEqualTo(RightAnchor),
+            InputTextField.BottomAnchor.ConstraintEqualTo(BottomAnchor),
+        });
+
+        _keyboardShownObserverToken = UIKeyboard.Notifications.ObserveDidShow(OnKeyboardShow);
+        _keyboardHiddenObserverToken = UIKeyboard.Notifications.ObserveWillHide(OnKeyboardHide);
     }
 
     /// <inheritdoc />
@@ -204,19 +215,19 @@ public sealed class IOSAutoCompleteEntry : UIView
         UpdateSuggestionListOpenState();
     }
 
-    private void InputText_OnEditingDidBegin(object sender, EventArgs e)
+    private void InputText_OnEditingDidBegin(object? sender, EventArgs e)
     {
         IsSuggestionListOpen = true;
         EditingDidBegin?.Invoke(this, e);
     }
 
-    private void InputText_OnEditingDidEnd(object sender, EventArgs e)
+    private void InputText_OnEditingDidEnd(object? sender, EventArgs e)
     {
         IsSuggestionListOpen = false;
         EditingDidEnd?.Invoke(this, e);
     }
 
-    private void InputText_OnEditingChanged(object sender, EventArgs e)
+    private void InputText_OnEditingChanged(object? sender, EventArgs e)
     {
         TextChanged?.Invoke(this, new AutoCompleteEntryTextChangedEventArgs(AutoCompleteEntryTextChangeReason.UserInput));
 
@@ -225,7 +236,7 @@ public sealed class IOSAutoCompleteEntry : UIView
         IsSuggestionListOpen = true;
     }
 
-    private void InputText_OnTextRangeChanged(object sender, EventArgs e)
+    private void InputText_OnTextRangeChanged(object? sender, EventArgs e)
     {
         var cp = InputTextField.GetOffsetFromPosition(InputTextField.BeginningOfDocument, InputTextField.SelectedTextRange?.Start ?? InputTextField.EndOfDocument).ToInt32();
 
@@ -260,7 +271,7 @@ public sealed class IOSAutoCompleteEntry : UIView
         Layer.MasksToBounds = true;
     }
 
-    internal void SetItems(IList items, string displayMemberPath, Func<object, string> textFunc, IMauiContext mauiContext)
+    internal void SetItems(IList? items, string? displayMemberPath, Func<object, string> textFunc, IMauiContext mauiContext)
     {
         _textFunc = textFunc;
 
@@ -274,7 +285,7 @@ public sealed class IOSAutoCompleteEntry : UIView
 
         if (items != null)
         {
-            var suggestionTableSource = new AutoCompleteEntryTableSource(SelectionList, items, displayMemberPath, ItemTemplate, mauiContext);
+            var suggestionTableSource = new AutoCompleteEntryTableSource(SelectionList, items, displayMemberPath ?? string.Empty, ItemTemplate, mauiContext);
             suggestionTableSource.TableRowSelected += SuggestionTableSource_TableRowSelected;
             SelectionList.Source = suggestionTableSource;
             SelectionList.ReloadData();
@@ -305,10 +316,12 @@ public sealed class IOSAutoCompleteEntry : UIView
                 viewController.Add(SelectionList);
             }
 
+            var selectionListSuperview = SelectionList.Superview
+                ?? throw new InvalidOperationException($"{nameof(SelectionList)} must have a superview before constraints are updated.");
             SelectionList.TopAnchor.ConstraintEqualTo(InputTextField.BottomAnchor).Active = true;
             SelectionList.LeftAnchor.ConstraintEqualTo(InputTextField.LeftAnchor).Active = true;
             SelectionList.WidthAnchor.ConstraintEqualTo(InputTextField.WidthAnchor).Active = true;
-            _bottomConstraint = SelectionList.BottomAnchor.ConstraintGreaterThanOrEqualTo(SelectionList.Superview.BottomAnchor, -_keyboardHeight);
+            _bottomConstraint = SelectionList.BottomAnchor.ConstraintGreaterThanOrEqualTo(selectionListSuperview.BottomAnchor, -_keyboardHeight);
             _bottomConstraint.Active = true;
             SelectionList.UpdateConstraints();
         }
@@ -321,7 +334,7 @@ public sealed class IOSAutoCompleteEntry : UIView
         }
     }
 
-    private void OnKeyboardHide(object sender, UIKeyboardEventArgs e)
+    private void OnKeyboardHide(object? sender, UIKeyboardEventArgs e)
     {
         _keyboardHeight = 0;
         if (_bottomConstraint != null)
@@ -331,7 +344,7 @@ public sealed class IOSAutoCompleteEntry : UIView
         }
     }
 
-    private void OnKeyboardShow(object sender, UIKeyboardEventArgs e)
+    private void OnKeyboardShow(object? sender, UIKeyboardEventArgs e)
     {
         _keyboardHeight = e.FrameEnd.Height;
         if (_bottomConstraint != null)
@@ -356,7 +369,7 @@ public sealed class IOSAutoCompleteEntry : UIView
     /// <inheritdoc />
     public override bool IsFirstResponder => InputTextField.IsFirstResponder;
 
-    private void SuggestionTableSource_TableRowSelected(object sender, TableRowSelectedEventArgs<object> e)
+    private void SuggestionTableSource_TableRowSelected(object? sender, TableRowSelectedEventArgs<object> e)
     {
         SelectionList.DeselectRow(e.SelectedItemIndexPath, false);
         var selection = e.SelectedItem;
@@ -371,11 +384,20 @@ public sealed class IOSAutoCompleteEntry : UIView
         ResignFirstResponder();
     }
 
+    /// <summary>
+    /// Text field implementation that raises an event when the selected text range changes.
+    /// </summary>
     public class MyUITextField : UITextField
     {
-        public event EventHandler<EventArgs> SelectedTextRangeChanged;
+        /// <summary>
+        /// Raised when the selected text range changes.
+        /// </summary>
+        public event EventHandler<EventArgs>? SelectedTextRangeChanged;
 
-        public override UITextRange SelectedTextRange
+        /// <summary>
+        /// Gets or sets the currently selected text range.
+        /// </summary>
+        public override UITextRange? SelectedTextRange
         {
             get => base.SelectedTextRange;
             set

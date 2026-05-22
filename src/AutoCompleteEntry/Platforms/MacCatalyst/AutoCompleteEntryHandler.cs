@@ -41,12 +41,12 @@ public partial class AutoCompleteEntryHandler : ViewHandler<AutoCompleteEntry, I
     }
 
 
-    private void PlatformView_OnCursorPositionChanged(object sender, AutoCompleteEntryCursorPositionChangedEventArgs e)
+    private void PlatformView_OnCursorPositionChanged(object? sender, AutoCompleteEntryCursorPositionChangedEventArgs e)
     {
         VirtualView?.OnCursorPositionChanged(e.CursorPosition);
     }
 
-    private void PlatformView_OnEditingDidBegin(object sender, EventArgs e)
+    private void PlatformView_OnEditingDidBegin(object? sender, EventArgs e)
     {
         if (VirtualView is IEntry virtualView)
         {
@@ -54,7 +54,7 @@ public partial class AutoCompleteEntryHandler : ViewHandler<AutoCompleteEntry, I
         }
     }
 
-    private void PlatformView_OnEditingDidEnd(object sender, EventArgs e)
+    private void PlatformView_OnEditingDidEnd(object? sender, EventArgs e)
     {
         if (VirtualView is IEntry virtualView)
         {
@@ -62,34 +62,53 @@ public partial class AutoCompleteEntryHandler : ViewHandler<AutoCompleteEntry, I
         }
     }
 
-    private void PlatformView_OnLoaded(object sender, EventArgs e)
+    private void PlatformView_OnLoaded(object? sender, EventArgs e)
     {
-        PlatformView.UpdateText(VirtualView);
-        PlatformView.UpdatePlaceholder(VirtualView);
-        PlatformView.UpdatePlaceholder(VirtualView);
-        PlatformView.InputTextField.UpdateHorizontalTextAlignment(VirtualView);
-        PlatformView.UpdateMaxLength(VirtualView);
-        PlatformView.UpdateIsReadOnly(VirtualView);
-        PlatformView.UpdateDisplayMemberPath(VirtualView, MauiContext);
-        PlatformView.UpdateIsEnabled(VirtualView);
-        PlatformView.UpdateUpdateTextOnSelect(VirtualView);
-        PlatformView.UpdateIsSuggestionListOpen(VirtualView);
-        PlatformView.UpdateItemsSource(VirtualView, MauiContext);
+        var virtualView = VirtualView;
+        if (virtualView is null)
+        {
+            return;
+        }
+        var mauiContext = GetRequiredMauiContext();
+
+        PlatformView.UpdateText(virtualView);
+        PlatformView.UpdatePlaceholder(virtualView);
+        PlatformView.UpdatePlaceholder(virtualView);
+        PlatformView.InputTextField.UpdateHorizontalTextAlignment(virtualView);
+        PlatformView.UpdateMaxLength(virtualView);
+        PlatformView.UpdateIsReadOnly(virtualView);
+        PlatformView.UpdateDisplayMemberPath(virtualView, mauiContext);
+        PlatformView.UpdateIsEnabled(virtualView);
+        PlatformView.UpdateUpdateTextOnSelect(virtualView);
+        PlatformView.UpdateIsSuggestionListOpen(virtualView);
+        PlatformView.UpdateItemsSource(virtualView, mauiContext);
     }
 
-    private void PlatformView_OnShouldReturn(object sender, EventArgs e)
+    private void PlatformView_OnShouldReturn(object? sender, EventArgs e)
     {
         VirtualView?.SendCompleted();
     }
 
-    private void PlatformView_OnSuggestionChosen(object sender, AutoCompleteEntrySuggestionChosenEventArgs e)
+    private void PlatformView_OnSuggestionChosen(object? sender, AutoCompleteEntrySuggestionChosenEventArgs e)
     {
-        VirtualView.OnSuggestionSelected(e.SelectedItem);
+        var virtualView = VirtualView;
+        if (virtualView is null)
+        {
+            return;
+        }
+
+        virtualView.OnSuggestionSelected(e.SelectedItem);
     }
 
-    private void PlatformView_OnTextChanged(object sender, AutoCompleteEntryTextChangedEventArgs e)
+    private void PlatformView_OnTextChanged(object? sender, AutoCompleteEntryTextChangedEventArgs e)
     {
-        VirtualView.OnTextChanged(PlatformView.Text, e.Reason);
+        var virtualView = VirtualView;
+        if (virtualView is null)
+        {
+            return;
+        }
+
+        virtualView.OnTextChanged(PlatformView.Text, e.Reason);
     }
 
 
@@ -141,7 +160,7 @@ public partial class AutoCompleteEntryHandler : ViewHandler<AutoCompleteEntry, I
     /// <param name="autoCompleteEntry"></param>
     public static void MapDisplayMemberPath(IAutoCompleteEntryHandler handler, AutoCompleteEntry autoCompleteEntry)
     {
-        handler?.PlatformView?.UpdateDisplayMemberPath(autoCompleteEntry, handler.MauiContext);
+        handler.PlatformView?.UpdateDisplayMemberPath(autoCompleteEntry, GetRequiredMauiContext(handler));
     }
 
     /// <summary>
@@ -219,7 +238,7 @@ public partial class AutoCompleteEntryHandler : ViewHandler<AutoCompleteEntry, I
     /// <param name="autoCompleteEntry"></param>
     public static void MapItemsSource(IAutoCompleteEntryHandler handler, AutoCompleteEntry autoCompleteEntry)
     {
-        handler?.PlatformView?.UpdateItemsSource(autoCompleteEntry, handler.MauiContext);
+        handler.PlatformView?.UpdateItemsSource(autoCompleteEntry, GetRequiredMauiContext(handler));
     }
 
     /// <summary>
@@ -231,6 +250,14 @@ public partial class AutoCompleteEntryHandler : ViewHandler<AutoCompleteEntry, I
     {
         handler.PlatformView?.UpdateMaxLength(autoCompleteEntry);
     }
+
+    private static IMauiContext GetRequiredMauiContext(IAutoCompleteEntryHandler handler) =>
+        handler.MauiContext
+        ?? throw new InvalidOperationException($"Unable to find the context. The {nameof(MauiContext)} property should have been set by the host.");
+
+    private IMauiContext GetRequiredMauiContext() =>
+        MauiContext
+        ?? throw new InvalidOperationException($"Unable to find the context. The {nameof(MauiContext)} property should have been set by the host.");
 
     /// <summary>
     /// Map the Placeholder value

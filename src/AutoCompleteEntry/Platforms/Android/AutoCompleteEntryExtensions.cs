@@ -18,7 +18,7 @@ public static class AutoCompleteEntryExtensions
     /// <returns>True if clear button is clicked and Text is cleared. False if not.</returns>
     public static bool HandleClearButtonTouched(this AndroidAutoCompleteEntry platformView,
                                                 Android.Views.View.TouchEventArgs touchEvent,
-                                                Func<Drawable> getClearButtonDrawable)
+                                                Func<Drawable?>? getClearButtonDrawable)
     {
         if (platformView is null)
             return false;
@@ -137,8 +137,8 @@ public static class AutoCompleteEntryExtensions
     {
         platformView.SetItems(
             virtualView.ItemsSource,
-            virtualView?.DisplayMemberPath,
-            (o) => !string.IsNullOrEmpty(virtualView?.TextMemberPath) ? o.GetPropertyValueAsString(virtualView?.TextMemberPath) : o?.ToString());
+            virtualView.DisplayMemberPath,
+            CreateTextSelector(virtualView));
     }
 
     /// <summary>
@@ -172,9 +172,9 @@ public static class AutoCompleteEntryExtensions
     public static void UpdateItemsSource(this AndroidAutoCompleteEntry platformView, AutoCompleteEntry virtualView)
     {
         platformView.SetItems(
-            virtualView?.ItemsSource,
-            virtualView?.DisplayMemberPath,
-            (o) => !string.IsNullOrEmpty(virtualView?.TextMemberPath) ? o.GetPropertyValueAsString(virtualView?.TextMemberPath) : o?.ToString());
+            virtualView.ItemsSource,
+            virtualView.DisplayMemberPath,
+            CreateTextSelector(virtualView));
     }
 
     /// <summary>
@@ -189,11 +189,7 @@ public static class AutoCompleteEntryExtensions
             return;
         }
 
-        platformView.Text = 
-            !string.IsNullOrEmpty(virtualView.TextMemberPath) ?
-            virtualView.SelectedSuggestion.GetPropertyValueAsString(virtualView.TextMemberPath) 
-            :
-            virtualView.SelectedSuggestion.ToString();
+        platformView.Text = CreateTextSelector(virtualView)(virtualView.SelectedSuggestion);
 
         platformView.SetSelection(platformView.Text?.Length ?? 0);
     }
@@ -240,8 +236,17 @@ public static class AutoCompleteEntryExtensions
     public static void UpdateItemTemplate(this AndroidAutoCompleteEntry platformView, AutoCompleteEntry virtualView)
     {
         platformView.SetItemTemplate(virtualView.ItemTemplate);
-        platformView.SetItems(virtualView.ItemsSource,
-                              virtualView?.DisplayMemberPath,
-                              (o) => !string.IsNullOrEmpty(virtualView?.TextMemberPath) ? o.GetPropertyValueAsString(virtualView?.TextMemberPath) : o?.ToString());
+        platformView.SetItems(
+            virtualView.ItemsSource,
+            virtualView.DisplayMemberPath,
+            CreateTextSelector(virtualView));
+    }
+
+    private static Func<object, string> CreateTextSelector(AutoCompleteEntry autoCompleteEntry)
+    {
+        var textMemberPath = autoCompleteEntry.TextMemberPath;
+        return item => !string.IsNullOrEmpty(textMemberPath)
+            ? item.GetPropertyValueAsString(textMemberPath)
+            : item?.ToString() ?? string.Empty;
     }
 }

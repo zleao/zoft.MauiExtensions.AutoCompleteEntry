@@ -4,7 +4,4 @@
 				 android:icon="@mipmap/appicon" 
 				 android:roundIcon="@mipmap/appicon_round" 
 				 android:supportsRtl="true"></application>
-
-	<!-- Target API level -->
-	<uses-sdk android:minSdkVersion="21" android:targetSdkVersion="35" />
 </manifest>

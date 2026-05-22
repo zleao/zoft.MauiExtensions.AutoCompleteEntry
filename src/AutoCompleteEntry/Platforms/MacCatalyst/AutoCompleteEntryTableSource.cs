@@ -161,6 +161,11 @@ internal class AutoCompleteEntryTableSource : UITableViewSource
     private void OnTableRowSelected(NSIndexPath itemIndexPath)
     {
         var item = _items[itemIndexPath.Row];
+        if (item is null)
+        {
+            return;
+        }
+
         TableRowSelected?.Invoke(this, new TableRowSelectedEventArgs<object>(item, itemIndexPath));
     }
 }
