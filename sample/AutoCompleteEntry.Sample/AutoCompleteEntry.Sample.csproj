@@ -6,7 +6,7 @@
 		<OutputType>Exe</OutputType>
 		<RootNamespace>AutoCompleteEntry.Sample</RootNamespace>
 		<UseMaui>true</UseMaui>
-		<MauiVersion>10.0.51</MauiVersion>
+		<MauiVersion>10.0.70</MauiVersion>
 		<SingleProject>true</SingleProject>
 		<ImplicitUsings>enable</ImplicitUsings>
 		<WindowsPackageType>None</WindowsPackageType>

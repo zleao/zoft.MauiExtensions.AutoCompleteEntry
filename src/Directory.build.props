@@ -1,51 +1,51 @@
 <Project>
-  <PropertyGroup>
-    <Copyright>Copyright (c) zleao</Copyright>
-    <PackageLicenseExpression>MIT</PackageLicenseExpression>
-    <Authors>zleao</Authors>
-    <Owners>zleao</Owners>
-    <RepositoryUrl>https://github.com/zleao/zoft.MauiExtensions.AutoCompleteEntry</RepositoryUrl>
-    <RepositoryType>git</RepositoryType>
-    <PublishRepositoryUrl>true</PublishRepositoryUrl>
-    <PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
-    <PackageProjectUrl>https://github.com/zleao/zoft.MauiExtensions.AutoCompleteEntry</PackageProjectUrl>
-    <Product>$(AssemblyName) ($(TargetFramework))</Product>
-    <NeutralLanguage>en</NeutralLanguage>
-    <Description>.Net MAUI Entry control that provides a list of suggestions as the user types.</Description>
-    <PackageTags>net10 maui zoft AutoCompleteEntry AutoCompleteBox AutoCompleteView AutoComplete</PackageTags>
-    <PackageReadmeFile>README.md</PackageReadmeFile>
+	<PropertyGroup>
+		<Copyright>Copyright (c) zleao</Copyright>
+		<PackageLicenseExpression>MIT</PackageLicenseExpression>
+		<Authors>zleao</Authors>
+		<Owners>zleao</Owners>
+		<RepositoryUrl>https://github.com/zleao/zoft.MauiExtensions.AutoCompleteEntry</RepositoryUrl>
+		<RepositoryType>git</RepositoryType>
+		<PublishRepositoryUrl>true</PublishRepositoryUrl>
+		<PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
+		<PackageProjectUrl>https://github.com/zleao/zoft.MauiExtensions.AutoCompleteEntry</PackageProjectUrl>
+		<Product>$(AssemblyName) ($(TargetFramework))</Product>
+		<NeutralLanguage>en</NeutralLanguage>
+		<Description>.Net MAUI Entry control that provides a list of suggestions as the user types.</Description>
+		<PackageTags>net10 maui zoft AutoCompleteEntry AutoCompleteBox AutoCompleteView AutoComplete</PackageTags>
+		<PackageReadmeFile>README.md</PackageReadmeFile>
 
-    <LangVersion>latest</LangVersion>
-    <Platform>AnyCPU</Platform>
-    <DebugType>full</DebugType>
-    <LangVersion>13.0</LangVersion>
+		<LangVersion>latest</LangVersion>
+		<Platform>AnyCPU</Platform>
+		<DebugType>full</DebugType>
+		<LangVersion>13.0</LangVersion>
 
-    <RootNamespace>zoft.MauiExtensions.Controls</RootNamespace>
-  </PropertyGroup>
+		<RootNamespace>zoft.MauiExtensions.Controls</RootNamespace>
+	</PropertyGroup>
 
-  <PropertyGroup Condition=" '$(Configuration)' == 'Release' ">
-	  <GenerateDocumentationFile>true</GenerateDocumentationFile>
-    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
-    <SymbolPackageFormat>snupkg</SymbolPackageFormat>
-    <IncludeSymbols>true</IncludeSymbols>
-    <AllowedOutputExtensionsInPackageBuildOutputFolder>$(AllowedOutputExtensionsInPackageBuildOutputFolder);.pdb</AllowedOutputExtensionsInPackageBuildOutputFolder>
-    <EmbedUntrackedSources>true</EmbedUntrackedSources>
-    <DebugType>portable</DebugType>
-    <DebugSymbols>true</DebugSymbols>
-  </PropertyGroup>
+	<PropertyGroup Condition=" '$(Configuration)' == 'Release' ">
+		<GenerateDocumentationFile>true</GenerateDocumentationFile>
+		<GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+		<SymbolPackageFormat>snupkg</SymbolPackageFormat>
+		<IncludeSymbols>true</IncludeSymbols>
+		<AllowedOutputExtensionsInPackageBuildOutputFolder>$(AllowedOutputExtensionsInPackageBuildOutputFolder);.pdb</AllowedOutputExtensionsInPackageBuildOutputFolder>
+		<EmbedUntrackedSources>true</EmbedUntrackedSources>
+		<DebugType>portable</DebugType>
+		<DebugSymbols>true</DebugSymbols>
+	</PropertyGroup>
 
-  <!-- Release notes are injected at publish time from CHANGELOG.md via ReleaseNotes.g.props (CI-generated, git-ignored) -->
-  <Import Project="$(MSBuildThisFileDirectory)ReleaseNotes.g.props" Condition="Exists('$(MSBuildThisFileDirectory)ReleaseNotes.g.props')" />
+	<!-- Release notes are injected at publish time from CHANGELOG.md via ReleaseNotes.g.props (CI-generated, git-ignored) -->
+	<Import Project="$(MSBuildThisFileDirectory)ReleaseNotes.g.props" Condition="Exists('$(MSBuildThisFileDirectory)ReleaseNotes.g.props')" />
 
-  <!-- Nuget package included files -->
-  <ItemGroup>
-    <None Include="..\..\LICENSE.md">
-      <Pack>True</Pack>
-      <PackagePath></PackagePath>
-    </None>
-    <None Include="..\..\README.md">
-      <Pack>True</Pack>
-      <PackagePath></PackagePath>
-    </None>
-  </ItemGroup>
+	<!-- Nuget package included files -->
+	<ItemGroup>
+		<None Include="..\..\LICENSE.md">
+			<Pack>True</Pack>
+			<PackagePath></PackagePath>
+		</None>
+		<None Include="..\..\README.md">
+			<Pack>True</Pack>
+			<PackagePath></PackagePath>
+		</None>
+	</ItemGroup>
 </Project>

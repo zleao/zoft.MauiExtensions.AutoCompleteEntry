@@ -25,13 +25,13 @@
 	<ItemGroup>
 		<PackageReference Include="MinVer" Version="7.0.0" PrivateAssets="all" />
 		<PackageReference Include="zoft.MauiExtensions.Core" Version="5.2.0" />
-		<PackageReference Include="Microsoft.Maui.Controls" Version="$(MauiVersion)" />
+		<PackageReference Include="Microsoft.Maui.Controls" Version="10.0.70" />
 	</ItemGroup>
 	<ItemGroup Condition="$(TargetFramework.StartsWith('net10.0-windows')) == true">
 		<PackageReference Include="CommunityToolkit.WinUI.Extensions" Version="8.2.251219" />
 	</ItemGroup>
 	<ItemGroup Condition="$(TargetFramework.StartsWith('net10.0-maccatalyst')) == true">
-		<PackageReference Include="Microsoft.Maui.Graphics" Version="$(MauiVersion)" />
+		<PackageReference Include="Microsoft.Maui.Graphics" Version="10.0.70" />
 	</ItemGroup>
 	<!-- Platform Specific Files-->
 	<ItemGroup Condition="$(TargetFramework.StartsWith('net10.0-ios')) == true OR $(TargetFramework.StartsWith('net10.0-maccatalyst')) == true OR $(TargetFramework.StartsWith('net10.0-android')) == true OR $(TargetFramework.Contains('-windows')) == true">
