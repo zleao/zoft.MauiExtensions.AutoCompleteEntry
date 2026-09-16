@@ -586,6 +586,8 @@ When triggered manually, the GitHub Release creation and asset upload steps are 
 
 ## 🤝 Contributing
 
+See [CONTRIBUTING.md](CONTRIBUTING.md) for setup and validation, and [AGENTS.md](AGENTS.md) for provider-neutral coding assistant guidance and the repository map.
+
 Contributions are welcome! Please feel free to submit a Pull Request. For major changes, please open an issue first to discuss what you would like to change.
 
 ## 📄 License

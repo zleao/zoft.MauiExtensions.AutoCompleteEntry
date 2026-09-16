@@ -6,6 +6,14 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 Historical entries before this file was added may be summarized from package metadata instead of full release notes.
 
+## [Unreleased]
+
+## [5.1.0]
+
+### Changed
+- Updated `zoft.MauiExtensions.Core` to `6.1.0`.
+- Updated the library's .NET MAUI dependencies to `10.0.101`.
+
 ## [5.0.0]
 
 ### Changed

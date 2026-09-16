@@ -8,6 +8,7 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "SolutionItems", "SolutionItems", "{BF6654F5-36D0-4B39-B2B2-6617DBA76A13}"
 	ProjectSection(SolutionItems) = preProject
 		..\CHANGELOG.md = ..\CHANGELOG.md
+		..\.github\workflows\ci.yml = ..\.github\workflows\ci.yml
 		Directory.build.props = Directory.build.props
 		..\global.json = ..\global.json
 		..\README.md = ..\README.md

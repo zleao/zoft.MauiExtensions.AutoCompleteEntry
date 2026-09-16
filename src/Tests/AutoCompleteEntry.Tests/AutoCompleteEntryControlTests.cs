@@ -6,7 +6,7 @@ namespace AutoCompleteEntry.Tests;
 /// platform-specific implementations depend on.
 ///
 /// Platform-specific behavior (e.g., iOS UITableView row sizing) requires
-/// device/emulator-based integration tests and cannot be exercised in a net9.0 unit test.
+/// device/emulator-based integration tests and cannot be exercised in a plain .NET unit test.
 /// </summary>
 public class AutoCompleteEntryControlTests
 {
