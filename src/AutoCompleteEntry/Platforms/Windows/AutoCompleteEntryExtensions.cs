@@ -11,6 +11,10 @@ namespace zoft.MauiExtensions.Controls.Platform;
 /// </summary>
 public static class AutoCompleteEntryExtensions
 {
+    private static readonly Microsoft.UI.Xaml.DependencyProperty SuggestionConverterProperty =
+        Microsoft.UI.Xaml.DependencyProperty.RegisterAttached("SuggestionConverter", typeof(SuggestionViewConverter),
+            typeof(AutoCompleteEntryExtensions), new Microsoft.UI.Xaml.PropertyMetadata(null));
+
     private static readonly string[] _placeholderForegroundColorKeys =
     {
         "TextControlPlaceholderForeground",
@@ -36,7 +40,9 @@ public static class AutoCompleteEntryExtensions
     /// <param name="autoCompleteEntry"></param>
     public static void UpdateDisplayMemberPath(this AutoSuggestBox platformControl, AutoCompleteEntry autoCompleteEntry)
     {
-        platformControl.DisplayMemberPath = autoCompleteEntry.DisplayMemberPath;
+        // WinUI gives DisplayMemberPath precedence over ItemTemplate.
+        platformControl.DisplayMemberPath = autoCompleteEntry.ItemTemplate is null
+            ? autoCompleteEntry.DisplayMemberPath : string.Empty;
     }
 
     /// <summary>
@@ -213,7 +219,32 @@ public static class AutoCompleteEntryExtensions
     /// <param name="virtualView"></param>
     public static void UpdateItemTemplate(this AutoSuggestBox platformView, AutoCompleteEntry virtualView)
     {
-        //TODO: Implement for Windows
+        UpdateItemTemplate(platformView, virtualView, virtualView.Handler?.MauiContext);
+    }
+
+    internal static void UpdateItemTemplate(this AutoSuggestBox platformView, AutoCompleteEntry virtualView, IMauiContext? context)
+    {
+        ClearItemTemplate(platformView);
+        platformView.UpdateDisplayMemberPath(virtualView);
+        if (virtualView.ItemTemplate is null)
+            return;
+
+        if (context is null)
+            throw new InvalidOperationException("A MauiContext is required to render suggestion ItemTemplate content.");
+
+        var resources = new SuggestionTemplates();
+        var converter = (SuggestionViewConverter)resources["SuggestionViewConverter"];
+        converter.Initialize(virtualView, context);
+        platformView.SetValue(SuggestionConverterProperty, converter);
+        platformView.ItemTemplate = (Microsoft.UI.Xaml.DataTemplate)resources["SuggestionTemplate"];
+    }
+
+    internal static void ClearItemTemplate(this AutoSuggestBox platformView)
+    {
+        var converter = platformView.GetValue(SuggestionConverterProperty) as SuggestionViewConverter;
+        platformView.ItemTemplate = null;
+        platformView.ClearValue(SuggestionConverterProperty);
+        converter?.Dispose();
     }
 
     private static void UpdateColors(Microsoft.UI.Xaml.ResourceDictionary resource, string[] keys, Microsoft.UI.Xaml.Media.Brush? brush)

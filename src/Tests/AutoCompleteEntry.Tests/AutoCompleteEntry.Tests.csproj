@@ -30,6 +30,7 @@
   <ItemGroup>
     <Compile Include="..\..\AutoCompleteEntry\Platforms\Android\DensityHelper.cs" Link="Linked\DensityHelper.cs" />
     <Compile Include="..\..\AutoCompleteEntry\Platforms\Android\TemplateIdMapper.cs" Link="Linked\TemplateIdMapper.cs" />
+    <Compile Include="..\..\AutoCompleteEntry\Platforms\Windows\SuggestionTemplateContent.cs" Link="Linked\SuggestionTemplateContent.cs" />
   </ItemGroup>
 
 </Project>

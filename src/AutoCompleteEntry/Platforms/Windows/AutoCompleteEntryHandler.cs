@@ -36,6 +36,8 @@ public partial class AutoCompleteEntryHandler : ViewHandler<AutoCompleteEntry, A
         platformView.SuggestionChosen -= PlatformView_OnSuggestionChosen;
         platformView.TextChanged -= PlatformView_OnTextChanged;
 
+        platformView.ClearItemTemplate();
+
         base.DisconnectHandler(platformView);
     }
 
@@ -351,6 +353,6 @@ public partial class AutoCompleteEntryHandler : ViewHandler<AutoCompleteEntry, A
     /// <param name="autoCompleteEntry"></param>
     public static void MapItemTemplate(IAutoCompleteEntryHandler handler, AutoCompleteEntry autoCompleteEntry)
     {
-        handler?.PlatformView.UpdateItemTemplate(autoCompleteEntry);
+        handler?.PlatformView.UpdateItemTemplate(autoCompleteEntry, handler.MauiContext);
     }
 }

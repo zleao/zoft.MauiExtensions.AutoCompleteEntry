@@ -392,7 +392,7 @@ autoCompleteEntry.SelectedSuggestion = mySelectedItem;
 | ItemsSource Binding | ✅ | ✅ | ✅ | ✅ | Full support |
 | Selection Events | ✅ | ✅ | ✅ | ✅ | Full support |
 | **Appearance & Styling** |
-| ItemTemplate | ❌ | ✅ | ✅ | ✅ | Windows: Planned for future release |
+| ItemTemplate | ✅ | ✅ | ✅ | ✅ | MAUI DataTemplate and DataTemplateSelector |
 | ShowBottomBorder | ❌ | ✅ | ✅ | ✅ | Windows: Planned for future release |
 | Text Styling | ✅ | ✅ | ✅ | ✅ | Fonts, colors, alignment |
 | **Behavior** |
@@ -412,12 +412,11 @@ autoCompleteEntry.SelectedSuggestion = mySelectedItem;
 
 ### Windows Platform Notes
 
-While the AutoCompleteEntry works great on Windows, some advanced styling features are still in development:
-
-- **ItemTemplate**: Currently displays items using their string representation. Custom templates are planned for a future release.
+- **ItemTemplate**: Renders MAUI views, including compiled bindings and `DataTemplateSelector`. Each row's binding context is the original suggestion; selectors receive the owning `AutoCompleteEntry` as their container. Templates must create a fresh MAUI `View` (not a `ViewCell`).
+- Custom templates take precedence over `DisplayMemberPath`. Setting `ItemTemplate` back to `null` restores native text rendering through `DisplayMemberPath`, or `ToString()` when the path is empty. The public display path and `TextMemberPath` are unchanged.
+- Templates can be replaced at runtime. Rows are created as WinUI realizes them and their handlers are released on unload or template replacement. Templates should be lightweight, passive suggestion content; the native list retains pointer/keyboard selection and focus. Embedded buttons and other interactive row controls do not receive pointer input.
+- The binding sample includes default, Group/Country, wrapped, and selector presentations, plus an observable-collection update button. Use the wrapped template to check variable row heights and resizing.
 - **ShowBottomBorder**: This styling option doesn't affect the Windows presentation currently.
-
-All core functionality including filtering, selection, and data binding works perfectly on Windows.
 
 ## 🎨 Advanced Customization
 
@@ -520,8 +519,9 @@ private async Task TextChanged(string text)
 - ✅ Ensure the selected item exists in the current `ItemsSource`
 
 **Issue**: Custom templates not rendering (Windows)
-- ⚠️ ItemTemplate is not yet implemented on Windows platform
-- ✅ Use DisplayMemberPath for basic text display on Windows
+- ✅ Return a fresh MAUI `View` from each template and a concrete, non-null template from each selector.
+- ✅ Bind row properties to the suggestion item's type (including the correct `x:DataType` for compiled bindings).
+- ✅ Set `ItemTemplate` to `null` to use `DisplayMemberPath` for native text display.
 
 **Issue**: Performance issues with large datasets
 - ✅ Implement efficient filtering logic
