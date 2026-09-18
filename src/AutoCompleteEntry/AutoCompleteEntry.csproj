@@ -30,6 +30,9 @@
 	<ItemGroup Condition="$(TargetFramework.StartsWith('net10.0-windows')) == true">
 		<PackageReference Include="CommunityToolkit.WinUI.Extensions" Version="8.2.251219" />
 	</ItemGroup>
+	<ItemGroup>
+		<MauiXaml Remove="Platforms\Windows\SuggestionTemplates.xaml" />
+	</ItemGroup>
 	<ItemGroup Condition="$(TargetFramework.StartsWith('net10.0-maccatalyst')) == true">
 		<PackageReference Include="Microsoft.Maui.Graphics" Version="10.0.101" />
 	</ItemGroup>

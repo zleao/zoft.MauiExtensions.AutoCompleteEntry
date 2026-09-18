@@ -1,0 +1,13 @@
+<ResourceDictionary
+    x:Class="zoft.MauiExtensions.Controls.Platform.SuggestionTemplates"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="using:zoft.MauiExtensions.Controls.Platform">
+    <local:SuggestionViewConverter x:Key="SuggestionViewConverter" />
+    <DataTemplate x:Key="SuggestionTemplate">
+        <ContentControl
+            HorizontalContentAlignment="Stretch"
+            IsTabStop="False"
+            Content="{Binding Converter={StaticResource SuggestionViewConverter}}" />
+    </DataTemplate>
+</ResourceDictionary>

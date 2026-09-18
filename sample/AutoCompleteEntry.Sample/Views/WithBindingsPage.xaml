@@ -10,6 +10,15 @@
 
     <ContentPage.Resources>
         <ctkm:IsNotNullConverter x:Key="IsNotNullConverter" />
+        <DataTemplate x:Key="WrappedSuggestion" x:DataType="vm:ListItem">
+            <VerticalStackLayout Padding="8" Spacing="4">
+                <Label
+                    FontAttributes="Bold"
+                    LineBreakMode="WordWrap"
+                    Text="{Binding Country}" />
+                <Label FontSize="12" Text="{Binding Group}" />
+            </VerticalStackLayout>
+        </DataTemplate>
     </ContentPage.Resources>
 
     <Grid>
@@ -40,6 +49,30 @@
                 <Switch IsToggled="{Binding ShowBottomBorder}" />
             </HorizontalStackLayout>
 
+            <Border Padding="15" HorizontalOptions="Start">
+                <VerticalStackLayout Spacing="15">
+                    <Label FontSize="20" Text="ItemTemplate" />
+                    <Picker
+                        x:Name="TemplateMode"
+                        Title="Suggestion presentation"
+                        Margin="0,5,0,0"
+                        HorizontalOptions="Start"
+                        SelectedIndexChanged="TemplateMode_Changed">
+                        <Picker.Items>
+                            <x:String>Default (null)</x:String>
+                            <x:String>Group / Country</x:String>
+                            <x:String>Wrapped</x:String>
+                            <x:String>Selector (two layouts)</x:String>
+                        </Picker.Items>
+                    </Picker>
+                    <HorizontalStackLayout Spacing="8">
+                        <Button Clicked="AddSuggestion_Clicked" Text="Add long suggestion" />
+                        <Label Text="Update text on selection" VerticalOptions="Center" />
+                        <Switch IsToggled="True" Toggled="UpdateTextOnSelect_Toggled" />
+                    </HorizontalStackLayout>
+                </VerticalStackLayout>
+            </Border>
+
             <Label>
                 <Label.FormattedText>
                     <FormattedString>
@@ -50,6 +83,7 @@
             </Label>
 
             <zoft:AutoCompleteEntry
+                x:Name="CountryEntry"
                 ClearButtonVisibility="Never"
                 Completed="AutoCompleteEntry_Completed"
                 CursorPosition="{Binding CursorPosition, Mode=TwoWay}"

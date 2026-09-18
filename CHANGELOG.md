@@ -8,6 +8,9 @@ Historical entries before this file was added may be summarized from package met
 
 ## [Unreleased]
 
+### Added
+- Windows support for MAUI suggestion `ItemTemplate` and `DataTemplateSelector`, including runtime template changes and restoring native text rendering ([#38](https://github.com/zleao/zoft.MauiExtensions.AutoCompleteEntry/issues/38)).
+
 ## [5.1.0]
 
 ### Changed
