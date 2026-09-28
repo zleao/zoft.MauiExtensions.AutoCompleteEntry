@@ -22,6 +22,7 @@ public partial class AutoCompleteEntryHandler : ViewHandler<AutoCompleteEntry, A
     protected override void ConnectHandler(AndroidAutoCompleteEntry platformView)
     {
         base.ConnectHandler(platformView);
+        platformView.ConnectOwner(VirtualView);
 
         platformView.CursorPositionChanged += PlatformView_OnCursorPositionChanged;
         platformView.EditorAction += PlatformView_OnEditorAction;
@@ -34,6 +35,7 @@ public partial class AutoCompleteEntryHandler : ViewHandler<AutoCompleteEntry, A
     /// <inheritdoc/>
     protected override void DisconnectHandler(AndroidAutoCompleteEntry platformView)
     {
+        VirtualView.IsSuggestionListOpen = false;
         platformView.CursorPositionChanged -= PlatformView_OnCursorPositionChanged;
         platformView.EditorAction -= PlatformView_OnEditorAction;
         platformView.SuggestionChosen -= PlatformView_OnSuggestionChosen;
@@ -112,12 +114,15 @@ public partial class AutoCompleteEntryHandler : ViewHandler<AutoCompleteEntry, A
             return;
         }
 
-        virtualView.OnTextChanged(PlatformView.Text, e.Reason);
+        if (!virtualView.IsMultiple || virtualView.Text != PlatformView.Text)
+            virtualView.OnTextChanged(PlatformView.Text, e.Reason);
         PlatformView.UpdateClearButtonVisibility(virtualView);
     }
 
     private void PlatformView_OnTouch(object? sender, Android.Views.View.TouchEventArgs e)
     {
+        if (e.Event?.Action == MotionEventActions.Down && VirtualView?.IsMultiple == true)
+            VirtualView.IsSuggestionListOpen = true;
         var virtualView = VirtualView;
         e.Handled = _clearButtonVisible
                     &&
@@ -375,8 +380,17 @@ public partial class AutoCompleteEntryHandler : ViewHandler<AutoCompleteEntry, A
     /// <param name="autoCompleteEntry"></param>
     public static void MapSelectedSuggestion(IAutoCompleteEntryHandler handler, AutoCompleteEntry autoCompleteEntry) 
     {
+        if (autoCompleteEntry.IsMultiple) return;
         handler.PlatformView?.UpdateSelectedSuggestion(autoCompleteEntry);
     }
+
+    /// <summary>Updates native multiple-selection rows and summary.</summary>
+    public static void MapSelectionPresentation(IAutoCompleteEntryHandler handler, AutoCompleteEntry entry)
+        => handler.PlatformView.RefreshSelection();
+
+    /// <summary>Switches native interaction mode.</summary>
+    public static void MapSelectionMode(IAutoCompleteEntryHandler handler, AutoCompleteEntry entry)
+        => handler.PlatformView.RefreshSelection(true);
 
     /// <summary>
     /// Map the ItemTemplate value

@@ -1,4 +1,4 @@
-﻿using AutoCompleteEntry.Sample.ViewModels;
+using AutoCompleteEntry.Sample.ViewModels;
 
 namespace AutoCompleteEntry.Sample.Views
 {
@@ -57,10 +57,29 @@ namespace AutoCompleteEntry.Sample.Views
         private void AutoCompleteEntry_Completed(object sender, EventArgs e)
         {
             if (sender is zoft.MauiExtensions.Controls.AutoCompleteEntry autoCompleteEntry &&
+                autoCompleteEntry.SelectionMode == zoft.MauiExtensions.Controls.AutoCompleteEntrySelectionMode.Single &&
                 BindingContext is SampleViewModel viewModel)
             {
                 viewModel.SelectedItem = viewModel.GetExactMatch(autoCompleteEntry.Text);
             }
         }
+
+        private void CountryEntry_Opening(object sender, EventArgs e)
+        {
+            if (BindingContext is SampleViewModel model) model.FilterList(CountryEntry.Text);
+        }
+
+        private void MultipleSelection_Toggled(object sender, ToggledEventArgs e)
+        {
+            CountryEntry.SelectionMode = e.Value
+                ? zoft.MauiExtensions.Controls.AutoCompleteEntrySelectionMode.Multiple
+                : zoft.MauiExtensions.Controls.AutoCompleteEntrySelectionMode.Single;
+        }
+
+        private void OpenSuggestions_Clicked(object sender, EventArgs e)
+            => CountryEntry.IsSuggestionListOpen = true;
+
+        private void CloseSuggestions_Clicked(object sender, EventArgs e)
+            => CountryEntry.IsSuggestionListOpen = false;
     }
 }

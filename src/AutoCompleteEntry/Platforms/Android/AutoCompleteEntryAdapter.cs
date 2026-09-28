@@ -18,6 +18,31 @@ internal class AutoCompleteEntryAdapter : BaseAdapter, IFilterable
     private readonly Page _listViewContainer;
     private bool _disposed = false;
     private int _templateGeneration;
+    internal AutoCompleteEntry? Owner { get; set; }
+    private readonly List<WeakReference<ViewWrapperTag>> _rows = [];
+    private readonly SelectionAccessibilityDelegate _selectionAccessibility;
+
+    internal void RefreshSelection()
+    {
+        // Weak references can still resolve after MAUI has disposed the Java peer.
+        // Forget retired/native-disposed rows before touching presentation or JNI.
+        _rows.RemoveAll(reference => !reference.TryGetTarget(out var tag) ||
+            tag.MauiView.Handler is null || tag.NativeView?.TryGetTarget(out var native) != true ||
+            native is null || native.Handle == IntPtr.Zero);
+        foreach (var reference in _rows)
+            if (reference.TryGetTarget(out var tag) && tag.MauiView is SelectionRow row && row.BindingContext is { } item && Owner is not null)
+            {
+                row.Update(Owner, item);
+                if (tag.NativeView?.TryGetTarget(out var native) == true)
+                    native.SendAccessibilityEvent(Android.Views.Accessibility.EventTypes.WindowContentChanged);
+            }
+    }
+
+    internal void ResetPresentation()
+    {
+        _templateGeneration++;
+        NotifyDataSetChanged();
+    }
 
     internal IMauiContext MauiContext => _listViewContainer.Handler?.MauiContext
         ?? throw new InvalidOperationException(
@@ -41,7 +66,8 @@ internal class AutoCompleteEntryAdapter : BaseAdapter, IFilterable
 
             // Tell the widget to discard all recycled views so stale layouts
             // from the previous template set are never handed to GetView.
-            NotifyDataSetInvalidated();
+            if (Owner?.IsMultiple == true) NotifyDataSetChanged();
+            else NotifyDataSetInvalidated();
         }
     }
 
@@ -52,7 +78,7 @@ internal class AutoCompleteEntryAdapter : BaseAdapter, IFilterable
             _defaultTemplate ??= new DataTemplate(() =>
                 {
                     var label = new Label();
-                    label.SetBinding(Label.TextProperty, _displayMemberPath ?? ".");
+                    label.SetBinding(Label.TextProperty, string.IsNullOrEmpty(_displayMemberPath) ? "." : _displayMemberPath);
                     label.HorizontalTextAlignment = Microsoft.Maui.TextAlignment.Center;
                     label.VerticalTextAlignment = Microsoft.Maui.TextAlignment.Center;
                     label.MinimumHeightRequest = 44;
@@ -66,6 +92,7 @@ internal class AutoCompleteEntryAdapter : BaseAdapter, IFilterable
     public AutoCompleteEntryAdapter(Context context) : base()
     {
         _ = context;
+        _selectionAccessibility = new(this);
 
         _listViewContainer = Application.Current?.Windows.FirstOrDefault()?.Page
             ?? throw new InvalidOperationException(
@@ -84,6 +111,16 @@ internal class AutoCompleteEntryAdapter : BaseAdapter, IFilterable
         if (disposing)
         {
             _filter?.Dispose();
+            foreach (var reference in _rows)
+                if (reference.TryGetTarget(out var tag))
+                {
+                    if (tag.NativeView?.TryGetTarget(out var native) == true && native.Handle != IntPtr.Zero)
+                        native.SetAccessibilityDelegate(null);
+                    tag.MauiView.DisconnectHandlers();
+                }
+            _rows.Clear();
+            _selectionAccessibility.Dispose();
+            Owner = null;
         }
 
         _filter = null;
@@ -94,6 +131,11 @@ internal class AutoCompleteEntryAdapter : BaseAdapter, IFilterable
 
     public void UpdateList(IEnumerable<object> list, string? displayMemberPath)
     {
+        if (_displayMemberPath != displayMemberPath)
+        {
+            _defaultTemplate = null;
+            _templateGeneration++;
+        }
         _displayMemberPath = displayMemberPath;
 
         resultList = list.ToList();
@@ -107,7 +149,8 @@ internal class AutoCompleteEntryAdapter : BaseAdapter, IFilterable
         {
             _templateToIdMap.Clear();
             _templateGeneration++;
-            NotifyDataSetInvalidated();
+            if (Owner?.IsMultiple == true) NotifyDataSetChanged();
+            else NotifyDataSetInvalidated();
         }
         else
         {
@@ -192,6 +235,12 @@ internal class AutoCompleteEntryAdapter : BaseAdapter, IFilterable
         else
         {
             // First few visible rows: create MAUI view + native handler from scratch
+            if (convertView?.Tag is ViewWrapperTag retired)
+            {
+                _rows.RemoveAll(reference => !reference.TryGetTarget(out var row) || ReferenceEquals(row, retired));
+                convertView.SetAccessibilityDelegate(null);
+                retired.MauiView.DisconnectHandlers();
+            }
             var createdContent = resolvedTemplate.CreateContent();
             if (createdContent is not Microsoft.Maui.Controls.View createdView)
                 throw new InvalidOperationException(
@@ -200,12 +249,33 @@ internal class AutoCompleteEntryAdapter : BaseAdapter, IFilterable
                     $"'{createdContent?.GetType().FullName ?? "null"}'.");
 
             templateView = createdView;
+            if (Owner?.IsMultiple == true) templateView = new SelectionRow(templateView);
             templateView.BindingContext = item;
 
             nativeView = templateView.ToPlatform(MauiContext);
 
             // Stash the MAUI view in the native view's Tag so it can be retrieved on recycle
-            nativeView.Tag = new ViewWrapperTag(templateView, _templateGeneration);
+            var rowTag = new ViewWrapperTag(templateView, _templateGeneration);
+            rowTag.NativeView = new(nativeView);
+            nativeView.Tag = rowTag;
+            _rows.RemoveAll(reference => !reference.TryGetTarget(out _));
+            _rows.Add(new(rowTag));
+        }
+
+        if (templateView is SelectionRow selectionRow && Owner is not null) selectionRow.Update(Owner, item);
+        if (Owner?.IsMultiple == true)
+        {
+            nativeView.ContentDescription = Owner.GetSelectionText(item);
+            nativeView.Focusable = false;
+            nativeView.Clickable = false;
+            nativeView.ImportantForAccessibility = ImportantForAccessibility.Yes;
+            nativeView.SetAccessibilityDelegate(_selectionAccessibility);
+            if (nativeView is ViewGroup group)
+            {
+                group.DescendantFocusability = DescendantFocusability.BlockDescendants;
+                for (var i = 0; i < group.ChildCount; i++)
+                    group.GetChildAt(i)!.ImportantForAccessibility = ImportantForAccessibility.NoHideDescendants;
+            }
         }
 
         // Measure after handler creation so MAUI's layout system can resolve sizes.
@@ -247,6 +317,35 @@ internal class AutoCompleteEntryAdapter : BaseAdapter, IFilterable
 
         internal Microsoft.Maui.Controls.View MauiView { get; }
         internal int TemplateGeneration { get; }
+        internal WeakReference<AView>? NativeView { get; set; }
+    }
+
+    private sealed class SelectionAccessibilityDelegate(AutoCompleteEntryAdapter adapter) : AView.AccessibilityDelegate
+    {
+        public override void OnInitializeAccessibilityNodeInfo(AView host, Android.Views.Accessibility.AccessibilityNodeInfo info)
+        {
+            base.OnInitializeAccessibilityNodeInfo(host, info);
+            if (info is null || host?.Tag is not ViewWrapperTag tag || adapter.Owner is not { } owner) return;
+            info.ClassName = "android.widget.CheckBox";
+            info.Checkable = true;
+            var selected = owner.IsSuggestionSelected(tag.MauiView.BindingContext);
+            if (OperatingSystem.IsAndroidVersionAtLeast(36))
+                info.CheckedState = selected ? Android.Views.Accessibility.CheckedState.True : Android.Views.Accessibility.CheckedState.False;
+            else info.Checked = selected;
+            info.Clickable = true;
+            info.AddAction(Android.Views.Accessibility.AccessibilityNodeInfo.AccessibilityAction.ActionClick);
+        }
+
+        public override bool PerformAccessibilityAction(AView host, Android.Views.Accessibility.Action action, Android.OS.Bundle? args)
+        {
+            if (action == Android.Views.Accessibility.Action.Click && host.Tag is ViewWrapperTag tag && adapter.Owner is { } owner)
+            {
+                owner.OnSuggestionSelected(tag.MauiView.BindingContext);
+                host.SendAccessibilityEvent(Android.Views.Accessibility.EventTypes.ViewClicked);
+                return true;
+            }
+            return base.PerformAccessibilityAction(host, action, args);
+        }
     }
 
     private class CustomFilter : Filter

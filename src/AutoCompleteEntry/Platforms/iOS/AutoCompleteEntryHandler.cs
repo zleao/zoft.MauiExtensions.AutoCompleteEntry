@@ -14,6 +14,7 @@ public partial class AutoCompleteEntryHandler : ViewHandler<AutoCompleteEntry, I
     protected override void ConnectHandler(IOSAutoCompleteEntry platformView)
     {
         base.ConnectHandler(platformView);
+        platformView.ConnectOwner(VirtualView);
 
         platformView.CursorPositionChanged += PlatformView_OnCursorPositionChanged;
         platformView.EditingDidBegin += PlatformView_OnEditingDidBegin;
@@ -27,6 +28,7 @@ public partial class AutoCompleteEntryHandler : ViewHandler<AutoCompleteEntry, I
     /// <inheritdoc/>
     protected override void DisconnectHandler(IOSAutoCompleteEntry platformView)
     {
+        VirtualView.IsSuggestionListOpen = false;
         platformView.CursorPositionChanged -= PlatformView_OnCursorPositionChanged;
         platformView.EditingDidBegin -= PlatformView_OnEditingDidBegin;
         platformView.EditingDidEnd -= PlatformView_OnEditingDidEnd;
@@ -108,7 +110,8 @@ public partial class AutoCompleteEntryHandler : ViewHandler<AutoCompleteEntry, I
             return;
         }
 
-        virtualView.OnTextChanged(PlatformView.Text, e.Reason);
+        if (!virtualView.IsMultiple || virtualView.Text != PlatformView.Text)
+            virtualView.OnTextChanged(PlatformView.Text, e.Reason);
     }
 
 
@@ -296,7 +299,19 @@ public partial class AutoCompleteEntryHandler : ViewHandler<AutoCompleteEntry, I
     /// <param name="autoCompleteEntry"></param>
     public static void MapSelectedSuggestion(IAutoCompleteEntryHandler handler, AutoCompleteEntry autoCompleteEntry)
     {
+        if (autoCompleteEntry.IsMultiple) return;
         handler?.PlatformView?.UpdateSelectedSuggestion(autoCompleteEntry);
+    }
+
+    /// <summary>Updates native checked rows and the separate summary label.</summary>
+    public static void MapSelectionPresentation(IAutoCompleteEntryHandler handler, AutoCompleteEntry entry)
+        => handler.PlatformView.RefreshSelection();
+
+    /// <summary>Recreates rows when the selection mode changes.</summary>
+    public static void MapSelectionMode(IAutoCompleteEntryHandler handler, AutoCompleteEntry entry)
+    {
+        MapItemsSource(handler, entry);
+        handler.PlatformView.RefreshSelection();
     }
 
     /// <summary>
@@ -367,5 +382,6 @@ public partial class AutoCompleteEntryHandler : ViewHandler<AutoCompleteEntry, I
     public static void MapItemTemplate(IAutoCompleteEntryHandler handler, AutoCompleteEntry autoCompleteEntry)
     {
         handler?.PlatformView.UpdateItemTemplate(autoCompleteEntry);
+        if (handler is not null && autoCompleteEntry.IsMultiple) MapItemsSource(handler, autoCompleteEntry);
     }
 }
