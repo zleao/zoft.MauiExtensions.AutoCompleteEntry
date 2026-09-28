@@ -22,6 +22,7 @@ Planned for **6.0.0** (major release). See the [migration guide](docs/migration-
 - The Android sample uses keyboard resize mode with its ScrollViews. Applications using window panning should review the documented keyboard configuration; the control does not change the host's keyboard mode globally.
 
 ### Fixed
+- iOS and MacCatalyst suggestions become visible when an initially empty observable result collection is populated during an open session, without resetting the query or repeating the opening event.
 - Android sample pages resize for the keyboard so suggestions do not cover the editor during window panning. Single-selection dropdowns also refresh their measurements when viewport or anchor bounds change.
 - Vertically centered the default Windows multiple-selection suggestion text beside its checkbox.
 - Windows multiple-selection suggestions reopen when clicking the still-focused editor after outside dismissal.

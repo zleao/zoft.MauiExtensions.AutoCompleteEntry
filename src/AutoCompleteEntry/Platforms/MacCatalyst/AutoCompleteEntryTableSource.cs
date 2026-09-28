@@ -90,8 +90,13 @@ internal class AutoCompleteEntryTableSource : UITableViewSource
 
     private void CollectionChanged(NotifyCollectionChangedEventArgs args)
     {
+        // Ignore queued notifications from a source that has since been replaced.
+        if (!ReferenceEquals(_view.Source, this)) return;
         _view.ReloadData();
+        ItemsChanged?.Invoke(this, EventArgs.Empty);
     }
+
+    internal event EventHandler? ItemsChanged;
 
     protected override void Dispose(bool disposing)
     {

@@ -90,6 +90,23 @@ available. Start in Single and verify existing interactions before enabling Mult
 
 ## Platform details
 
+### Apple observable-result regression checks
+
+On both iOS and MacCatalyst, repeat in Single and Multiple modes:
+
+1. Assign an empty observable collection to `ItemsSource`, focus the editor,
+   and populate that same collection from the user-input filtering callback.
+   Verify the table appears immediately and `SuggestionListOpening` fires once.
+2. Clear the collection while the session is open, then add results later on the
+   UI thread without typing or replacing `ItemsSource`. Verify the table hides
+   and reappears, the query stays unchanged, and selection is retained.
+3. Close the session, then add results. Verify the table stays closed.
+4. Replace `ItemsSource` or disconnect the handler, then mutate the old collection.
+   Verify no stale table updates or duplicate callbacks occur.
+
+These checks require an Apple device/simulator or Mac host; plain .NET tests do
+not exercise UITableView visibility.
+
 ### Windows
 
 Both selection modes dismiss on outside clicks and reopen from a still-focused

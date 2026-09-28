@@ -100,7 +100,12 @@ public sealed class IOSAutoCompleteEntry : UIView
         get => _isSuggestionListOpen;
         set
         {
-            if (_isSuggestionListOpen == value) return;
+            if (_isSuggestionListOpen == value)
+            {
+                // Results may have arrived since this session was opened empty.
+                UpdateSuggestionListOpenState();
+                return;
+            }
             _isSuggestionListOpen = value;
             if (!value) _highlight = -1;
             if (Owner is not null) Owner.IsSuggestionListOpen = value;
@@ -147,6 +152,7 @@ public sealed class IOSAutoCompleteEntry : UIView
         if (SelectionList.Source is AutoCompleteEntryTableSource source)
         {
             source.TableRowSelected -= SuggestionTableSource_TableRowSelected;
+            source.ItemsChanged -= SuggestionTableSource_ItemsChanged;
             SelectionList.Source = null;
             source.Dispose();
         }
@@ -321,6 +327,7 @@ public sealed class IOSAutoCompleteEntry : UIView
         if (SelectionList.Source is AutoCompleteEntryTableSource oldSource)
         {
             oldSource.TableRowSelected -= SuggestionTableSource_TableRowSelected;
+            oldSource.ItemsChanged -= SuggestionTableSource_ItemsChanged;
             oldSource.Dispose();
         }
 
@@ -330,6 +337,7 @@ public sealed class IOSAutoCompleteEntry : UIView
         {
             var suggestionTableSource = new AutoCompleteEntryTableSource(SelectionList, items, displayMemberPath ?? string.Empty, ItemTemplate, mauiContext, Owner);
             suggestionTableSource.TableRowSelected += SuggestionTableSource_TableRowSelected;
+            suggestionTableSource.ItemsChanged += SuggestionTableSource_ItemsChanged;
             SelectionList.Source = suggestionTableSource;
             SelectionList.ReloadData();
         }
@@ -337,6 +345,14 @@ public sealed class IOSAutoCompleteEntry : UIView
         {
             IsSuggestionListOpen = false;
         }
+        UpdateSuggestionListOpenState();
+    }
+
+    private void SuggestionTableSource_ItemsChanged(object? sender, EventArgs e)
+    {
+        if (!ReferenceEquals(sender, SelectionList.Source)) return;
+        _highlight = -1;
+        // Refresh the native surface without reopening or resetting the query.
         UpdateSuggestionListOpenState();
     }
 
