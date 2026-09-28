@@ -8,7 +8,9 @@ Historical entries before this file was added may be summarized from package met
 
 ## [Unreleased]
 
-Planned for **6.0.0** (major release). See the [migration guide](docs/migration-6.0.md).
+## [6.0.0] - 2026-09-28
+
+Major release. See the [migration guide](docs/migration-6.0.md).
 
 ### Added
 - Opt-in multiple selection on Android, Windows, iOS, and MacCatalyst: two-way `SelectedSuggestions`, checkbox suggestion rows, persistent query sessions, and an ellipsized selection summary separate from `Text` ([#74](https://github.com/zleao/zoft.MauiExtensions.AutoCompleteEntry/issues/74)).

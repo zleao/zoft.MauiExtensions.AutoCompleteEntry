@@ -145,7 +145,7 @@ For complete working examples, see the sample app in `sample\AutoCompleteEntry.S
 
 ## 📋 Properties Reference
 
-The changes on this branch target **6.0.0**. See the [6.0 migration guide](docs/migration-6.0.md)
+Version **6.0.0** introduces multiple selection. See the [6.0 migration guide](docs/migration-6.0.md)
 for selection contracts, Windows dismissal changes, and Android keyboard configuration.
 
 ### AutoCompleteEntry-Specific Properties
@@ -613,9 +613,8 @@ The package version is derived automatically from git tags via [MinVer](https://
 
 ### Stable release flow
 
-The next planned major release is **6.0.0**. At release time, move its notes from
-`[Unreleased]` to `[6.0.0]` and use the tag `6.0.0` (no `v` prefix). Opening or
-merging the implementation PR does not itself publish a package.
+Stable releases use tags such as `6.0.0` (no `v` prefix), with a matching changelog
+section. Opening or merging an implementation PR does not itself publish a package.
 
 1. Update `CHANGELOG.md`: move the pending entries from `[Unreleased]` into a new `[X.Y.Z]` section.
 2. Commit and push (or merge a PR) to `main`.
