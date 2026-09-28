@@ -45,7 +45,8 @@ public static class AutoCompleteEntryExtensions
             return false;
         }
 
-        platformView.Text = null;
+        if (platformView.Owner?.IsMultiple == true) platformView.ClearQueryFromUser();
+        else platformView.Text = null;
         return true;
     }
     // Android.Graphics.Rect has a Containts(x,y) method, but it only takes `int` and the coordinates from

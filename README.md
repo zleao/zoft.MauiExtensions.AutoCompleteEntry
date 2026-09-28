@@ -145,17 +145,23 @@ For complete working examples, see the sample app in `sample\AutoCompleteEntry.S
 
 ## 📋 Properties Reference
 
+The changes on this branch target **6.0.0**. See the [6.0 migration guide](docs/migration-6.0.md)
+for selection contracts, Windows dismissal changes, and Android keyboard configuration.
+
 ### AutoCompleteEntry-Specific Properties
 
 | Property | Type | Default | Description |
 |----------|------|---------|-------------|
 | `ItemsSource` | `IList` | `null` | Collection of suggestion items to display |
-| `SelectedSuggestion` | `object` | `null` | Currently selected suggestion item (two-way binding) |
+| `SelectedSuggestion` | `object` | `null` | Single-mode selection (two-way binding); inactive in multiple mode |
+| `SelectionMode` | `AutoCompleteEntrySelectionMode` | `Single` | Opt in to `Multiple` selection |
+| `SelectedSuggestions` | `IList` | Per-instance empty observable collection | Ordered multiple selections (two-way binding); use a mutable observable list |
+| `SelectionSummary` | `string` (read-only) | `""` | Full informational selection text, separate from the query |
 | `DisplayMemberPath` | `string` | `""` | Property path for displaying items in the suggestion list |
 | `TextMemberPath` | `string` | `""` | Property path for the text value when an item is selected |
 | `ItemTemplate` | `DataTemplate` | `null` | Custom template for rendering suggestion items |
 | `IsSuggestionListOpen` | `bool` | `false` | Controls whether the suggestion dropdown is open |
-| `UpdateTextOnSelect` | `bool` | `true` | Whether selecting an item updates the text field |
+| `UpdateTextOnSelect` | `bool` | `true` | Whether selecting an item updates the text field in single mode; ignored in multiple mode |
 | `ShowBottomBorder` | `bool` | `true` | Controls the visibility of the bottom border |
 | `TextChangedCommand` | `ICommand` | `null` | Command executed when the user types (receives the current text as parameter) |
 
@@ -184,7 +190,9 @@ AutoCompleteEntry inherits from `Entry`, so all standard Entry properties are av
 | Event | EventArgs | Description |
 |-------|-----------|-------------|
 | `TextChanged` | `AutoCompleteEntryTextChangedEventArgs` | Fired when text changes and includes the reason |
-| `SuggestionChosen` | `AutoCompleteEntrySuggestionChosenEventArgs` | Fired when a suggestion is selected |
+| `SuggestionChosen` | `AutoCompleteEntrySuggestionChosenEventArgs` | User activation; multiple mode includes deselection, reported by `IsSelected` |
+| `SelectionChanged` | `AutoCompleteEntrySelectionChangedEventArgs` | Effective selection changes; immutable `AddedItems` and `RemovedItems` snapshots |
+| `SuggestionListOpening` | `EventArgs` | Populate initial suggestions before a closed search session opens, including when `ItemsSource` is empty |
 | `CursorPositionChanged` | `AutoCompleteEntryCursorPositionChangedEventArgs` | Fired when cursor position changes |
 
 Plus all inherited Entry events: `Completed`, `Focused`, `Unfocused`
@@ -213,6 +221,51 @@ The most common setup is:
    - **event-based filtering** with `TextChanged`
 
 ## 💡 Usage Examples
+
+### Multiple selection
+
+```xml
+<zoft:AutoCompleteEntry
+    SelectionMode="Multiple"
+    SelectedSuggestions="{Binding SelectedCountries, Mode=TwoWay}"
+    ItemsSource="{Binding FilteredList}"
+    DisplayMemberPath="Country"
+    TextMemberPath="Country"
+    TextChangedCommand="{Binding TextChangedCommand}"
+    SuggestionListOpening="Countries_Opening"
+    ClearButtonVisibility="WhileEditing" />
+```
+
+Use a mutable `ObservableCollection<CountryItem>` for `SelectedCountries`. Set the mode before assigning initial selections in code. The control adds a leading checkbox around the existing row content, including custom `ItemTemplate` and `DataTemplateSelector` content. Models do not need an `IsSelected` property. Select or deselect by activating the row or checkbox; arrow keys only highlight, and Enter activates the highlighted row.
+
+Populate initial results explicitly: closing clears the query without calling the filtering command, so the old results might be stale or empty.
+
+```csharp
+private void Countries_Opening(object sender, EventArgs e)
+{
+    var entry = (zoft.MauiExtensions.Controls.AutoCompleteEntry)sender;
+    ViewModel.FilterList(entry.Text ?? string.Empty);
+}
+```
+
+`SuggestionListOpening` fires once per closed-to-open search transition, before native rows are presented. It also fires for programmatic opening and for single mode (without changing single-mode text). In multiple mode the query is empty before this callback. Replacing or updating `ItemsSource` inside the callback, or while already open, does not raise another opening event. Empty results keep the search session active; they do not reset the query. Applications still own filtering, loading, cancellation, and stale asynchronous response protection.
+
+While open, `Text` is the editable query. Toggling suggestions preserves the query, editing focus, and open session. Filtering items out of `ItemsSource` never deselects them. The clear button clears only the query and follows normal user-input filtering. `UpdateTextOnSelect` has no effect in multiple mode.
+
+Closing or dismissing the list clears `Text` programmatically, preserving both `Entry.TextChanged` and the reason-aware event when the value changes, without executing `TextChangedCommand`. The closed field displays `SelectionSummary`, joining selected text in selection order with `"; "`. Text resolves through `TextMemberPath`, or `ToString()` when the path is empty. `DisplayMemberPath` still controls default row text. The summary is visually ellipsized to fit the field, never assigned to `Text`, never truncated in state, and never parsed: item labels may contain semicolons. With no selections the ordinary empty/placeholder presentation appears. Reopening retains selection and starts an empty query.
+
+#### Collection and transition contract
+
+- `SelectedSuggestions` defaults to a fresh mutable observable list per control. Assigning `null` creates another empty list. Read-only and fixed-size lists (including arrays) throw `ArgumentException`; assignment leaves the previous selection intact.
+- Membership uses `object.Equals` / `GetHashCode` through the default equality comparer, never display text. Use stable equality and hash codes while selected. Null entries are ignored. Duplicate equal entries in consumer collections count as one effective selection, in first-occurrence order. The control never adds duplicates; deselection removes every equal occurrence. It does not rewrite externally supplied duplicates during `CollectionChanged`, avoiding observable-collection reentrancy exceptions.
+- Observable additions, removals, replacements, moves, and resets immediately refresh checked rows and the summary. Moves and duplicate-only changes produce no added/removed event. Replaced collections are unsubscribed; the remaining subscription does not keep an abandoned control alive.
+- Plain mutable `IList` is supported for assignment and user toggles. External edits to a non-observable list are not detected; assign a **new list instance** to publish them. Change bound collections on the UI thread.
+- In single mode `SelectedSuggestion` is authoritative; the multiple collection is inactive. In multiple mode the collection is authoritative; assigning `SelectedSuggestion` is inactive and does not change text or selection.
+- Single → multiple clears the inactive collection and carries only the current non-null `SelectedSuggestion`, then clears `SelectedSuggestion`. Multiple → single keeps the first effective selection (or null), clears the multiple collection, and sets single-mode text from that item (or empty). Both transitions close the session and discard any query. Inactive writes are discarded on conversion, so repeated switching cannot revive stale selections. For preselection, set `SelectionMode` first, then assign the collection.
+
+`SelectionChanged` reports effective changes from user interaction, observable edits, property replacement, and mode conversion. Converting A to the same A produces no change event; converting A/B to A reports B removed. Changes to inactive state do not raise the event. For a multiple-mode user activation, the bound collection updates first, checked rows and summary update next, then `SelectionChanged` fires, followed by `SuggestionChosen`. `SuggestionChosen.SelectedItem` is the activated item and `IsSelected` is its resulting state; deselection also fires it. Programmatic changes and mode conversion never fire `SuggestionChosen`. Single-mode activation retains its existing event order and reports `IsSelected = true`.
+
+Both sample pages offer mode switching, open/close, initial loading, and programmatic selection buttons. The binding page also exercises default/custom/wrapped/selector rows. The event page displays event order and selection state. See [implementation decisions and native verification checklist](docs/multiple-selection.md).
 
 ### Binding-based example
 
@@ -391,6 +444,7 @@ autoCompleteEntry.SelectedSuggestion = mySelectedItem;
 | Text Input & Filtering | ✅ | ✅ | ✅ | ✅ | Full support |
 | ItemsSource Binding | ✅ | ✅ | ✅ | ✅ | Full support |
 | Selection Events | ✅ | ✅ | ✅ | ✅ | Full support |
+| Multiple Selection | ✅ | ✅ | ✅ | ✅ | Opt-in collection selection, checkbox rows, query sessions, closed summary; see native verification checklist |
 | **Appearance & Styling** |
 | ItemTemplate | ✅ | ✅ | ✅ | ✅ | MAUI DataTemplate and DataTemplateSelector |
 | ShowBottomBorder | ❌ | ✅ | ✅ | ✅ | Windows: Planned for future release |
@@ -410,7 +464,24 @@ autoCompleteEntry.SelectedSuggestion = mySelectedItem;
 - ❌ **Not Implemented** - Feature exists in API but not yet implemented on this platform
 - ⚠️ **Limited Support** - Feature works with some limitations
 
+### Android keyboard layout
+
+For scrollable pages, use Android's resize keyboard mode so the page can scroll
+the editor into view without panning the entire window. The sample configures this
+in its `App` constructor:
+
+```csharp
+Microsoft.Maui.Controls.PlatformConfiguration.AndroidSpecific.Application.SetWindowSoftInputModeAdjust(
+    this, Microsoft.Maui.Controls.PlatformConfiguration.AndroidSpecific.WindowSoftInputModeAdjust.Resize);
+```
+
+The native single-selection dropdown can overlap the editor when the host uses
+window panning. The control refreshes popup placement as the viewport changes, but
+does not change the host application's keyboard mode globally.
+
 ### Windows Platform Notes
+
+- In both selection modes, clicking outside the editor and suggestion list dismisses the list, including clicks on non-focusable page background. Clicking the editor reopens it even if focus remained there. Single-mode dismissal preserves text and selection.
 
 - **ItemTemplate**: Renders MAUI views, including compiled bindings and `DataTemplateSelector`. Each row's binding context is the original suggestion; selectors receive the owning `AutoCompleteEntry` as their container. Templates must create a fresh MAUI `View` (not a `ViewCell`).
 - Custom templates take precedence over `DisplayMemberPath`. Setting `ItemTemplate` back to `null` restores native text rendering through `DisplayMemberPath`, or `ToString()` when the path is empty. The public display path and `TextMemberPath` are unchanged.
@@ -541,6 +612,10 @@ Your support helps maintain and improve this project for the entire .NET MAUI co
 The package version is derived automatically from git tags via [MinVer](https://github.com/adamralph/minver). There is no version property to edit manually. Pushing a tag triggers the **Publish package** workflow automatically.
 
 ### Stable release flow
+
+The next planned major release is **6.0.0**. At release time, move its notes from
+`[Unreleased]` to `[6.0.0]` and use the tag `6.0.0` (no `v` prefix). Opening or
+merging the implementation PR does not itself publish a package.
 
 1. Update `CHANGELOG.md`: move the pending entries from `[Unreleased]` into a new `[X.Y.Z]` section.
 2. Commit and push (or merge a PR) to `main`.

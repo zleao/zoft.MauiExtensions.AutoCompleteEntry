@@ -1,9 +1,13 @@
 using Microsoft.Maui.Platform;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
+using Microsoft.UI.Xaml.Automation;
+using Microsoft.UI.Xaml.Automation.Peers;
+using Microsoft.UI.Xaml.Automation.Provider;
 using WSize = Windows.Foundation.Size;
 using MView = Microsoft.Maui.Controls.View;
 using DataTemplate = Microsoft.Maui.Controls.DataTemplate;
+using AutomationProperties = Microsoft.UI.Xaml.Automation.AutomationProperties;
 
 namespace zoft.MauiExtensions.Controls.Platform;
 
@@ -19,7 +23,25 @@ public sealed class SuggestionViewConverter : Microsoft.UI.Xaml.Data.IValueConve
     {
         _owner = owner;
         _context = context;
-        _template = owner.ItemTemplate;
+        _template = owner.ItemTemplate ?? new DataTemplate(() =>
+        {
+            // The selection row supplies the minimum touch height. Center the
+            // label at its natural height so WinUI does not top-align its text
+            // inside an artificially tall label beside the checkbox.
+            var label = new Label
+            {
+                VerticalOptions = LayoutOptions.Center,
+                VerticalTextAlignment = Microsoft.Maui.TextAlignment.Center
+            };
+            label.SetBinding(Label.TextProperty, string.IsNullOrEmpty(owner.DisplayMemberPath) ? "." : owner.DisplayMemberPath);
+            return label;
+        });
+    }
+
+    internal void RefreshSelection()
+    {
+        foreach (var reference in _rows)
+            if (reference.TryGetTarget(out var row)) row.RefreshSelection();
     }
 
     /// <inheritdoc />
@@ -57,6 +79,7 @@ public sealed class SuggestionViewConverter : Microsoft.UI.Xaml.Data.IValueConve
         private DataTemplate? _template;
         private object? _item;
         private MView? _view;
+        private bool _checked;
 
         internal SuggestionRow(AutoCompleteEntry owner, IMauiContext context, DataTemplate template, object item)
         {
@@ -77,6 +100,8 @@ public sealed class SuggestionViewConverter : Microsoft.UI.Xaml.Data.IValueConve
                 return;
 
             _view = SuggestionTemplateContent.Create(_template, _item!, _owner);
+            if (_owner.IsMultiple) _view = new SelectionRow(_view);
+            RefreshSelection();
             // Parent supplies inherited resources; BindingContext remains the original item.
             _view.Parent = _owner;
             _view.MeasureInvalidated += OnMeasureInvalidated;
@@ -101,6 +126,36 @@ public sealed class SuggestionViewConverter : Microsoft.UI.Xaml.Data.IValueConve
 
         private void OnUnloaded(object sender, RoutedEventArgs args) => ReleaseView();
         private void OnMeasureInvalidated(object? sender, EventArgs args) => InvalidateMeasure();
+
+        internal void RefreshSelection()
+        {
+            if (_view is SelectionRow row && _owner is not null && _item is not null)
+            {
+                row.Update(_owner, _item);
+                AutomationProperties.SetName(this, _owner.GetSelectionText(_item));
+                var selected = _owner.IsSuggestionSelected(_item);
+                if (selected != _checked && FrameworkElementAutomationPeer.FromElement(this) is { } peer)
+                    peer.RaisePropertyChangedEvent(TogglePatternIdentifiers.ToggleStateProperty,
+                        _checked ? ToggleState.On : ToggleState.Off, selected ? ToggleState.On : ToggleState.Off);
+                _checked = selected;
+            }
+        }
+
+        protected override AutomationPeer OnCreateAutomationPeer()
+            => _owner?.IsMultiple == true ? new SelectionAutomationPeer(this) : base.OnCreateAutomationPeer();
+
+        private sealed class SelectionAutomationPeer(SuggestionRow row) : FrameworkElementAutomationPeer(row), IToggleProvider
+        {
+            protected override AutomationControlType GetAutomationControlTypeCore() => AutomationControlType.CheckBox;
+            protected override string GetClassNameCore() => "CheckBox";
+            protected override string GetNameCore() => row._item is not null ? row._owner?.GetSelectionText(row._item) ?? string.Empty : string.Empty;
+            protected override bool IsControlElementCore() => true;
+            protected override bool IsContentElementCore() => true;
+            protected override object GetPatternCore(PatternInterface patternInterface)
+                => patternInterface == PatternInterface.Toggle ? this : base.GetPatternCore(patternInterface);
+            public ToggleState ToggleState => row._owner?.IsSuggestionSelected(row._item) == true ? ToggleState.On : ToggleState.Off;
+            public void Toggle() => row._owner?.OnSuggestionSelected(row._item);
+        }
 
         protected override WSize MeasureOverride(WSize availableSize)
         {

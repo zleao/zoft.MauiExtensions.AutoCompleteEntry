@@ -10,8 +10,12 @@ public sealed class AutoCompleteEntrySuggestionChosenEventArgs : EventArgs
     /// </summary>
     /// <param name="selectedItem"></param>
     internal AutoCompleteEntrySuggestionChosenEventArgs(object? selectedItem)
+        : this(selectedItem, true) { }
+
+    internal AutoCompleteEntrySuggestionChosenEventArgs(object? selectedItem, bool isSelected)
     {
         SelectedItem = selectedItem;
+        IsSelected = isSelected;
     }
 
     /// <summary>
@@ -19,4 +23,7 @@ public sealed class AutoCompleteEntrySuggestionChosenEventArgs : EventArgs
     /// </summary>
     /// <value>A reference to the selected item.</value>
     public object? SelectedItem { get; }
+
+    /// <summary>Whether the activated suggestion is selected after this interaction.</summary>
+    public bool IsSelected { get; }
 }

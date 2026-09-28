@@ -59,6 +59,28 @@ internal partial class SampleViewModel : ZoftObservableObject
     public partial ListItem SelectedItem { get; set; }
 
     [ObservableProperty]
+    public partial ObservableCollection<ListItem> SelectedItems { get; set; } = [];
+
+    [RelayCommand]
+    private void AddSelection()
+    {
+        var item = _teams.FirstOrDefault(item => !SelectedItems.Contains(item));
+        if (item is not null) SelectedItems.Add(item);
+    }
+
+    [RelayCommand]
+    private void RemoveSelection()
+    {
+        if (SelectedItems.Count > 0) SelectedItems.RemoveAt(0);
+    }
+
+    [RelayCommand]
+    private void ReplaceSelection() => SelectedItems = new(_teams.Take(3));
+
+    [RelayCommand]
+    private void ClearSelection() => SelectedItems.Clear();
+
+    [ObservableProperty]
     public partial int CursorPosition { get; set; }
 
     [ObservableProperty]
@@ -80,8 +102,8 @@ internal partial class SampleViewModel : ZoftObservableObject
     {
         SelectedItem = null;
         
-        FilteredList?.Clear();
-        FilteredList = null;
+        // Publish a complete result set once; the previous result collection may
+        // still be in use by a native suggestion/selection callback.
         FilteredList = new ObservableCollection<ListItem>(
             _teams.Where(t => t.Group.Contains(filter ?? "", StringComparison.CurrentCultureIgnoreCase) ||
                              t.Country.Contains(filter ?? "", StringComparison.CurrentCultureIgnoreCase)));

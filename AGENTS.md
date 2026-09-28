@@ -31,7 +31,7 @@ This file is the shared entry point for coding assistants, regardless of provide
 - Consumers own filtering: they react to text changes and update `ItemsSource`. Do not move filtering into the control unless explicitly requested.
 - Preserve text-change reasons: `UserInput`, `ProgrammaticChange`, and `SuggestionChosen`. `TextChangedCommand` executes for user input; programmatic changes and selection must not accidentally trigger filtering loops.
 - Preserve the base `Entry.TextChanged` event as well as the control's own event.
-- `SelectedSuggestion` is two-way selection state. `TextMemberPath` determines selected text; `DisplayMemberPath` determines suggestion display.
+- `SelectedSuggestion` is two-way single-selection state; `SelectedSuggestions` is authoritative in multiple mode. `TextMemberPath` determines selected text; `DisplayMemberPath` determines suggestion display. Keep multiple-mode query text separate from the selection summary.
 - Keep shared behavior in the control and native wiring/rendering in platform implementations. Prefer platform partials over scattered conditional compilation in shared files.
 - Unsubscribe native events in `DisconnectHandler` and release owned resources through the platform view's cleanup mechanism.
 
@@ -40,7 +40,7 @@ This file is the shared entry point for coding assistants, regardless of provide
 - Android wraps `AndroidAutoCompleteEntry`; Windows wraps `AutoSuggestBox`.
 - iOS and MacCatalyst each have their own `IOSAutoCompleteEntry`, handler, extensions, and table source files. These are separate, nearly identical implementations, not one shared source. Inspect both when changing Apple behavior and explain any intentional divergence.
 - `Handlers/AutoCompleteEntryHandler.Standard.cs` supports the plain .NET target with no-op mappings; native view creation throws. Do not implement native UI behavior there or treat plain .NET tests as native UI coverage.
-- Check README platform limitations before changing behavior. Windows support for `ItemTemplate` and `ShowBottomBorder` is incomplete.
+- Check README platform limitations before changing behavior. Windows supports `ItemTemplate` and `DataTemplateSelector`; `ShowBottomBorder` remains unsupported. Read the Android resize keyboard configuration notes before changing popup positioning.
 - For observable platform/API changes, extend the appropriate sample scenario when existing coverage does not exercise the change: `Views/WithBindingsPage` for bindings and `Views/WithEventsPage` for events.
 
 ## Validation

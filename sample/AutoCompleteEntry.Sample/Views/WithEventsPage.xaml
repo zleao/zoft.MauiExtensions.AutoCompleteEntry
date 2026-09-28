@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8" ?>
+<?xml version="1.0" encoding="utf-8" ?>
 <ContentPage
     x:Class="AutoCompleteEntry.Sample.Views.WithEventsPage"
     xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
@@ -12,68 +12,97 @@
         <ctkm:IsNotNullConverter x:Key="IsNotNullConverter" />
     </ContentPage.Resources>
 
-    <Grid>
+    <ScrollView Orientation="Vertical">
+        <Grid>
 
-        <Image
-            HeightRequest="200"
-            HorizontalOptions="Center"
-            Source="dotnet_bot.png"
-            VerticalOptions="End" />
+            <Image
+                HeightRequest="200"
+                HorizontalOptions="Center"
+                Source="dotnet_bot.png"
+                VerticalOptions="End" />
 
-        <VerticalStackLayout Margin="10" Spacing="10">
+            <VerticalStackLayout Margin="10" Spacing="10">
 
-            <Label>
-                <Label.FormattedText>
-                    <FormattedString>
-                        <Span Text="CursorPosition: " />
-                        <Span Text="{Binding CursorPosition}" />
-                    </FormattedString>
-                </Label.FormattedText>
-            </Label>
+                <Label>
+                    <Label.FormattedText>
+                        <FormattedString>
+                            <Span Text="CursorPosition: " />
+                            <Span Text="{Binding CursorPosition}" />
+                        </FormattedString>
+                    </Label.FormattedText>
+                </Label>
 
-            <HorizontalStackLayout>
-                <Button Command="{Binding SetCursorPositionCommand}" Text="Set CursorPosition" />
-                <Entry Keyboard="Numeric" Text="{Binding NewCursorPosition, Mode=TwoWay}" />
-            </HorizontalStackLayout>
+                <HorizontalStackLayout>
+                    <Button Command="{Binding SetCursorPositionCommand}" Text="Set CursorPosition" />
+                    <Entry Keyboard="Numeric" Text="{Binding NewCursorPosition, Mode=TwoWay}" />
+                </HorizontalStackLayout>
 
-            <HorizontalStackLayout Spacing="5">
-                <Label Text="Show Bottom Border" VerticalOptions="Center" />
-                <Switch IsToggled="{Binding ShowBottomBorder}" />
-            </HorizontalStackLayout>
+                <HorizontalStackLayout Spacing="5">
+                    <Label Text="Show Bottom Border" VerticalOptions="Center" />
+                    <Switch IsToggled="{Binding ShowBottomBorder}" />
+                </HorizontalStackLayout>
 
-            <zoft:AutoCompleteEntry
-                ClearButtonVisibility="WhileEditing"
-                Completed="AutoCompleteEntry_Completed"
-                CursorPosition="{Binding CursorPosition, Mode=TwoWay}"
-                CursorPositionChanged="AutoCompleteEntry_CursorPositionChanged"
-                DisplayMemberPath="Country"
-                HeightRequest="50"
-                ItemsSource="{Binding FilteredList}"
-                Placeholder="Search for a country or group"
-                ShowBottomBorder="{Binding ShowBottomBorder}"
-                SuggestionChosen="AutoCompleteEntry_SuggestionChosen"
-                TextChanged="AutoCompleteEntry_TextChanged"
-                TextMemberPath="Country" />
+                <Border Padding="15">
+                    <VerticalStackLayout Spacing="15">
+                        <Label FontSize="20" Text="Multiple selection" />
+                        <FlexLayout AlignItems="Center" Wrap="Wrap">
+                            <HorizontalStackLayout Margin="0,0,8,8" Spacing="8">
+                                <Label Text="Enabled" VerticalOptions="Center" />
+                                <Switch Toggled="MultipleSelection_Toggled" />
+                            </HorizontalStackLayout>
+                            <Button Margin="0,0,8,8" Text="Open" Clicked="OpenSuggestions_Clicked" />
+                            <Button Margin="0,0,8,8" Text="Close" Clicked="CloseSuggestions_Clicked" />
+                        </FlexLayout>
+                        <Label Text="Search, toggle countries, refine the query, and close/reopen. SelectionChanged precedes SuggestionChosen." />
+                        <FlexLayout Wrap="Wrap">
+                            <Button Margin="0,0,8,8" Text="Add selection" Clicked="AddSelection_Clicked" />
+                            <Button Margin="0,0,8,8" Text="Remove first" Clicked="RemoveSelection_Clicked" />
+                            <Button Margin="0,0,8,8" Text="Replace selection" Clicked="ReplaceSelection_Clicked" />
+                            <Button Margin="0,0,8,8" Text="Clear selection" Clicked="ClearSelection_Clicked" />
+                        </FlexLayout>
+                    </VerticalStackLayout>
+                </Border>
 
-            <Border
-                BackgroundColor="LightGray"
-                HorizontalOptions="Start"
-                IsVisible="{Binding SelectedItem, Converter={StaticResource IsNotNullConverter}}"
-                Stroke="Gray"
-                StrokeShape="RoundRectangle 8">
-                <VerticalStackLayout Padding="10">
-                    <HorizontalStackLayout Spacing="5">
-                        <Label Text="Group:" />
-                        <Label FontAttributes="Bold" Text="{Binding SelectedItem.Group}" />
-                    </HorizontalStackLayout>
-                    <HorizontalStackLayout Spacing="5">
-                        <Label Text="Country:" />
-                        <Label FontAttributes="Bold" Text="{Binding SelectedItem.Country}" />
-                    </HorizontalStackLayout>
-                </VerticalStackLayout>
-            </Border>
+                <zoft:AutoCompleteEntry
+                    x:Name="CountryEntry"
+                    ClearButtonVisibility="WhileEditing"
+                    Completed="AutoCompleteEntry_Completed"
+                    CursorPosition="{Binding CursorPosition, Mode=TwoWay}"
+                    CursorPositionChanged="AutoCompleteEntry_CursorPositionChanged"
+                    DisplayMemberPath="Country"
+                    HeightRequest="50"
+                    ItemsSource="{Binding FilteredList}"
+                    Placeholder="Search for a country or group"
+                    ShowBottomBorder="{Binding ShowBottomBorder}"
+                    SuggestionChosen="AutoCompleteEntry_SuggestionChosen"
+                    SelectionChanged="CountryEntry_SelectionChanged"
+                    SuggestionListOpening="CountryEntry_Opening"
+                    TextChanged="AutoCompleteEntry_TextChanged"
+                    TextMemberPath="Country" />
 
-        </VerticalStackLayout>
-    </Grid>
+                <Label x:Name="SelectionStatus" />
+                <Label x:Name="EventLog" MaxLines="5" />
+
+                <Border
+                    BackgroundColor="LightGray"
+                    HorizontalOptions="Start"
+                    IsVisible="{Binding SelectedItem, Converter={StaticResource IsNotNullConverter}}"
+                    Stroke="Gray"
+                    StrokeShape="RoundRectangle 8">
+                    <VerticalStackLayout Padding="10">
+                        <HorizontalStackLayout Spacing="5">
+                            <Label Text="Group:" />
+                            <Label FontAttributes="Bold" Text="{Binding SelectedItem.Group}" />
+                        </HorizontalStackLayout>
+                        <HorizontalStackLayout Spacing="5">
+                            <Label Text="Country:" />
+                            <Label FontAttributes="Bold" Text="{Binding SelectedItem.Country}" />
+                        </HorizontalStackLayout>
+                    </VerticalStackLayout>
+                </Border>
+
+            </VerticalStackLayout>
+        </Grid>
+    </ScrollView>
 
 </ContentPage>

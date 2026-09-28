@@ -7,6 +7,10 @@ namespace zoft.MauiExtensions.Controls.Handlers;
 /// </summary>
 public partial class AutoCompleteEntryHandler : ViewHandler<AutoCompleteEntry, object>
 {
+    /// <summary>Plain .NET has no native selection presentation.</summary>
+    public static void MapSelectionMode(IAutoCompleteEntryHandler handler, AutoCompleteEntry entry) { }
+    /// <summary>Plain .NET has no native selection presentation.</summary>
+    public static void MapSelectionPresentation(IAutoCompleteEntryHandler handler, AutoCompleteEntry entry) { }
     /// <inheritdoc/>
     protected override object CreatePlatformView() => throw new NotImplementedException();
 

@@ -6,7 +6,7 @@ namespace zoft.MauiExtensions.Controls;
 /// Represents a text control that makes suggestions to users as they type. The app is notified when text 
 /// has been changed by the user and is responsible for providing relevant suggestions for this control to display.
 /// </summary>
-public class AutoCompleteEntry : Entry
+public partial class AutoCompleteEntry : Entry
 {
     private bool _suppressTextChangedEvent;
 
@@ -15,6 +15,7 @@ public class AutoCompleteEntry : Entry
     /// </summary>
     public AutoCompleteEntry()
     {
+        ObserveSelection(SelectedSuggestions);
     }
 
     /// <summary>
@@ -36,7 +37,8 @@ public class AutoCompleteEntry : Entry
     /// Identifies the <see cref="TextMemberPath"/> bindable property.
     /// </summary>
     public static readonly BindableProperty TextMemberPathProperty =
-        BindableProperty.Create(nameof(TextMemberPath), typeof(string), typeof(AutoCompleteEntry), string.Empty);
+        BindableProperty.Create(nameof(TextMemberPath), typeof(string), typeof(AutoCompleteEntry), string.Empty,
+            propertyChanged: (b, o, n) => ((AutoCompleteEntry)b).RefreshSelectionPresentation());
 
 
     /// <summary>
@@ -73,11 +75,13 @@ public class AutoCompleteEntry : Entry
     /// Identifies the <see cref="IsSuggestionListOpen"/> bindable property.
     /// </summary>
     public static readonly BindableProperty IsSuggestionListOpenProperty =
-        BindableProperty.Create(nameof(IsSuggestionListOpen), typeof(bool), typeof(AutoCompleteEntry), false);
+        BindableProperty.Create(nameof(IsSuggestionListOpen), typeof(bool), typeof(AutoCompleteEntry), false,
+            propertyChanged: (b, o, n) => ((AutoCompleteEntry)b).SuggestionListStateChanged((bool)n));
 
     /// <summary>
     /// Used in conjunction with <see cref="TextMemberPath"/>, gets or sets a value indicating whether items in the view will trigger an update 
     /// of the editable text part of the <see cref="AutoCompleteEntry"/> when clicked.
+    /// Applies only in single selection mode; ignored in multiple mode.
     /// </summary>
     /// <value>A value indicating whether items in the view will trigger an update of the editable text part of the <see cref="AutoCompleteEntry"/> when clicked.</value>
     public bool UpdateTextOnSelect
@@ -136,6 +140,10 @@ public class AutoCompleteEntry : Entry
     public void OnTextChanged(string? text, AutoCompleteEntryTextChangeReason reason)
     {
         // Called by the native control when users enter text
+        // A dismissed session can leave the editor focused. Start the new empty
+        // session before applying the first keystroke, so opening cannot erase it.
+        if (IsMultiple && reason == AutoCompleteEntryTextChangeReason.UserInput && !IsSuggestionListOpen)
+            IsSuggestionListOpen = true;
 
         _suppressTextChangedEvent = true; //prevent loop of events raising, as setting this property will make it back into the native control
         Text = text;
@@ -186,7 +194,8 @@ public class AutoCompleteEntry : Entry
 
 
     /// <summary>
-    /// Get or Set the currently selected suggestion, from the items source list
+    /// Gets or sets the single-mode selection. This property is inactive in multiple
+    /// mode; use SelectedSuggestions there. A selected item need not be in ItemsSource.
     /// </summary>
     public object? SelectedSuggestion
     {
@@ -200,7 +209,8 @@ public class AutoCompleteEntry : Entry
     public static readonly BindableProperty SelectedSuggestionProperty =
         BindableProperty.Create(nameof(SelectedSuggestion),
             typeof(object),
-            typeof(AutoCompleteEntry), null, BindingMode.TwoWay);
+            typeof(AutoCompleteEntry), null, BindingMode.TwoWay,
+            propertyChanged: (b, o, n) => ((AutoCompleteEntry)b).SingleSelectionChanged());
 
     /// <summary>
     /// Method used to signal the platform control, that a suggestion was selected.
@@ -208,13 +218,21 @@ public class AutoCompleteEntry : Entry
     /// <param name="selectedItem">Item selected</param>
     public void OnSuggestionSelected(object? selectedItem)
     {
+        if (SelectionMode == AutoCompleteEntrySelectionMode.Multiple)
+        {
+            ToggleSuggestion(selectedItem);
+            return;
+        }
         SelectedSuggestion = selectedItem;
 
         SuggestionChosen?.Invoke(this, new AutoCompleteEntrySuggestionChosenEventArgs(selectedItem));
     }
 
     /// <summary>
-    /// Raised before the text content of the editable control component is updated.
+    /// Raised for user suggestion activation. In multiple mode, fires after the
+    /// selected collection, presentation and SelectionChanged event have updated,
+    /// for both selection and deselection. Inspect the event argument's IsSelected.
+    /// Programmatic selection changes and mode conversion do not raise this event.
     /// </summary>
     public event EventHandler<AutoCompleteEntrySuggestionChosenEventArgs>? SuggestionChosen;
 

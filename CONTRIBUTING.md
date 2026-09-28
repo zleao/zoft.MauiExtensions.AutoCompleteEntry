@@ -37,6 +37,12 @@ Read [AGENTS.md](AGENTS.md) for the repository map, architecture contracts, and 
 
 ## Validation
 
+Tests use VSTest with `xunit.v3.mtp-off` 4.0.1, the xUnit Visual Studio adapter,
+and `coverlet.collector`. The explicit `mtp-off` variant preserves the existing
+`dotnet test`, TRX logger and coverage collector workflow: the default `xunit.v3`
+4.x package instead enables Microsoft Testing Platform v2, which requires a
+different .NET 10 test configuration. See the [xUnit platform documentation](https://xunit.net/docs/getting-started/v3/microsoft-testing-platform).
+
 Run commands from the repository root. The library Release build above matches CI and generates NuGet packages locally; it does not publish them. For a targeted platform build, pass `-f <target-framework>` using a framework declared in the project. A targeted build is useful feedback but does not replace the full CI build.
 
 | Change | Validation |
@@ -47,7 +53,7 @@ Run commands from the repository root. The library Release build above matches C
 | Public API or binding usage | Build the library and sample, run relevant tests, and update the README/sample usage and changelog. |
 | Project/dependency/build configuration | Build the library, run unit tests, and build the affected sample targets; inspect package output when packaging changes. |
 
-The test project targets plain `net10.0`. It exercises shared control state, defaults, and event flow, plus linked Android `DensityHelper` and `TemplateIdMapper` source. It does not instantiate native controls or validate dropdown rendering, keyboard behavior, or platform event subscriptions. A project reference to the multi-target library may still require MAUI workload restoration.
+The test project targets plain `net10.0`. It exercises shared control state, selection collections, mode transitions, query lifecycle and event order, plus linked Android density/template/placement helpers and the Windows suggestion snapshot helper. It does not instantiate native controls or validate dropdown rendering, keyboard behavior, or platform event subscriptions. A project reference to the multi-target library may still require MAUI workload restoration.
 
 ### Manual platform checks
 
@@ -63,6 +69,9 @@ dotnet run --project sample/AutoCompleteEntry.Sample/AutoCompleteEntry.Sample.cs
 - Verify `TextMemberPath`, `DisplayMemberPath`, and supported item templates with the affected item type.
 - Open/dismiss the dropdown, change focus, and exercise the keyboard, cursor, and layout behavior affected by the change.
 - Navigate away and back or reconnect the handler: check for duplicate callbacks and stale native subscriptions.
+- For multiple selection, run the [native checklist](docs/multiple-selection.md#native-manual-script), including default/custom/selector rows, checkbox activation, query refinement and programmatic collection updates. Both sample pages scroll and group multiple-selection options in a bordered section.
+- On Windows, check outside dismissal and reopening while still focused in both modes, clear after selection, light/dark popup appearance, and default-row vertical alignment.
+- On Android, start at the top of With Events and focus the editor. With the sample's resize keyboard mode, the list must not cover the editor or keyboard. Repeat in both modes on a small viewport.
 - For Apple changes, check both iOS and MacCatalyst implementations and validate on each affected platform when available.
 
 Report the commands/results and the platforms actually exercised. Document any unavailable device, workload, or host checks as unverified.
