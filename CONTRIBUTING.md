@@ -37,6 +37,12 @@ Read [AGENTS.md](AGENTS.md) for the repository map, architecture contracts, and 
 
 ## Validation
 
+Tests use VSTest with `xunit.v3.mtp-off` 4.0.1, the xUnit Visual Studio adapter,
+and `coverlet.collector`. The explicit `mtp-off` variant preserves the existing
+`dotnet test`, TRX logger and coverage collector workflow: the default `xunit.v3`
+4.x package instead enables Microsoft Testing Platform v2, which requires a
+different .NET 10 test configuration. See the [xUnit platform documentation](https://xunit.net/docs/getting-started/v3/microsoft-testing-platform).
+
 Run commands from the repository root. The library Release build above matches CI and generates NuGet packages locally; it does not publish them. For a targeted platform build, pass `-f <target-framework>` using a framework declared in the project. A targeted build is useful feedback but does not replace the full CI build.
 
 | Change | Validation |

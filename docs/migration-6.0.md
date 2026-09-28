@@ -4,6 +4,15 @@ The multiple-selection work targets the planned **6.0.0 major release**. It is n
 published by the implementation PR. Package versions come from MinVer tags; the
 release tag is `6.0.0`, without a `v` prefix.
 
+## Dependencies
+
+The library and sample reference `Microsoft.Maui.Controls` **10.0.110**; the
+MacCatalyst graphics reference is also **10.0.110**. If your app pins MAUI packages,
+update those references consistently to avoid a dependency downgrade. Target
+frameworks remain .NET 10. The test SDK, xUnit framework/runner, NSubstitute and
+coverage collector were also updated; these test dependencies are not part of the
+published control's consumer API.
+
 ## Existing single-selection applications
 
 `SelectionMode` still defaults to `Single`. Existing property names, defaults,

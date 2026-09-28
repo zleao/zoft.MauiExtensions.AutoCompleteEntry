@@ -16,6 +16,7 @@ Planned for **6.0.0** (major release). See the [migration guide](docs/migration-
 - Scrollable binding/event samples with grouped multiple-selection options, initial-list population, programmatic selection changes, and event-order reporting.
 
 ### Changed
+- Updated `Microsoft.Maui.Controls` in the library/sample and the MacCatalyst `Microsoft.Maui.Graphics` dependency to `10.0.110`.
 - **Breaking behavior (Windows):** outside clicks now dismiss single-selection suggestions even on non-focusable page background; clicking the still-focused editor reopens them. Text and selection are preserved on dismissal.
 - Windows native suggestion updates are deferred and coalesced through snapshots rather than applied synchronously during consumer collection notifications.
 - The Android sample uses keyboard resize mode with its ScrollViews. Applications using window panning should review the documented keyboard configuration; the control does not change the host's keyboard mode globally.

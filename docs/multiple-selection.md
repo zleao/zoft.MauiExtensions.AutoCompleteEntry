@@ -131,6 +131,14 @@ is retained in single mode.
 
 PR preparation on 2026-09-28, Windows host with .NET SDK 10.0.401:
 
+After updating the stable dependencies (MAUI 10.0.110), the full library and
+Windows sample Release builds passed with zero warnings/errors. All 127 tests
+passed with xUnit 4.0.1 using the VSTest-compatible `xunit.v3.mtp-off` package;
+TRX output and Coverlet Cobertura collection were verified. The Android Release
+APK was also rebuilt successfully with zero warnings/errors, using
+`RunAOTCompilation=false` and the ASCII TEMP/TMP setup described below. Native
+interaction and Android AOT were not rerun for this dependency update.
+
 - Full Release library build: all five targets (plain .NET, Android, Windows,
   iOS, MacCatalyst), zero warnings/errors. Local packages were not published.
 - Shared/helper tests: **127 passed**. Coverage includes collection state,
@@ -144,6 +152,10 @@ PR preparation on 2026-09-28, Windows host with .NET SDK 10.0.401:
   TEMP/TMP paths under ignored `obj` avoided the host's Unicode-path AOT issue.
 
 ### Native checks performed
+
+The native checks below predate the dependency update to MAUI 10.0.110. That
+update was validated with builds and shared tests; native interaction has not
+been rerun with the updated packages.
 
 - Android API 36 Pixel 7 emulator: both sample pages, single-mode typing/selection,
   multiple row/checkbox toggles, filtering while retaining selections, empty-result
