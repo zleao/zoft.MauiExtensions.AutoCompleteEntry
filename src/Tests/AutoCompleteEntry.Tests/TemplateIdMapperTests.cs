@@ -28,7 +28,7 @@ public class TemplateIdMapperTests
     [Fact]
     public void GetViewType_PlainTemplate_ReturnsZero()
     {
-        var result = TemplateIdMapper.GetViewType(NewTemplate(), new object(), null, new());
+        int result = TemplateIdMapper.GetViewType(NewTemplate(), new object(), null, new());
 
         Assert.Equal(0, result);
     }
@@ -46,11 +46,11 @@ public class TemplateIdMapperTests
     [Fact]
     public void GetViewType_ResolvedTemplate_AssignsStableId()
     {
-        var template = NewTemplate();
+        DataTemplate template = NewTemplate();
         var idMap = new Dictionary<DataTemplate, int>();
 
-        var first = TemplateIdMapper.GetViewType(template, idMap);
-        var second = TemplateIdMapper.GetViewType(template, idMap);
+        int first = TemplateIdMapper.GetViewType(template, idMap);
+        int second = TemplateIdMapper.GetViewType(template, idMap);
 
         Assert.Equal(0, first);
         Assert.Equal(first, second);
@@ -63,12 +63,12 @@ public class TemplateIdMapperTests
     [InlineData("c")]
     public void GetViewType_PlainTemplate_MultipleCalls_AlwaysReturnsZero(string item)
     {
-        var template = NewTemplate();
+        DataTemplate template = NewTemplate();
         var idMap = new Dictionary<DataTemplate, int>();
 
-        var firstResult = TemplateIdMapper.GetViewType(template, item, null, idMap);
-        var secondResult = TemplateIdMapper.GetViewType(template, item, null, idMap);
-        var thirdResult = TemplateIdMapper.GetViewType(template, item, null, idMap);
+        int firstResult = TemplateIdMapper.GetViewType(template, item, null, idMap);
+        int secondResult = TemplateIdMapper.GetViewType(template, item, null, idMap);
+        int thirdResult = TemplateIdMapper.GetViewType(template, item, null, idMap);
 
         Assert.Equal(0, firstResult);
         Assert.Equal(0, secondResult);
@@ -83,11 +83,11 @@ public class TemplateIdMapperTests
     [Fact]
     public void GetViewType_Selector_FirstEncounteredTemplate_AssignsIdZero()
     {
-        var templateA = NewTemplate();
+        DataTemplate templateA = NewTemplate();
         var selector = new TestSelector(_ => templateA);
         var idMap = new Dictionary<DataTemplate, int>();
 
-        var result = TemplateIdMapper.GetViewType(selector, "item", null, idMap);
+        int result = TemplateIdMapper.GetViewType(selector, "item", null, idMap);
 
         Assert.Equal(0, result);
     }
@@ -95,13 +95,13 @@ public class TemplateIdMapperTests
     [Fact]
     public void GetViewType_Selector_TwoDistinctTemplates_AssignsDifferentIds()
     {
-        var templateA = NewTemplate();
-        var templateB = NewTemplate();
+        DataTemplate templateA = NewTemplate();
+        DataTemplate templateB = NewTemplate();
         var selector = new TestSelector(item => item is "a" ? templateA : templateB);
         var idMap = new Dictionary<DataTemplate, int>();
 
-        var idA = TemplateIdMapper.GetViewType(selector, "a", null, idMap);
-        var idB = TemplateIdMapper.GetViewType(selector, "b", null, idMap);
+        int idA = TemplateIdMapper.GetViewType(selector, "a", null, idMap);
+        int idB = TemplateIdMapper.GetViewType(selector, "b", null, idMap);
 
         Assert.NotEqual(idA, idB);
     }
@@ -109,9 +109,9 @@ public class TemplateIdMapperTests
     [Fact]
     public void GetViewType_Selector_ThreeDistinctTemplates_AssignsSequentialIds()
     {
-        var templateA = NewTemplate();
-        var templateB = NewTemplate();
-        var templateC = NewTemplate();
+        DataTemplate templateA = NewTemplate();
+        DataTemplate templateB = NewTemplate();
+        DataTemplate templateC = NewTemplate();
         var selector = new TestSelector(item => item switch
         {
             "a" => templateA,
@@ -120,9 +120,9 @@ public class TemplateIdMapperTests
         });
         var idMap = new Dictionary<DataTemplate, int>();
 
-        var idA = TemplateIdMapper.GetViewType(selector, "a", null, idMap);
-        var idB = TemplateIdMapper.GetViewType(selector, "b", null, idMap);
-        var idC = TemplateIdMapper.GetViewType(selector, "c", null, idMap);
+        int idA = TemplateIdMapper.GetViewType(selector, "a", null, idMap);
+        int idB = TemplateIdMapper.GetViewType(selector, "b", null, idMap);
+        int idC = TemplateIdMapper.GetViewType(selector, "c", null, idMap);
 
         Assert.Equal(3, new[] { idA, idB, idC }.Distinct().Count());
         Assert.Equal(new[] { 0, 1, 2 }, new[] { idA, idB, idC });
@@ -135,12 +135,12 @@ public class TemplateIdMapperTests
     [Fact]
     public void GetViewType_Selector_SameTemplateInstance_ReturnsSameIdEachTime()
     {
-        var templateA = NewTemplate();
+        DataTemplate templateA = NewTemplate();
         var selector = new TestSelector(_ => templateA);
         var idMap = new Dictionary<DataTemplate, int>();
 
-        var first = TemplateIdMapper.GetViewType(selector, "x", null, idMap);
-        var second = TemplateIdMapper.GetViewType(selector, "y", null, idMap);
+        int first = TemplateIdMapper.GetViewType(selector, "x", null, idMap);
+        int second = TemplateIdMapper.GetViewType(selector, "y", null, idMap);
 
         Assert.Equal(first, second);
     }
@@ -148,14 +148,14 @@ public class TemplateIdMapperTests
     [Fact]
     public void GetViewType_Selector_IdsDoNotChangeAfterNewTemplateAdded()
     {
-        var templateA = NewTemplate();
-        var templateB = NewTemplate();
+        DataTemplate templateA = NewTemplate();
+        DataTemplate templateB = NewTemplate();
         var selector = new TestSelector(item => item is "a" ? templateA : templateB);
         var idMap = new Dictionary<DataTemplate, int>();
 
-        var idA_before = TemplateIdMapper.GetViewType(selector, "a", null, idMap);
+        int idA_before = TemplateIdMapper.GetViewType(selector, "a", null, idMap);
         TemplateIdMapper.GetViewType(selector, "b", null, idMap); // register B
-        var idA_after = TemplateIdMapper.GetViewType(selector, "a", null, idMap);
+        int idA_after = TemplateIdMapper.GetViewType(selector, "a", null, idMap);
 
         Assert.Equal(idA_before, idA_after);
     }
@@ -167,8 +167,8 @@ public class TemplateIdMapperTests
     [Fact]
     public void GetViewType_Selector_PopulatesMapWithResolvedTemplates()
     {
-        var templateA = NewTemplate();
-        var templateB = NewTemplate();
+        DataTemplate templateA = NewTemplate();
+        DataTemplate templateB = NewTemplate();
         var selector = new TestSelector(item => item is "a" ? templateA : templateB);
         var idMap = new Dictionary<DataTemplate, int>();
 
@@ -183,7 +183,7 @@ public class TemplateIdMapperTests
     [Fact]
     public void GetViewType_Selector_RepeatedSameTemplate_DoesNotGrowMap()
     {
-        var templateA = NewTemplate();
+        DataTemplate templateA = NewTemplate();
         var selector = new TestSelector(_ => templateA);
         var idMap = new Dictionary<DataTemplate, int>();
 
@@ -201,15 +201,17 @@ public class TemplateIdMapperTests
     [Fact]
     public void GetViewType_Selector_ExceedsMaxViewTypes_Throws()
     {
-        var templates = Enumerable.Range(0, TemplateIdMapper.MaxViewTypes + 1)
+        DataTemplate[] templates = Enumerable.Range(0, TemplateIdMapper.MaxViewTypes + 1)
                                   .Select(_ => NewTemplate())
                                   .ToArray();
         var selector = new TestSelector(item => templates[(int)item]);
         var idMap = new Dictionary<DataTemplate, int>();
 
         // Fill up to the limit — all should succeed
-        for (var i = 0; i < TemplateIdMapper.MaxViewTypes; i++)
+        for (int i = 0; i < TemplateIdMapper.MaxViewTypes; i++)
+        {
             TemplateIdMapper.GetViewType(selector, i, null, idMap);
+        }
 
         // One more distinct template must throw
         Assert.Throws<InvalidOperationException>(
@@ -219,15 +221,17 @@ public class TemplateIdMapperTests
     [Fact]
     public void GetViewType_Selector_AtExactLimit_DoesNotThrow()
     {
-        var templates = Enumerable.Range(0, TemplateIdMapper.MaxViewTypes)
+        DataTemplate[] templates = Enumerable.Range(0, TemplateIdMapper.MaxViewTypes)
                                   .Select(_ => NewTemplate())
                                   .ToArray();
         var selector = new TestSelector(item => templates[(int)item]);
         var idMap = new Dictionary<DataTemplate, int>();
 
         // Exactly MaxViewTypes distinct templates must all succeed
-        for (var i = 0; i < TemplateIdMapper.MaxViewTypes; i++)
+        for (int i = 0; i < TemplateIdMapper.MaxViewTypes; i++)
+        {
             TemplateIdMapper.GetViewType(selector, i, null, idMap);
+        }
 
         Assert.Equal(TemplateIdMapper.MaxViewTypes, idMap.Count);
     }

@@ -1,6 +1,6 @@
+using System.Collections.ObjectModel;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
-using System.Collections.ObjectModel;
 using zoft.MauiExtensions.Core.Models;
 
 namespace AutoCompleteEntry.Sample.ViewModels;
@@ -8,10 +8,16 @@ namespace AutoCompleteEntry.Sample.ViewModels;
 internal partial class ListItem : ObservableObject
 {
     [ObservableProperty]
-    public partial string Group { get; set; }
+    public partial string Group
+    {
+        get; set;
+    }
 
     [ObservableProperty]
-    public partial string Country { get; set; }
+    public partial string Country
+    {
+        get; set;
+    }
 }
 
 internal partial class SampleViewModel : ZoftObservableObject
@@ -53,10 +59,16 @@ internal partial class SampleViewModel : ZoftObservableObject
     ];
 
     [ObservableProperty]
-    public partial ObservableCollection<ListItem> FilteredList { get; set; }
+    public partial ObservableCollection<ListItem> FilteredList
+    {
+        get; set;
+    }
 
     [ObservableProperty]
-    public partial ListItem SelectedItem { get; set; }
+    public partial ListItem SelectedItem
+    {
+        get; set;
+    }
 
     [ObservableProperty]
     public partial ObservableCollection<ListItem> SelectedItems { get; set; } = [];
@@ -64,14 +76,20 @@ internal partial class SampleViewModel : ZoftObservableObject
     [RelayCommand]
     private void AddSelection()
     {
-        var item = _teams.FirstOrDefault(item => !SelectedItems.Contains(item));
-        if (item is not null) SelectedItems.Add(item);
+        ListItem item = _teams.FirstOrDefault(item => !SelectedItems.Contains(item));
+        if (item is not null)
+        {
+            SelectedItems.Add(item);
+        }
     }
 
     [RelayCommand]
     private void RemoveSelection()
     {
-        if (SelectedItems.Count > 0) SelectedItems.RemoveAt(0);
+        if (SelectedItems.Count > 0)
+        {
+            SelectedItems.RemoveAt(0);
+        }
     }
 
     [RelayCommand]
@@ -81,13 +99,22 @@ internal partial class SampleViewModel : ZoftObservableObject
     private void ClearSelection() => SelectedItems.Clear();
 
     [ObservableProperty]
-    public partial int CursorPosition { get; set; }
+    public partial int CursorPosition
+    {
+        get; set;
+    }
 
     [ObservableProperty]
-    public partial int NewCursorPosition { get; set; }
+    public partial int NewCursorPosition
+    {
+        get; set;
+    }
 
     [ObservableProperty]
-    public partial string Text { get; set; }
+    public partial string Text
+    {
+        get; set;
+    }
 
     [ObservableProperty]
     public partial bool ShowBottomBorder { get; set; } = true;
@@ -101,7 +128,7 @@ internal partial class SampleViewModel : ZoftObservableObject
     public void FilterList(string filter)
     {
         SelectedItem = null;
-        
+
         // Publish a complete result set once; the previous result collection may
         // still be in use by a native suggestion/selection callback.
         FilteredList = new ObservableCollection<ListItem>(

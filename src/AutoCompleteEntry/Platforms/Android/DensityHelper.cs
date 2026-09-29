@@ -24,9 +24,11 @@ internal static class DensityHelper
     internal static int HeightDipToPixels(double heightDip, double density)
     {
         if (density <= 0)
+        {
             return 0;
+        }
 
-        var px = (int)System.Math.Ceiling(heightDip * density);
+        int px = (int)System.Math.Ceiling(heightDip * density);
         return System.Math.Max(px, 0);
     }
 }

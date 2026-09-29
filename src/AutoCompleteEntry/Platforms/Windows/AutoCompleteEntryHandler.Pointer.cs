@@ -24,8 +24,12 @@ public partial class AutoCompleteEntryHandler
 
     private void AttachSingleSelectionRootHandler()
     {
-        var root = PlatformView.XamlRoot?.Content;
-        if (ReferenceEquals(root, _singleSelectionRoot)) return;
+        UIElement? root = PlatformView.XamlRoot?.Content;
+        if (ReferenceEquals(root, _singleSelectionRoot))
+        {
+            return;
+        }
+
         DetachSingleSelectionRootHandler();
         if (root is not null && _singleSelectionRootPointerHandler is not null)
         {
@@ -37,7 +41,10 @@ public partial class AutoCompleteEntryHandler
     private void DetachSingleSelectionRootHandler()
     {
         if (_singleSelectionRootPointerHandler is not null)
+        {
             _singleSelectionRoot?.RemoveHandler(UIElement.PointerPressedEvent, _singleSelectionRootPointerHandler);
+        }
+
         _singleSelectionRoot = null;
     }
 
@@ -45,31 +52,48 @@ public partial class AutoCompleteEntryHandler
     {
         DetachSingleSelectionRootHandler();
         if (_singleSelectionEditorPointerHandler is not null)
+        {
             editor.RemoveHandler(UIElement.PointerPressedEvent, _singleSelectionEditorPointerHandler);
+        }
+
         _singleSelectionEditorPointerHandler = null;
         _singleSelectionRootPointerHandler = null;
     }
 
     private void OnSingleSelectionEditorPointerPressed(object sender, PointerRoutedEventArgs e)
     {
-        if (VirtualView is null || VirtualView.IsMultiple) return;
+        if (VirtualView is null || VirtualView.IsMultiple)
+        {
+            return;
+        }
+
         VirtualView.IsSuggestionListOpen = true;
-        if (VirtualView.ItemsSource?.Count > 0) PlatformView.IsSuggestionListOpen = true;
+        if (VirtualView.ItemsSource?.Count > 0)
+        {
+            PlatformView.IsSuggestionListOpen = true;
+        }
         // Leave caret placement and clear-button processing to the native editor.
     }
 
     private void OnSingleSelectionRootPointerPressed(object sender, PointerRoutedEventArgs e)
     {
         if (VirtualView is null || VirtualView.IsMultiple ||
-            (!VirtualView.IsSuggestionListOpen && !PlatformView.IsSuggestionListOpen)) return;
+            (!VirtualView.IsSuggestionListOpen && !PlatformView.IsSuggestionListOpen))
+        {
+            return;
+        }
 
         // Popup content has a separate visual ancestry from the editor. Exclude
         // the complete suggestion surface so item/scrollbar clicks work normally.
-        var popupContent = PlatformView.FindDescendant<Popup>()?.Child;
+        UIElement? popupContent = PlatformView.FindDescendant<Popup>()?.Child;
         var source = e.OriginalSource as DependencyObject;
         while (source is not null)
         {
-            if (ReferenceEquals(source, PlatformView) || ReferenceEquals(source, popupContent)) return;
+            if (ReferenceEquals(source, PlatformView) || ReferenceEquals(source, popupContent))
+            {
+                return;
+            }
+
             source = VisualTreeHelper.GetParent(source);
         }
 

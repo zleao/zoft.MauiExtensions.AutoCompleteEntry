@@ -1,4 +1,4 @@
-﻿using Foundation;
+using Foundation;
 
 namespace zoft.MauiExtensions.Controls.Platform;
 
@@ -10,6 +10,12 @@ internal class TableRowSelectedEventArgs<T> : EventArgs
         SelectedItemIndexPath = selectedItemIndexPath;
     }
 
-    public T SelectedItem { get; }
-    public NSIndexPath SelectedItemIndexPath { get; }
+    public T SelectedItem
+    {
+        get;
+    }
+    public NSIndexPath SelectedItemIndexPath
+    {
+        get;
+    }
 }

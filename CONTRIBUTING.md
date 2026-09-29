@@ -35,6 +35,33 @@ Read [AGENTS.md](AGENTS.md) for the repository map, architecture contracts, and 
    dotnet build sample/AutoCompleteEntry.Sample/AutoCompleteEntry.Sample.csproj -f net10.0-windows10.0.19041.0 -c Release
    ```
 
+## Coding style
+
+Use [Microsoft's common C# conventions](https://learn.microsoft.com/dotnet/csharp/fundamentals/coding-style/coding-conventions), with the root [.editorconfig](.editorconfig) defining this repository's concrete preferences. Microsoft offers several related conventions rather than one mandatory .NET style; the field naming follows the [.NET runtime conventions](https://github.com/dotnet/runtime/blob/main/docs/coding-guidelines/coding-style.md).
+
+- Indent C# with four spaces, put braces on separate lines (Allman style), and use braces for control-flow bodies, including single statements. Keep one statement per line.
+- Put `using` directives outside namespaces and sort `System` directives first.
+- Use C# type keywords (`string`, `int`, etc.). Use `var` when the type is apparent from the initializer; otherwise write the type explicitly.
+- Use PascalCase for types, members, and constants; camelCase for parameters and locals; `_camelCase` for private instance fields; and `s_camelCase` for private static fields. Specify accessibility explicitly outside interfaces.
+- Preserve public API names (including the `zoft` namespace), framework overrides, binding/XAML names, generated members, and descriptive test/event-handler names. Keep existing file-scoped or block-scoped namespace declarations. Style work must preserve behavior and resource lifetimes.
+- These rules cover library, native platform, test, and sample C# files. Do not format generated files, `bin`, or `obj`. XML/XAML and project files retain their existing layout.
+
+From the repository root, format all source folders, including platform code excluded by the current host's project evaluation:
+
+```powershell
+$sourceFiles = @(git ls-files -- '*.cs')
+dotnet format whitespace . --folder --include $sourceFiles
+```
+
+Run targeted semantic style fixes against the solution and sample after restoring them:
+
+```powershell
+dotnet format style src/AutoCompleteEntry.sln --no-restore --severity info --diagnostics IDE0003 IDE0009 IDE0011 IDE0040 IDE0049 IDE0007 IDE0008 IDE0065 IDE1006
+dotnet format style sample/AutoCompleteEntry.Sample/AutoCompleteEntry.Sample.csproj --no-restore --severity info --diagnostics IDE0003 IDE0009 IDE0011 IDE0040 IDE0049 IDE0007 IDE0008 IDE0065 IDE1006
+```
+
+Append `--verify-no-changes` to check each command without modifying files. Include any new untracked C# files explicitly in `$sourceFiles`. Review the diff, run `git diff --check`, and perform the change-specific validation below. Project-based style analysis only checks successfully loaded targets and active preprocessor branches; review the other platform implementations as well, on a supported host when semantic analysis requires it. The solution already includes the sample; the separate sample command is useful for sample-only changes. Naming fixes may need manual review, particularly for partial classes and bindings. Multi-target and linked files can produce formatter conflict markers: resolve them and rerun verification before considering formatting complete. No additional analyzer package is required.
+
 ## Validation
 
 Tests use VSTest with `xunit.v3.mtp-off` 4.0.1, the xUnit Visual Studio adapter,

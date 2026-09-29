@@ -20,10 +20,16 @@ public interface IAutoCompleteEntryHandler : IViewHandler
     /// <summary>
     /// Maui view
     /// </summary>
-    new AutoCompleteEntry VirtualView { get; }
+    new AutoCompleteEntry VirtualView
+    {
+        get;
+    }
 
     /// <summary>
     /// Platform specific implementation
     /// </summary>
-    new PlatformView PlatformView { get; }
+    new PlatformView PlatformView
+    {
+        get;
+    }
 }

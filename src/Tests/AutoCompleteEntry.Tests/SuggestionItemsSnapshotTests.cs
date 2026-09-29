@@ -11,9 +11,9 @@ public class SuggestionItemsSnapshotTests
     {
         var queue = new Queue<Action>();
         IList? nativeItems = null;
-        var changes = 0;
+        int changes = 0;
         using var bridge = new SuggestionItemsSnapshot(queue.Enqueue, items => { nativeItems = items; changes++; });
-        var selected = new object();
+        object selected = new object();
         var source = new ObservableCollection<object> { selected };
         bridge.SetSource(source);
         queue.Dequeue()();
@@ -36,14 +36,18 @@ public class SuggestionItemsSnapshotTests
     {
         var queue = new Queue<Action>();
         var source = new ObservableCollection<string> { "selected" };
-        var applying = false;
+        bool applying = false;
         var snapshots = new List<IList?>();
         using var bridge = new SuggestionItemsSnapshot(queue.Enqueue, items =>
         {
             Assert.False(applying);
             applying = true;
             snapshots.Add(items);
-            if (snapshots.Count == 1) { source.Clear(); source.Add("filtered"); }
+            if (snapshots.Count == 1)
+            {
+                source.Clear();
+                source.Add("filtered");
+            }
             applying = false;
         });
         bridge.SetSource(source);
@@ -80,7 +84,7 @@ public class SuggestionItemsSnapshotTests
     public void DisconnectCancelsPendingWorkAndDetachesObservableSource()
     {
         var queue = new Queue<Action>();
-        var applied = false;
+        bool applied = false;
         var source = new ObservableCollection<string>();
         var bridge = new SuggestionItemsSnapshot(queue.Enqueue, _ => applied = true);
         bridge.SetSource(source);

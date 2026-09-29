@@ -66,12 +66,12 @@ public partial class AutoCompleteEntryHandler : ViewHandler<AutoCompleteEntry, I
 
     private void PlatformView_OnLoaded(object? sender, EventArgs e)
     {
-        var virtualView = VirtualView;
+        AutoCompleteEntry? virtualView = VirtualView;
         if (virtualView is null)
         {
             return;
         }
-        var mauiContext = GetRequiredMauiContext();
+        IMauiContext mauiContext = GetRequiredMauiContext();
 
         PlatformView.UpdateText(virtualView);
         PlatformView.UpdatePlaceholder(virtualView);
@@ -93,7 +93,7 @@ public partial class AutoCompleteEntryHandler : ViewHandler<AutoCompleteEntry, I
 
     private void PlatformView_OnSuggestionChosen(object? sender, AutoCompleteEntrySuggestionChosenEventArgs e)
     {
-        var virtualView = VirtualView;
+        AutoCompleteEntry? virtualView = VirtualView;
         if (virtualView is null)
         {
             return;
@@ -104,14 +104,16 @@ public partial class AutoCompleteEntryHandler : ViewHandler<AutoCompleteEntry, I
 
     private void PlatformView_OnTextChanged(object? sender, AutoCompleteEntryTextChangedEventArgs e)
     {
-        var virtualView = VirtualView;
+        AutoCompleteEntry? virtualView = VirtualView;
         if (virtualView is null)
         {
             return;
         }
 
         if (!virtualView.IsMultiple || virtualView.Text != PlatformView.Text)
+        {
             virtualView.OnTextChanged(PlatformView.Text, e.Reason);
+        }
     }
 
 
@@ -173,13 +175,13 @@ public partial class AutoCompleteEntryHandler : ViewHandler<AutoCompleteEntry, I
     /// <param name="autoCompleteEntry"></param>
     public static void MapFont(IAutoCompleteEntryHandler handler, AutoCompleteEntry autoCompleteEntry)
     {
-        var context = handler.MauiContext ??
+        IMauiContext context = handler.MauiContext ??
                       throw new InvalidOperationException($"Unable to find the context. The {nameof(MauiContext)} property should have been set by the host.");
 
-        var services = context?.Services ??
+        IServiceProvider services = context?.Services ??
                        throw new InvalidOperationException($"Unable to find the service provider. The {nameof(MauiContext)} property should have been set by the host.");
 
-        var fontManager = services.GetRequiredService<IFontManager>();
+        IFontManager fontManager = services.GetRequiredService<IFontManager>();
 
         handler.PlatformView?.InputTextField.UpdateFont(autoCompleteEntry, fontManager);
     }
@@ -299,7 +301,11 @@ public partial class AutoCompleteEntryHandler : ViewHandler<AutoCompleteEntry, I
     /// <param name="autoCompleteEntry"></param>
     public static void MapSelectedSuggestion(IAutoCompleteEntryHandler handler, AutoCompleteEntry autoCompleteEntry)
     {
-        if (autoCompleteEntry.IsMultiple) return;
+        if (autoCompleteEntry.IsMultiple)
+        {
+            return;
+        }
+
         handler?.PlatformView?.UpdateSelectedSuggestion(autoCompleteEntry);
     }
 
@@ -382,6 +388,9 @@ public partial class AutoCompleteEntryHandler : ViewHandler<AutoCompleteEntry, I
     public static void MapItemTemplate(IAutoCompleteEntryHandler handler, AutoCompleteEntry autoCompleteEntry)
     {
         handler?.PlatformView.UpdateItemTemplate(autoCompleteEntry);
-        if (handler is not null && autoCompleteEntry.IsMultiple) MapItemsSource(handler, autoCompleteEntry);
+        if (handler is not null && autoCompleteEntry.IsMultiple)
+        {
+            MapItemsSource(handler, autoCompleteEntry);
+        }
     }
 }

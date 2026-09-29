@@ -13,12 +13,23 @@ internal sealed class SuggestionItemsSnapshot(Action<Action> enqueue, Action<ILi
 
     internal void SetSource(IList? source)
     {
-        if (_disposed) return;
+        if (_disposed)
+        {
+            return;
+        }
+
         if (!ReferenceEquals(source, _source))
         {
-            if (_source is INotifyCollectionChanged old) old.CollectionChanged -= OnChanged;
+            if (_source is INotifyCollectionChanged old)
+            {
+                old.CollectionChanged -= OnChanged;
+            }
+
             _source = source;
-            if (_source is INotifyCollectionChanged current) current.CollectionChanged += OnChanged;
+            if (_source is INotifyCollectionChanged current)
+            {
+                current.CollectionChanged += OnChanged;
+            }
         }
         Schedule();
     }
@@ -27,19 +38,30 @@ internal sealed class SuggestionItemsSnapshot(Action<Action> enqueue, Action<ILi
 
     private void Schedule()
     {
-        if (_pending || _disposed) return;
+        if (_pending || _disposed)
+        {
+            return;
+        }
+
         _pending = true;
         enqueue(() =>
         {
             _pending = false;
-            if (!_disposed) apply(_source?.Cast<object?>().ToArray());
+            if (!_disposed)
+            {
+                apply(_source?.Cast<object?>().ToArray());
+            }
         });
     }
 
     public void Dispose()
     {
         _disposed = true;
-        if (_source is INotifyCollectionChanged source) source.CollectionChanged -= OnChanged;
+        if (_source is INotifyCollectionChanged source)
+        {
+            source.CollectionChanged -= OnChanged;
+        }
+
         _source = null;
     }
 }

@@ -24,14 +24,22 @@ public partial class AutoCompleteEntryHandler : ViewHandler<AutoCompleteEntry, A
     {
         _suggestionItems = new(action => platformView.DispatcherQueue.TryEnqueue(() => action()), items =>
         {
-            if (VirtualView.IsMultiple) _multiple?.SetItems(items);
-            else platformView.ItemsSource = items;
+            if (VirtualView.IsMultiple)
+            {
+                _multiple?.SetItems(items);
+            }
+            else
+            {
+                platformView.ItemsSource = items;
+            }
         });
         _openStateToken = platformView.RegisterPropertyChangedCallback(AutoSuggestBox.IsSuggestionListOpenProperty,
             (sender, property) =>
             {
                 if (VirtualView?.IsMultiple != true && VirtualView is not null)
+                {
                     VirtualView.IsSuggestionListOpen = platformView.IsSuggestionListOpen;
+                }
             });
         platformView.GotFocus += PlatformView_OnGotFocus;
         platformView.LostFocus += PlatformView_LostFocus;
@@ -69,8 +77,15 @@ public partial class AutoCompleteEntryHandler : ViewHandler<AutoCompleteEntry, A
 
     private void PlatformView_OnGotFocus(object sender, Microsoft.UI.Xaml.RoutedEventArgs e)
     {
-        if (VirtualView is not null) VirtualView.IsSuggestionListOpen = true;
-        if (VirtualView?.IsMultiple == true) _multiple?.Update();
+        if (VirtualView is not null)
+        {
+            VirtualView.IsSuggestionListOpen = true;
+        }
+
+        if (VirtualView?.IsMultiple == true)
+        {
+            _multiple?.Update();
+        }
         else if (VirtualView?.ItemsSource?.Count > 0)
         {
             PlatformView.IsSuggestionListOpen = true;
@@ -85,10 +100,16 @@ public partial class AutoCompleteEntryHandler : ViewHandler<AutoCompleteEntry, A
     private void PlatformView_LostFocus(object sender, Microsoft.UI.Xaml.RoutedEventArgs e)
     {
         if (_multiple is not null)
+        {
             PlatformView.DispatcherQueue.TryEnqueue(() =>
             {
-                if (_multiple is not null && !_multiple.ContainsFocus()) VirtualView.IsSuggestionListOpen = false;
+                if (_multiple is not null && !_multiple.ContainsFocus())
+                {
+                    VirtualView.IsSuggestionListOpen = false;
+                }
             });
+        }
+
         if (VirtualView is IEntry virtualView)
         {
             virtualView.IsFocused = false;
@@ -98,9 +119,15 @@ public partial class AutoCompleteEntryHandler : ViewHandler<AutoCompleteEntry, A
     // Note: this is copied from MAUI's EntryHandler.Windows.cs > OnPlatformKeyUp
     private void PlatformView_OnKeyUp(object sender, KeyRoutedEventArgs args)
     {
-        if (VirtualView?.IsMultiple == true && VirtualView.IsSuggestionListOpen) return;
-        if (args?.Key != VirtualKey.Enter)
+        if (VirtualView?.IsMultiple == true && VirtualView.IsSuggestionListOpen)
+        {
             return;
+        }
+
+        if (args?.Key != VirtualKey.Enter)
+        {
+            return;
+        }
 
         if (VirtualView?.ReturnType == ReturnType.Next)
         {
@@ -136,14 +163,22 @@ public partial class AutoCompleteEntryHandler : ViewHandler<AutoCompleteEntry, A
 
     private void PlatformView_OnSuggestionChosen(object sender, AutoSuggestBoxSuggestionChosenEventArgs e)
     {
-        if (VirtualView?.IsMultiple == true) return;
+        if (VirtualView?.IsMultiple == true)
+        {
+            return;
+        }
+
         VirtualView?.OnSuggestionSelected(e.SelectedItem);
     }
 
     private void PlatformView_OnTextChanged(object sender, AutoSuggestBoxTextChangedEventArgs e)
     {
         if (VirtualView?.IsMultiple == true &&
-            (e.Reason == AutoSuggestionBoxTextChangeReason.SuggestionChosen || PlatformView.Text == VirtualView.Text)) return;
+            (e.Reason == AutoSuggestionBoxTextChangeReason.SuggestionChosen || PlatformView.Text == VirtualView.Text))
+        {
+            return;
+        }
+
         VirtualView?.OnTextChanged(PlatformView.Text, (AutoCompleteEntryTextChangeReason)e.Reason);
     }
 
@@ -194,7 +229,11 @@ public partial class AutoCompleteEntryHandler : ViewHandler<AutoCompleteEntry, A
     /// <param name="autoCompleteEntry"></param>
     public static void MapDisplayMemberPath(IAutoCompleteEntryHandler handler, AutoCompleteEntry autoCompleteEntry)
     {
-        if (handler is AutoCompleteEntryHandler { _multiple: { } multiple }) multiple.SetTemplate();
+        if (handler is AutoCompleteEntryHandler { _multiple: { } multiple })
+        {
+            multiple.SetTemplate();
+        }
+
         handler?.PlatformView?.UpdateDisplayMemberPath(autoCompleteEntry);
     }
 
@@ -206,13 +245,13 @@ public partial class AutoCompleteEntryHandler : ViewHandler<AutoCompleteEntry, A
     /// <exception cref="InvalidOperationException"></exception>
     public static void MapFont(IAutoCompleteEntryHandler handler, IEntry entry)
     {
-        var context = handler.MauiContext ??
+        IMauiContext context = handler.MauiContext ??
             throw new InvalidOperationException($"Unable to find the context. The {nameof(MauiContext)} property should have been set by the host.");
 
-        var services = context?.Services ??
+        IServiceProvider services = context?.Services ??
             throw new InvalidOperationException($"Unable to find the service provider. The {nameof(MauiContext)} property should have been set by the host.");
 
-        var fontManager = services.GetRequiredService<IFontManager>();
+        IFontManager fontManager = services.GetRequiredService<IFontManager>();
 
         handler.PlatformView?.UpdateFont(entry, fontManager);
     }
@@ -254,7 +293,11 @@ public partial class AutoCompleteEntryHandler : ViewHandler<AutoCompleteEntry, A
     /// <param name="autoCompleteEntry"></param>
     public static void MapIsSuggestionListOpen(IAutoCompleteEntryHandler handler, AutoCompleteEntry autoCompleteEntry)
     {
-        if (autoCompleteEntry.IsMultiple) { MapSelectionPresentation(handler, autoCompleteEntry); return; }
+        if (autoCompleteEntry.IsMultiple)
+        {
+            MapSelectionPresentation(handler, autoCompleteEntry);
+            return;
+        }
         handler?.PlatformView?.UpdateIsSuggestionListOpen(autoCompleteEntry);
     }
 
@@ -276,7 +319,9 @@ public partial class AutoCompleteEntryHandler : ViewHandler<AutoCompleteEntry, A
     public static void MapItemsSource(IAutoCompleteEntryHandler handler, AutoCompleteEntry autoCompleteEntry)
     {
         if (handler is AutoCompleteEntryHandler actual)
+        {
             actual._suggestionItems?.SetSource(autoCompleteEntry.ItemsSource);
+        }
     }
 
     /// <summary>
@@ -326,7 +371,11 @@ public partial class AutoCompleteEntryHandler : ViewHandler<AutoCompleteEntry, A
     /// <param name="autoCompleteEntry"></param>
     public static void MapSelectedSuggestion(IAutoCompleteEntryHandler handler, AutoCompleteEntry autoCompleteEntry)
     {
-        if (autoCompleteEntry.IsMultiple) return;
+        if (autoCompleteEntry.IsMultiple)
+        {
+            return;
+        }
+
         handler?.PlatformView.UpdateSelectedSuggestion(autoCompleteEntry);
     }
 
@@ -367,7 +416,11 @@ public partial class AutoCompleteEntryHandler : ViewHandler<AutoCompleteEntry, A
     /// <param name="autoCompleteEntry"></param>
     public static void MapUpdateTextOnSelect(IAutoCompleteEntryHandler handler, AutoCompleteEntry autoCompleteEntry)
     {
-        if (autoCompleteEntry.IsMultiple) { handler.PlatformView.UpdateTextOnSelect = false; return; }
+        if (autoCompleteEntry.IsMultiple)
+        {
+            handler.PlatformView.UpdateTextOnSelect = false;
+            return;
+        }
         handler?.PlatformView?.UpdateUpdateTextOnSelect(autoCompleteEntry);
     }
 
@@ -409,13 +462,20 @@ public partial class AutoCompleteEntryHandler : ViewHandler<AutoCompleteEntry, A
     /// <summary>Updates checked rows and the separate summary overlay.</summary>
     public static void MapSelectionPresentation(IAutoCompleteEntryHandler handler, AutoCompleteEntry entry)
     {
-        if (handler is AutoCompleteEntryHandler actual) actual._multiple?.Update();
+        if (handler is AutoCompleteEntryHandler actual)
+        {
+            actual._multiple?.Update();
+        }
     }
 
     /// <summary>Switches between native single and persistent multiple suggestion lists.</summary>
     public static void MapSelectionMode(IAutoCompleteEntryHandler handler, AutoCompleteEntry entry)
     {
-        if (handler is not AutoCompleteEntryHandler actual) return;
+        if (handler is not AutoCompleteEntryHandler actual)
+        {
+            return;
+        }
+
         actual._multiple?.Dispose();
         actual._multiple = null;
         if (entry.IsMultiple && handler.MauiContext is { } context)

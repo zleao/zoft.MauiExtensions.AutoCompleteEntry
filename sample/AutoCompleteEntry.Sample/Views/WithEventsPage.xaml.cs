@@ -28,7 +28,10 @@ namespace AutoCompleteEntry.Sample.Views
         private void AutoCompleteEntry_SuggestionChosen(object sender, zoft.MauiExtensions.Controls.AutoCompleteEntrySuggestionChosenEventArgs e)
         {
             Log($"SuggestionChosen: {(e.SelectedItem as ListItem)?.Country}, selected={e.IsSelected}");
-            if (CountryEntry.SelectionMode == zoft.MauiExtensions.Controls.AutoCompleteEntrySelectionMode.Multiple) return;
+            if (CountryEntry.SelectionMode == zoft.MauiExtensions.Controls.AutoCompleteEntrySelectionMode.Multiple)
+            {
+                return;
+            }
             // Set sender.Text. You can use args.SelectedItem to build your text string.
             ViewModel.SelectedItem = e.SelectedItem as ListItem;
         }
@@ -55,7 +58,11 @@ namespace AutoCompleteEntry.Sample.Views
 
         private void CountryEntry_SelectionChanged(object sender, zoft.MauiExtensions.Controls.AutoCompleteEntrySelectionChangedEventArgs e)
         {
-            if (SelectionStatus is not null) SelectionStatus.Text = CountryEntry.SelectionSummary;
+            if (SelectionStatus is not null)
+            {
+                SelectionStatus.Text = CountryEntry.SelectionSummary;
+            }
+
             Log($"SelectionChanged: +{e.AddedItems.Count}, -{e.RemovedItems.Count}");
         }
 
@@ -72,13 +79,19 @@ namespace AutoCompleteEntry.Sample.Views
 
         private void AddSelection_Clicked(object sender, EventArgs e)
         {
-            var item = ViewModel.GetExactMatch("Portugal");
-            if (!CountryEntry.SelectedSuggestions.Contains(item)) CountryEntry.SelectedSuggestions.Add(item);
+            ListItem item = ViewModel.GetExactMatch("Portugal");
+            if (!CountryEntry.SelectedSuggestions.Contains(item))
+            {
+                CountryEntry.SelectedSuggestions.Add(item);
+            }
         }
 
         private void RemoveSelection_Clicked(object sender, EventArgs e)
         {
-            if (CountryEntry.SelectedSuggestions.Count > 0) CountryEntry.SelectedSuggestions.RemoveAt(0);
+            if (CountryEntry.SelectedSuggestions.Count > 0)
+            {
+                CountryEntry.SelectedSuggestions.RemoveAt(0);
+            }
         }
 
         private void ReplaceSelection_Clicked(object sender, EventArgs e)
@@ -90,8 +103,10 @@ namespace AutoCompleteEntry.Sample.Views
         private void Log(string message)
         {
             if (EventLog is not null)
+            {
                 EventLog.Text = string.Join(Environment.NewLine,
                     ((EventLog.Text ?? "") + Environment.NewLine + message).Split(Environment.NewLine).TakeLast(5));
+            }
         }
     }
 }

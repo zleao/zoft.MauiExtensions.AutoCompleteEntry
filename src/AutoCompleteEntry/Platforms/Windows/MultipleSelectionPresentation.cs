@@ -4,11 +4,11 @@ using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Controls.Primitives;
 using Microsoft.UI.Xaml.Input;
 using Windows.System;
-using WGrid = Microsoft.UI.Xaml.Controls.Grid;
 using ListView = Microsoft.UI.Xaml.Controls.ListView;
-using SizeChangedEventArgs = Microsoft.UI.Xaml.SizeChangedEventArgs;
 using ListViewSelectionMode = Microsoft.UI.Xaml.Controls.ListViewSelectionMode;
+using SizeChangedEventArgs = Microsoft.UI.Xaml.SizeChangedEventArgs;
 using WBorder = Microsoft.UI.Xaml.Controls.Border;
+using WGrid = Microsoft.UI.Xaml.Controls.Grid;
 
 namespace zoft.MauiExtensions.Controls.Platform;
 
@@ -58,7 +58,11 @@ internal sealed class MultipleSelectionPresentation : IDisposable
         AttachSummary();
     }
 
-    private void OnLoaded(object sender, RoutedEventArgs e) { AttachSummary(); Update(); }
+    private void OnLoaded(object sender, RoutedEventArgs e)
+    {
+        AttachSummary();
+        Update();
+    }
 
     private void OnThemeChanged(FrameworkElement sender, object args) => UpdateBackground();
 
@@ -96,7 +100,11 @@ internal sealed class MultipleSelectionPresentation : IDisposable
 
     internal void SetItems(System.Collections.IList? items)
     {
-        if (_disposed) return;
+        if (_disposed)
+        {
+            return;
+        }
+
         _list.ItemsSource = items;
         _highlight = -1;
         Update();
@@ -109,9 +117,9 @@ internal sealed class MultipleSelectionPresentation : IDisposable
             _root = root;
             _root.AddHandler(UIElement.PointerPressedEvent, _rootPointerHandler, true);
         }
-        var textBox = _editor.FindDescendant<TextBox>();
+        TextBox? textBox = _editor.FindDescendant<TextBox>();
         textBox?.ApplyTemplate();
-        var content = textBox?.FindDescendant<ScrollViewer>();
+        ScrollViewer? content = textBox?.FindDescendant<ScrollViewer>();
         if (_summary.Parent is null && content?.Parent is WGrid grid)
         {
             _textContent = content;
@@ -139,7 +147,11 @@ internal sealed class MultipleSelectionPresentation : IDisposable
 
     internal void Update()
     {
-        if (_changing || _disposed) return;
+        if (_changing || _disposed)
+        {
+            return;
+        }
+
         _changing = true;
         try
         {
@@ -168,10 +180,15 @@ internal sealed class MultipleSelectionPresentation : IDisposable
                 _summary.VerticalAlignment = content.VerticalAlignment;
                 _summary.HorizontalAlignment = content.HorizontalAlignment;
                 if (_editor.FindDescendant<TextBox>() is { } textBox)
+                {
                     _summary.TextAlignment = textBox.TextAlignment;
+                }
             }
             if (_placeholder is not null)
+            {
                 _placeholder.Opacity = _owner.ShowsSelectionSummary ? 0 : _placeholderOpacity;
+            }
+
             Microsoft.UI.Xaml.Automation.AutomationProperties.SetHelpText(_editor,
                 _owner.ShowsSelectionSummary ? _owner.SelectionSummary : string.Empty);
             if (_editor.XamlRoot is not null)
@@ -186,7 +203,7 @@ internal sealed class MultipleSelectionPresentation : IDisposable
 
     private void PositionPopup()
     {
-        var point = _editor.TransformToVisual(null).TransformPoint(new Windows.Foundation.Point(0, _editor.ActualHeight));
+        Windows.Foundation.Point point = _editor.TransformToVisual(null).TransformPoint(new Windows.Foundation.Point(0, _editor.ActualHeight));
         _popup.HorizontalOffset = point.X;
         _popup.VerticalOffset = point.Y;
         _surface.Width = Math.Max(1, _editor.ActualWidth);
@@ -196,7 +213,11 @@ internal sealed class MultipleSelectionPresentation : IDisposable
     private void OnSizeChanged(object sender, SizeChangedEventArgs e) => Update();
     private void OnPointerPressed(object sender, PointerRoutedEventArgs e)
     {
-        if (_disposed) return;
+        if (_disposed)
+        {
+            return;
+        }
+
         _owner.IsSuggestionListOpen = true;
         // Also reconcile native visibility if the shared value was already true.
         // Do not handle the event: the TextBox still owns caret/selection input.
@@ -209,7 +230,11 @@ internal sealed class MultipleSelectionPresentation : IDisposable
         var source = e.OriginalSource as DependencyObject;
         while (source is not null)
         {
-            if (ReferenceEquals(source, _editor) || ReferenceEquals(source, _surface)) return;
+            if (ReferenceEquals(source, _editor) || ReferenceEquals(source, _surface))
+            {
+                return;
+            }
+
             source = Microsoft.UI.Xaml.Media.VisualTreeHelper.GetParent(source);
         }
         _owner.IsSuggestionListOpen = false;
@@ -218,7 +243,10 @@ internal sealed class MultipleSelectionPresentation : IDisposable
     {
         // A queued Closed notification from an earlier dismissal must not close
         // a session that has already been reopened by another pointer press.
-        if (!_changing && !_disposed && !_popup.IsOpen) _owner.IsSuggestionListOpen = false;
+        if (!_changing && !_disposed && !_popup.IsOpen)
+        {
+            _owner.IsSuggestionListOpen = false;
+        }
     }
 
     internal bool ContainsFocus()
@@ -226,7 +254,11 @@ internal sealed class MultipleSelectionPresentation : IDisposable
         var focused = FocusManager.GetFocusedElement(_editor.XamlRoot) as DependencyObject;
         while (focused is not null)
         {
-            if (ReferenceEquals(focused, _editor) || ReferenceEquals(focused, _list)) return true;
+            if (ReferenceEquals(focused, _editor) || ReferenceEquals(focused, _list))
+            {
+                return true;
+            }
+
             focused = Microsoft.UI.Xaml.Media.VisualTreeHelper.GetParent(focused);
         }
         return false;
@@ -240,7 +272,12 @@ internal sealed class MultipleSelectionPresentation : IDisposable
 
     private void OnKeyDown(object sender, KeyRoutedEventArgs e)
     {
-        if (e.Key == VirtualKey.Escape) { _owner.IsSuggestionListOpen = false; e.Handled = true; return; }
+        if (e.Key == VirtualKey.Escape)
+        {
+            _owner.IsSuggestionListOpen = false;
+            e.Handled = true;
+            return;
+        }
         if (e.Key is VirtualKey.Down or VirtualKey.Up)
         {
             _owner.IsSuggestionListOpen = true;
@@ -276,9 +313,22 @@ internal sealed class MultipleSelectionPresentation : IDisposable
         _editor.ActualThemeChanged -= OnThemeChanged;
         _root?.RemoveHandler(UIElement.PointerPressedEvent, _rootPointerHandler);
         _root = null;
-        if (_summary.Parent is WGrid grid) grid.Children.Remove(_summary);
-        if (_textContent is not null) _textContent.Opacity = _contentOpacity;
-        if (_placeholder is not null) _placeholder.Opacity = _placeholderOpacity;
+
+        if (_summary.Parent is WGrid grid)
+        {
+            grid.Children.Remove(_summary);
+        }
+
+        if (_textContent is not null)
+        {
+            _textContent.Opacity = _contentOpacity;
+        }
+
+        if (_placeholder is not null)
+        {
+            _placeholder.Opacity = _placeholderOpacity;
+        }
+
         Microsoft.UI.Xaml.Automation.AutomationProperties.SetHelpText(_editor, string.Empty);
     }
 }

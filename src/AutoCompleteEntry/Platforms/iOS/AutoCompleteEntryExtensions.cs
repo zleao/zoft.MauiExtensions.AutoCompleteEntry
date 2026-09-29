@@ -77,7 +77,7 @@ public static class AutoCompleteEntryExtensions
     /// <param name="autoCompleteEntry"></param>
     public static void UpdateMaxLength(this IOSAutoCompleteEntry iosAutoCompleteEntry, AutoCompleteEntry autoCompleteEntry)
     {
-        var newText = iosAutoCompleteEntry.InputTextField.AttributedText.TrimToMaxLength(autoCompleteEntry.MaxLength);
+        NSAttributedString? newText = iosAutoCompleteEntry.InputTextField.AttributedText.TrimToMaxLength(autoCompleteEntry.MaxLength);
         if (newText != null && iosAutoCompleteEntry.InputTextField.AttributedText != null && !iosAutoCompleteEntry.InputTextField.AttributedText.Equals(newText))
         {
             iosAutoCompleteEntry.InputTextField.AttributedText = newText;
@@ -92,15 +92,15 @@ public static class AutoCompleteEntryExtensions
     /// <param name="defaultPlaceholderColor"></param>
     public static void UpdatePlaceholder(this IOSAutoCompleteEntry iosAutoCompleteEntry, AutoCompleteEntry autoCompleteEntry, Color? defaultPlaceholderColor = null)
     {
-        var placeholder = autoCompleteEntry.Placeholder;
+        string placeholder = autoCompleteEntry.Placeholder;
         if (placeholder == null)
         {
             iosAutoCompleteEntry.InputTextField.AttributedPlaceholder = null;
             return;
         }
 
-        var placeholderColor = autoCompleteEntry.PlaceholderColor;
-        var foregroundColor = placeholderColor ?? defaultPlaceholderColor;
+        Color placeholderColor = autoCompleteEntry.PlaceholderColor;
+        Color? foregroundColor = placeholderColor ?? defaultPlaceholderColor;
 
         iosAutoCompleteEntry.InputTextField.AttributedPlaceholder = foregroundColor == null
             ? new NSAttributedString(placeholder)
@@ -179,7 +179,7 @@ public static class AutoCompleteEntryExtensions
 
     private static Func<object, string> CreateTextSelector(AutoCompleteEntry autoCompleteEntry)
     {
-        var textMemberPath = autoCompleteEntry.TextMemberPath;
+        string textMemberPath = autoCompleteEntry.TextMemberPath;
         return item => !string.IsNullOrEmpty(textMemberPath)
             ? item.GetPropertyValueAsString(textMemberPath)
             : item?.ToString() ?? string.Empty;

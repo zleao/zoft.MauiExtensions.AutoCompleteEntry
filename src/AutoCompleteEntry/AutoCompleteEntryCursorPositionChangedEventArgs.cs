@@ -1,4 +1,4 @@
-﻿namespace zoft.MauiExtensions.Controls;
+namespace zoft.MauiExtensions.Controls;
 
 /// <summary>
 /// Provides data for cursor position changes in <see cref="AutoCompleteEntry"/>.
@@ -18,5 +18,8 @@ public sealed class AutoCompleteEntryCursorPositionChangedEventArgs : EventArgs
     /// Gets the current cursor position.
     /// </summary>
     /// <value>The current cursor position.</value>
-    public int CursorPosition { get; }
+    public int CursorPosition
+    {
+        get;
+    }
 }

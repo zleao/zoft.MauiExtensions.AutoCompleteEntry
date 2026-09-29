@@ -21,16 +21,22 @@ public static class AutoCompleteEntryExtensions
                                                 Func<Drawable?>? getClearButtonDrawable)
     {
         if (platformView is null)
+        {
             return false;
+        }
 
-        var motionEvent = touchEvent?.Event;
+        MotionEvent? motionEvent = touchEvent?.Event;
         if (motionEvent is null)
+        {
             return false;
+        }
 
         if (motionEvent.Action != MotionEventActions.Up)
+        {
             return false;
+        }
 
-        var rBounds = getClearButtonDrawable?.Invoke()?.Bounds;
+        Android.Graphics.Rect? rBounds = getClearButtonDrawable?.Invoke()?.Bounds;
 
         if (rBounds is null)
         {
@@ -38,15 +44,22 @@ public static class AutoCompleteEntryExtensions
             return false;
         }
 
-        var buttonRect = GetClearButtonLocation(rBounds, platformView);
+        Android.Graphics.Rect buttonRect = GetClearButtonLocation(rBounds, platformView);
 
         if (!RectContainsMotionEvent(buttonRect, motionEvent))
         {
             return false;
         }
 
-        if (platformView.Owner?.IsMultiple == true) platformView.ClearQueryFromUser();
-        else platformView.Text = null;
+        if (platformView.Owner?.IsMultiple == true)
+        {
+            platformView.ClearQueryFromUser();
+        }
+        else
+        {
+            platformView.Text = null;
+        }
+
         return true;
     }
     // Android.Graphics.Rect has a Containts(x,y) method, but it only takes `int` and the coordinates from
@@ -54,14 +67,14 @@ public static class AutoCompleteEntryExtensions
     // bounds of the EditText.
     private static bool RectContainsMotionEvent(Android.Graphics.Rect rect, MotionEvent motionEvent)
     {
-        var x = motionEvent.GetX();
+        float x = motionEvent.GetX();
 
         if (x < rect.Left || x > rect.Right)
         {
             return false;
         }
 
-        var y = motionEvent.GetY();
+        float y = motionEvent.GetY();
 
         if (y < rect.Top || y > rect.Bottom)
         {
@@ -76,23 +89,23 @@ public static class AutoCompleteEntryExtensions
         // Determine the top and bottom edges of the button
         // This assumes the button is vertically centered within the padded area of the EditText
 
-        var topEdge = platformView.PaddingTop;
-        var bottomEdge = platformView.Height - platformView.PaddingBottom;
+        int topEdge = platformView.PaddingTop;
+        int bottomEdge = platformView.Height - platformView.PaddingBottom;
 
         // The horizontal location of the button depends on the layout direction
-        var flowDirection = platformView.LayoutDirection;
+        Android.Views.LayoutDirection flowDirection = platformView.LayoutDirection;
 
         if (flowDirection == Android.Views.LayoutDirection.Ltr)
         {
-            var rightEdge = platformView.Width - platformView.PaddingRight;
-            var leftEdge = rightEdge - buttonRect.Width();
+            int rightEdge = platformView.Width - platformView.PaddingRight;
+            int leftEdge = rightEdge - buttonRect.Width();
 
             return new Android.Graphics.Rect(leftEdge, topEdge, rightEdge, bottomEdge);
         }
         else
         {
-            var leftEdge = platformView.PaddingLeft;
-            var rightEdge = leftEdge + buttonRect.Width();
+            int leftEdge = platformView.PaddingLeft;
+            int rightEdge = leftEdge + buttonRect.Width();
 
             return new Android.Graphics.Rect(leftEdge, topEdge, rightEdge, bottomEdge);
         }
@@ -160,9 +173,13 @@ public static class AutoCompleteEntryExtensions
     public static void UpdateIsTextPredictionEnabled(this AndroidAutoCompleteEntry platformView, AutoCompleteEntry virtualView)
     {
         if (virtualView.IsTextPredictionEnabled)
+        {
             platformView.InputType &= ~InputTypes.TextFlagNoSuggestions;
+        }
         else
+        {
             platformView.InputType |= InputTypes.TextFlagNoSuggestions;
+        }
     }
 
     /// <summary>
@@ -245,7 +262,7 @@ public static class AutoCompleteEntryExtensions
 
     private static Func<object, string> CreateTextSelector(AutoCompleteEntry autoCompleteEntry)
     {
-        var textMemberPath = autoCompleteEntry.TextMemberPath;
+        string textMemberPath = autoCompleteEntry.TextMemberPath;
         return item => !string.IsNullOrEmpty(textMemberPath)
             ? item.GetPropertyValueAsString(textMemberPath)
             : item?.ToString() ?? string.Empty;

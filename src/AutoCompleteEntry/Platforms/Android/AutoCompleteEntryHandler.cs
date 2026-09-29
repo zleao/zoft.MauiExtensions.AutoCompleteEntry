@@ -10,10 +10,10 @@ namespace zoft.MauiExtensions.Controls.Handlers;
 
 public partial class AutoCompleteEntryHandler : ViewHandler<AutoCompleteEntry, AndroidAutoCompleteEntry>
 {
-    Drawable? _clearButtonDrawable;
-    bool _clearButtonVisible;
+    private Drawable? _clearButtonDrawable;
+    private bool _clearButtonVisible;
 
-   
+
 
     /// <inheritdoc/>
     protected override AndroidAutoCompleteEntry CreatePlatformView() => new(Context);
@@ -57,7 +57,7 @@ public partial class AutoCompleteEntryHandler : ViewHandler<AutoCompleteEntry, A
     // Note: this is copied from MAUI's EntryHandler.Android.cs > OnEditorAction
     private void PlatformView_OnEditorAction(object? sender, Android.Widget.TextView.EditorActionEventArgs e)
     {
-        var returnType = VirtualView?.ReturnType;
+        ReturnType? returnType = VirtualView?.ReturnType;
 
         // Inside of the android implementations that map events to listeners, the default return value for "Handled" is always true
         // This means, just by subscribing to EditorAction/KeyPressed/etc.. you change the behavior of the control
@@ -65,8 +65,8 @@ public partial class AutoCompleteEntryHandler : ViewHandler<AutoCompleteEntry, A
         bool handled = false;
         if (returnType != null)
         {
-            var actionId = e.ActionId;
-            var evt = e.Event;
+            ImeAction actionId = e.ActionId;
+            KeyEvent? evt = e.Event;
             ImeAction currentInputImeFlag = PlatformView.ImeOptions;
 
             // On API 34 it looks like they fixed the issue where the actionId is ImeAction.ImeNull when using a keyboard
@@ -97,7 +97,7 @@ public partial class AutoCompleteEntryHandler : ViewHandler<AutoCompleteEntry, A
 
     private void PlatformView_OnSuggestionChosen(object? sender, AutoCompleteEntrySuggestionChosenEventArgs e)
     {
-        var virtualView = VirtualView;
+        AutoCompleteEntry? virtualView = VirtualView;
         if (virtualView is null)
         {
             return;
@@ -108,22 +108,28 @@ public partial class AutoCompleteEntryHandler : ViewHandler<AutoCompleteEntry, A
 
     private void PlatformView_OnTextChanged(object? sender, AutoCompleteEntryTextChangedEventArgs e)
     {
-        var virtualView = VirtualView;
+        AutoCompleteEntry? virtualView = VirtualView;
         if (virtualView is null)
         {
             return;
         }
 
         if (!virtualView.IsMultiple || virtualView.Text != PlatformView.Text)
+        {
             virtualView.OnTextChanged(PlatformView.Text, e.Reason);
+        }
+
         PlatformView.UpdateClearButtonVisibility(virtualView);
     }
 
     private void PlatformView_OnTouch(object? sender, Android.Views.View.TouchEventArgs e)
     {
         if (e.Event?.Action == MotionEventActions.Down && VirtualView?.IsMultiple == true)
+        {
             VirtualView.IsSuggestionListOpen = true;
-        var virtualView = VirtualView;
+        }
+
+        AutoCompleteEntry? virtualView = VirtualView;
         e.Handled = _clearButtonVisible
                     &&
                     virtualView is not null
@@ -133,7 +139,7 @@ public partial class AutoCompleteEntryHandler : ViewHandler<AutoCompleteEntry, A
 
     private void PlatformView_OnViewAttachedToWindow(object? sender, Android.Views.View.ViewAttachedToWindowEventArgs e)
     {
-        var virtualView = VirtualView;
+        AutoCompleteEntry? virtualView = VirtualView;
         if (virtualView is null)
         {
             return;
@@ -169,7 +175,7 @@ public partial class AutoCompleteEntryHandler : ViewHandler<AutoCompleteEntry, A
     /// </summary>
     /// <param name="handler"></param>
     /// <param name="autoCompleteEntry"></param>
-    public static void MapClearButtonVisibility(IAutoCompleteEntryHandler handler, AutoCompleteEntry autoCompleteEntry) 
+    public static void MapClearButtonVisibility(IAutoCompleteEntryHandler handler, AutoCompleteEntry autoCompleteEntry)
     {
         handler.PlatformView?.UpdateClearButtonVisibility(autoCompleteEntry);
     }
@@ -262,13 +268,13 @@ public partial class AutoCompleteEntryHandler : ViewHandler<AutoCompleteEntry, A
     /// <exception cref="InvalidOperationException"></exception>
     public static void MapFont(IAutoCompleteEntryHandler handler, IEntry entry)
     {
-        var context = handler.MauiContext ??
+        IMauiContext context = handler.MauiContext ??
                       throw new InvalidOperationException($"Unable to find the context. The {nameof(MauiContext)} property should have been set by the host.");
 
-        var services = context?.Services ??
+        IServiceProvider services = context?.Services ??
                        throw new InvalidOperationException($"Unable to find the service provider. The {nameof(MauiContext)} property should have been set by the host.");
 
-        var fontManager = services.GetRequiredService<IFontManager>();
+        IFontManager fontManager = services.GetRequiredService<IFontManager>();
 
         handler.PlatformView?.UpdateFont(entry, fontManager);
     }
@@ -378,9 +384,13 @@ public partial class AutoCompleteEntryHandler : ViewHandler<AutoCompleteEntry, A
     /// </summary>
     /// <param name="handler"></param>
     /// <param name="autoCompleteEntry"></param>
-    public static void MapSelectedSuggestion(IAutoCompleteEntryHandler handler, AutoCompleteEntry autoCompleteEntry) 
+    public static void MapSelectedSuggestion(IAutoCompleteEntryHandler handler, AutoCompleteEntry autoCompleteEntry)
     {
-        if (autoCompleteEntry.IsMultiple) return;
+        if (autoCompleteEntry.IsMultiple)
+        {
+            return;
+        }
+
         handler.PlatformView?.UpdateSelectedSuggestion(autoCompleteEntry);
     }
 
@@ -423,21 +433,29 @@ public partial class AutoCompleteEntryHandler : ViewHandler<AutoCompleteEntry, A
             return;
         }
 
-        var drawable = GetClearButtonDrawable();
+        Drawable? drawable = GetClearButtonDrawable();
         if (drawable is null)
         {
             return;
         }
 
         if (VirtualView?.TextColor is not null)
+        {
             drawable.SetColorFilter(VirtualView.TextColor.ToPlatform(), FilterMode.SrcIn);
+        }
         else
+        {
             drawable.ClearColorFilter();
+        }
 
         if (PlatformView.LayoutDirection == Android.Views.LayoutDirection.Rtl)
+        {
             PlatformView.SetCompoundDrawablesWithIntrinsicBounds(drawable, null, null, null);
+        }
         else
+        {
             PlatformView.SetCompoundDrawablesWithIntrinsicBounds(null, null, drawable, null);
+        }
 
         _clearButtonVisible = true;
     }

@@ -18,7 +18,7 @@ public class DensityHelperTests
     public void WidthPixelsToDipConstraint_PositiveWidth_ReturnsDipValue(
         int parentWidthPx, double density, double expectedDip)
     {
-        var result = DensityHelper.WidthPixelsToDipConstraint(parentWidthPx, density);
+        double result = DensityHelper.WidthPixelsToDipConstraint(parentWidthPx, density);
 
         Assert.Equal(expectedDip, result, precision: 3);
     }
@@ -30,7 +30,7 @@ public class DensityHelperTests
     public void WidthPixelsToDipConstraint_ZeroOrNegativeWidth_ReturnsPositiveInfinity(
         int parentWidthPx, double density)
     {
-        var result = DensityHelper.WidthPixelsToDipConstraint(parentWidthPx, density);
+        double result = DensityHelper.WidthPixelsToDipConstraint(parentWidthPx, density);
 
         Assert.Equal(double.PositiveInfinity, result);
     }
@@ -41,7 +41,7 @@ public class DensityHelperTests
     public void WidthPixelsToDipConstraint_ZeroOrNegativeDensity_ReturnsPositiveInfinity(
         int parentWidthPx, double density)
     {
-        var result = DensityHelper.WidthPixelsToDipConstraint(parentWidthPx, density);
+        double result = DensityHelper.WidthPixelsToDipConstraint(parentWidthPx, density);
 
         Assert.Equal(double.PositiveInfinity, result);
     }
@@ -58,7 +58,7 @@ public class DensityHelperTests
     public void HeightDipToPixels_StandardDensities_ReturnsCorrectPixels(
         double heightDip, double density, int expectedPx)
     {
-        var result = DensityHelper.HeightDipToPixels(heightDip, density);
+        int result = DensityHelper.HeightDipToPixels(heightDip, density);
 
         Assert.Equal(expectedPx, result);
     }
@@ -67,7 +67,7 @@ public class DensityHelperTests
     public void HeightDipToPixels_FractionalResult_RoundsUp()
     {
         // 45.0 * 2.75 = 123.75 → ceil = 124 (never clip content)
-        var result = DensityHelper.HeightDipToPixels(45.0, 2.75);
+        int result = DensityHelper.HeightDipToPixels(45.0, 2.75);
 
         Assert.Equal(124, result);
     }
@@ -75,7 +75,7 @@ public class DensityHelperTests
     [Fact]
     public void HeightDipToPixels_ZeroHeight_ReturnsZero()
     {
-        var result = DensityHelper.HeightDipToPixels(0.0, 3.0);
+        int result = DensityHelper.HeightDipToPixels(0.0, 3.0);
 
         Assert.Equal(0, result);
     }
@@ -86,7 +86,7 @@ public class DensityHelperTests
     public void HeightDipToPixels_ZeroOrNegativeDensity_ReturnsZero(
         double heightDip, double density)
     {
-        var result = DensityHelper.HeightDipToPixels(heightDip, density);
+        int result = DensityHelper.HeightDipToPixels(heightDip, density);
 
         Assert.Equal(0, result);
     }
@@ -95,7 +95,7 @@ public class DensityHelperTests
     public void HeightDipToPixels_VerySmallHeight_RoundsUpToAtLeastOne()
     {
         // 0.1 * 2.0 = 0.2 → ceil = 1
-        var result = DensityHelper.HeightDipToPixels(0.1, 2.0);
+        int result = DensityHelper.HeightDipToPixels(0.1, 2.0);
 
         Assert.Equal(1, result);
     }
@@ -107,7 +107,7 @@ public class DensityHelperTests
     public void HeightDipToPixels_NegativeHeight_ClampedToZero(
         double heightDip, double density)
     {
-        var result = DensityHelper.HeightDipToPixels(heightDip, density);
+        int result = DensityHelper.HeightDipToPixels(heightDip, density);
 
         Assert.Equal(0, result);
     }

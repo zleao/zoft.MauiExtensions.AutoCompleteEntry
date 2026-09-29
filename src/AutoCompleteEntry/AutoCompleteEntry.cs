@@ -29,8 +29,14 @@ public partial class AutoCompleteEntry : Entry
     /// </value>
     public string TextMemberPath
     {
-        get { return (string)GetValue(TextMemberPathProperty); }
-        set { SetValue(TextMemberPathProperty, value); }
+        get
+        {
+            return (string)GetValue(TextMemberPathProperty);
+        }
+        set
+        {
+            SetValue(TextMemberPathProperty, value);
+        }
     }
 
     /// <summary>
@@ -50,8 +56,14 @@ public partial class AutoCompleteEntry : Entry
     /// </value>
     public string DisplayMemberPath
     {
-        get { return (string)GetValue(DisplayMemberPathProperty); }
-        set { SetValue(DisplayMemberPathProperty, value); }
+        get
+        {
+            return (string)GetValue(DisplayMemberPathProperty);
+        }
+        set
+        {
+            SetValue(DisplayMemberPathProperty, value);
+        }
     }
 
     /// <summary>
@@ -143,7 +155,9 @@ public partial class AutoCompleteEntry : Entry
         // A dismissed session can leave the editor focused. Start the new empty
         // session before applying the first keystroke, so opening cannot erase it.
         if (IsMultiple && reason == AutoCompleteEntryTextChangeReason.UserInput && !IsSuggestionListOpen)
+        {
             IsSuggestionListOpen = true;
+        }
 
         _suppressTextChangedEvent = true; //prevent loop of events raising, as setting this property will make it back into the native control
         Text = text;
@@ -186,7 +200,10 @@ public partial class AutoCompleteEntry : Entry
     /// <param name="cursorPosition"></param>
     public void OnCursorPositionChanged(int cursorPosition)
     {
-        if (CursorPosition == cursorPosition) return;
+        if (CursorPosition == cursorPosition)
+        {
+            return;
+        }
 
         CursorPosition = cursorPosition;
         CursorPositionChanged?.Invoke(this, new AutoCompleteEntryCursorPositionChangedEventArgs(cursorPosition));

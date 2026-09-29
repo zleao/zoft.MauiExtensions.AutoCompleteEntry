@@ -1,3 +1,4 @@
+using System.Collections;
 using Android.Content;
 using Android.Graphics.Drawables;
 using Android.Runtime;
@@ -8,7 +9,6 @@ using Android.Widget;
 using AndroidX.AppCompat.Widget;
 using Java.Lang;
 using Microsoft.Maui.Platform;
-using System.Collections;
 using Color = Microsoft.Maui.Graphics.Color;
 
 namespace zoft.MauiExtensions.Controls.Platform;
@@ -23,7 +23,10 @@ public sealed partial class AndroidAutoCompleteEntry : AppCompatAutoCompleteText
     private Func<object, string> _textMemberPathFunc = static item => item?.ToString() ?? string.Empty;
     private AutoCompleteEntryAdapter _adapter;
     private Drawable? _originalBackground;
-    internal AutoCompleteEntry? Owner { get; set; }
+    internal AutoCompleteEntry? Owner
+    {
+        get; set;
+    }
     private PopupWindow? _multiplePopup;
     private Android.Widget.ListView? _multipleList;
     private bool _updatingPopup;
@@ -47,7 +50,10 @@ public sealed partial class AndroidAutoCompleteEntry : AppCompatAutoCompleteText
             _resourcesFreed = false;
         }
         _adapter.Owner = owner;
-        if (IsAttachedToWindow) ObserveViewport();
+        if (IsAttachedToWindow)
+        {
+            ObserveViewport();
+        }
     }
 
     protected override void OnAttachedToWindow()
@@ -71,7 +77,11 @@ public sealed partial class AndroidAutoCompleteEntry : AppCompatAutoCompleteText
         ViewTreeObserver!.GlobalLayout -= OnViewportChanged;
         ViewTreeObserver.ScrollChanged -= OnViewportChanged;
         ViewTreeObserver.PreDraw -= OnViewportPreDraw;
-        if (Owner?.IsMultiple == true) CloseSuggestionList();
+        if (Owner?.IsMultiple == true)
+        {
+            CloseSuggestionList();
+        }
+
         base.OnDetachedFromWindow();
     }
 
@@ -80,13 +90,18 @@ public sealed partial class AndroidAutoCompleteEntry : AppCompatAutoCompleteText
         // The IME can appear after the first popup layout. Refit without ending
         // the search session or covering the user's keyboard.
         if (Owner is { IsMultiple: true, IsSuggestionListOpen: true } && _multiplePopup?.IsShowing == true)
+        {
             ShowDropDown();
+        }
         else if (Owner?.IsMultiple != true && IsPopupShowing)
         {
             // The native popup tracks its anchor but can retain the height from
             // before IME-driven parent scrolling. Re-measure it at the new anchor.
-            var viewport = GetSingleViewport();
-            if (_singleViewport != viewport) ShowDropDown();
+            (int X, int Y, int Width, int Height, int Left, int Top, int Right, int Bottom) viewport = GetSingleViewport();
+            if (_singleViewport != viewport)
+            {
+                ShowDropDown();
+            }
         }
     }
 
@@ -102,7 +117,7 @@ public sealed partial class AndroidAutoCompleteEntry : AppCompatAutoCompleteText
     {
         using var visible = new Android.Graphics.Rect();
         GetWindowVisibleDisplayFrame(visible);
-        var position = new int[2];
+        int[] position = new int[2];
         GetLocationOnScreen(position);
         return (position[0], position[1], Width, Height, visible.Left, visible.Top, visible.Right, visible.Bottom);
     }
@@ -133,13 +148,20 @@ public sealed partial class AndroidAutoCompleteEntry : AppCompatAutoCompleteText
 
     public void FreeResources()
     {
-        if (_resourcesFreed) return;
+        if (_resourcesFreed)
+        {
+            return;
+        }
+
         _resourcesFreed = true;
         ViewTreeObserver!.GlobalLayout -= OnViewportChanged;
         ViewTreeObserver.ScrollChanged -= OnViewportChanged;
         ViewTreeObserver.PreDraw -= OnViewportPreDraw;
         if (_items is System.Collections.Specialized.INotifyCollectionChanged observable)
+        {
             observable.CollectionChanged -= OnItemsChanged;
+        }
+
         _items = null;
         ItemClick -= OnItemClick;
         Dismiss -= OnNativeDismiss;
@@ -169,7 +191,10 @@ public sealed partial class AndroidAutoCompleteEntry : AppCompatAutoCompleteText
 
     protected override void PerformFiltering(ICharSequence? text, int keyCode)
     {
-        if (Owner?.IsMultiple != true) base.PerformFiltering(text, keyCode);
+        if (Owner?.IsMultiple != true)
+        {
+            base.PerformFiltering(text, keyCode);
+        }
     }
 
     /// <inheritdoc />
@@ -184,24 +209,42 @@ public sealed partial class AndroidAutoCompleteEntry : AppCompatAutoCompleteText
     {
         if (!ReferenceEquals(_items, items))
         {
-            if (_items is System.Collections.Specialized.INotifyCollectionChanged previous) previous.CollectionChanged -= OnItemsChanged;
+            if (_items is System.Collections.Specialized.INotifyCollectionChanged previous)
+            {
+                previous.CollectionChanged -= OnItemsChanged;
+            }
+
             _items = items;
-            if (_items is System.Collections.Specialized.INotifyCollectionChanged current) current.CollectionChanged += OnItemsChanged;
+            if (_items is System.Collections.Specialized.INotifyCollectionChanged current)
+            {
+                current.CollectionChanged += OnItemsChanged;
+            }
+
             _highlight = -1;
         }
         _displayPath = displayMemberPath;
         _adapter.Owner = Owner;
         _textMemberPathFunc = textMemberPathFunc;
-        var updatingItems = _updatingItems;
+        bool updatingItems = _updatingItems;
         _updatingItems = true;
-        try { _adapter.UpdateList(items is null ? Enumerable.Empty<string>() : items.OfType<object>(), displayMemberPath); }
+        try
+        {
+            _adapter.UpdateList(items is null ? Enumerable.Empty<string>() : items.OfType<object>(), displayMemberPath);
+        }
         finally { _updatingItems = updatingItems; }
-        if (Owner?.IsMultiple == true && Owner.IsSuggestionListOpen) ShowDropDown();
+        if (Owner?.IsMultiple == true && Owner.IsSuggestionListOpen)
+        {
+            ShowDropDown();
+        }
     }
 
     private void OnItemsChanged(object? sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
     {
-        if (Owner?.IsMultiple != true) return;
+        if (Owner?.IsMultiple != true)
+        {
+            return;
+        }
+
         _highlight = -1;
         SetItems(_items, _displayPath, _textMemberPathFunc);
     }
@@ -287,9 +330,13 @@ public sealed partial class AndroidAutoCompleteEntry : AppCompatAutoCompleteText
     private void UpdateBottomBorderVisibility()
     {
         if (ShowBottomBorder)
+        {
             Background = _originalBackground;
+        }
         else
+        {
             Background = null;
+        }
     }
 
     /// <inheritdoc />
@@ -318,9 +365,13 @@ public sealed partial class AndroidAutoCompleteEntry : AppCompatAutoCompleteText
 
     private void OnItemClick(object? sender, AdapterView.ItemClickEventArgs e)
     {
-        if (Owner?.IsMultiple == true) { OnMultipleItemClick(sender, e); return; }
+        if (Owner?.IsMultiple == true)
+        {
+            OnMultipleItemClick(sender, e);
+            return;
+        }
         DismissKeyboard();
-        var obj = _adapter.GetObject(e.Position);
+        object obj = _adapter.GetObject(e.Position);
         if (UpdateTextOnSelect)
         {
             _suppressTextChangedEvent = true;
@@ -359,18 +410,30 @@ public sealed partial class AndroidAutoCompleteEntry : AppCompatAutoCompleteText
         _adapter.ItemTemplate = itemTemplate;
         // ListView captures ViewTypeCount when its adapter is assigned. Reset its
         // recycling pools when switching between a template and a selector.
-        if (_multipleList is not null) _multipleList.Adapter = _adapter;
+        if (_multipleList is not null)
+        {
+            _multipleList.Adapter = _adapter;
+        }
+
         _highlight = -1;
     }
 
     internal void RefreshSelection(bool modeChanged = false)
     {
-        if (Owner?.IsMultiple != true && !modeChanged) return;
+        if (Owner?.IsMultiple != true && !modeChanged)
+        {
+            return;
+        }
+
         _adapter.Owner = Owner;
         if (modeChanged)
         {
             _updatingPopup = true;
-            try { base.DismissDropDown(); _multiplePopup?.Dismiss(); }
+            try
+            {
+                base.DismissDropDown();
+                _multiplePopup?.Dismiss();
+            }
             finally { _updatingPopup = false; }
             // AutoCompleteTextView observes its adapter and asynchronously dismisses
             // on zero results. Multiple mode owns a separate list and must not let
@@ -378,25 +441,41 @@ public sealed partial class AndroidAutoCompleteEntry : AppCompatAutoCompleteText
             Adapter = Owner?.IsMultiple == true ? null : _adapter;
             _adapter.ResetPresentation();
         }
-        else _adapter.RefreshSelection();
+        else
+        {
+            _adapter.RefreshSelection();
+        }
+
         ContentDescription = Owner?.ShowsSelectionSummary == true ? Owner.SelectionSummary : null;
         Invalidate();
     }
 
     public override void ShowDropDown()
     {
-        if (_updatingPopup) return;
+        if (_updatingPopup)
+        {
+            return;
+        }
+
         _updatingPopup = true;
         try
         {
-            if (Owner is not null) Owner.IsSuggestionListOpen = true;
+            if (Owner is not null)
+            {
+                Owner.IsSuggestionListOpen = true;
+            }
+
             if (Owner?.IsMultiple != true)
             {
                 _singleViewport = GetSingleViewport();
                 base.ShowDropDown();
                 return;
             }
-            if (WindowToken is null) return;
+            if (WindowToken is null)
+            {
+                return;
+            }
+
             if (_multiplePopup is null)
             {
                 _multipleList = new Android.Widget.ListView(Context!) { Adapter = _adapter, ItemsCanFocus = false };
@@ -412,17 +491,17 @@ public sealed partial class AndroidAutoCompleteEntry : AppCompatAutoCompleteText
                 _multiplePopup.DismissEvent += OnMultipleDismiss;
                 _multiplePopup.TouchIntercepted += OnPopupTouch;
             }
-            var density = Resources?.DisplayMetrics?.Density ?? 1;
+            float density = Resources?.DisplayMetrics?.Density ?? 1;
             using var visible = new Android.Graphics.Rect();
             GetWindowVisibleDisplayFrame(visible);
-            var position = new int[2];
+            int[] position = new int[2];
             GetLocationOnScreen(position);
             // Keep an empty-result session alive without an opaque empty panel.
             var screenPlacement = SuggestionPopupPlacement.Calculate(position[0], position[1], Width, Height,
                 visible.Left, visible.Top, visible.Right, visible.Bottom, _adapter.Count == 0 ? 1 : (int)(320 * density));
-            var windowPosition = new int[2];
+            int[] windowPosition = new int[2];
             GetLocationInWindow(windowPosition);
-            var placement = screenPlacement with
+            SuggestionPopupPlacement placement = screenPlacement with
             {
                 X = screenPlacement.X - position[0] + windowPosition[0],
                 Y = screenPlacement.Y - position[1] + windowPosition[1]
@@ -450,27 +529,46 @@ public sealed partial class AndroidAutoCompleteEntry : AppCompatAutoCompleteText
     {
         // Calls from AutoCompleteTextView's internal text/filter observers concern
         // only its own dropdown. Explicit closes use CloseSuggestionList instead.
-        if (Owner?.IsMultiple == true) { base.DismissDropDown(); return; }
+        if (Owner?.IsMultiple == true)
+        {
+            base.DismissDropDown();
+            return;
+        }
         CloseSuggestionList();
     }
 
     private void CloseSuggestionList()
     {
-        if (_updatingPopup) return;
+        if (_updatingPopup)
+        {
+            return;
+        }
+
         base.DismissDropDown();
         _multiplePopup?.Dismiss();
-        if (!_updatingItems && Owner is not null) Owner.IsSuggestionListOpen = false;
+        if (!_updatingItems && Owner is not null)
+        {
+            Owner.IsSuggestionListOpen = false;
+        }
+
         _highlight = -1;
     }
 
     private void OnNativeDismiss(object? sender, EventArgs e)
     {
-        if (!_updatingPopup && !_updatingItems && Owner is { IsMultiple: false }) Owner.IsSuggestionListOpen = false;
+        if (!_updatingPopup && !_updatingItems && Owner is { IsMultiple: false })
+        {
+            Owner.IsSuggestionListOpen = false;
+        }
     }
 
     private void OnMultipleDismiss(object? sender, EventArgs e)
     {
-        if (!_updatingPopup && Owner is not null) Owner.IsSuggestionListOpen = false;
+        if (!_updatingPopup && Owner is not null)
+        {
+            Owner.IsSuggestionListOpen = false;
+        }
+
         _highlight = -1;
     }
 
@@ -480,8 +578,12 @@ public sealed partial class AndroidAutoCompleteEntry : AppCompatAutoCompleteText
     private void OnPopupTouch(object? sender, Android.Views.View.TouchEventArgs e)
     {
         e.Handled = false;
-        if (e.Event?.Action != MotionEventActions.Outside) return;
-        var position = new int[2];
+        if (e.Event?.Action != MotionEventActions.Outside)
+        {
+            return;
+        }
+
+        int[] position = new int[2];
         GetLocationOnScreen(position);
         // Clicking the editor is part of the current query session, not dismissal.
         e.Handled = e.Event.RawX >= position[0] && e.Event.RawX < position[0] + Width &&
@@ -500,11 +602,19 @@ public sealed partial class AndroidAutoCompleteEntry : AppCompatAutoCompleteText
             }
             if (keyCode is Keycode.Enter or Keycode.DpadCenter && _highlight >= 0 && _highlight < _adapter.Count)
             {
-                if (e?.RepeatCount == 0) Owner.OnSuggestionSelected(_adapter.GetObject(_highlight));
+                if (e?.RepeatCount == 0)
+                {
+                    Owner.OnSuggestionSelected(_adapter.GetObject(_highlight));
+                }
+
                 _consumeActivationKeyUp = true;
                 return true;
             }
-            if (keyCode == Keycode.Escape) { CloseSuggestionList(); return true; }
+            if (keyCode == Keycode.Escape)
+            {
+                CloseSuggestionList();
+                return true;
+            }
         }
         return base.OnKeyDown(keyCode, e);
     }
@@ -537,11 +647,15 @@ public sealed partial class AndroidAutoCompleteEntry : AppCompatAutoCompleteText
 
     protected override void OnDraw(Android.Graphics.Canvas canvas)
     {
-        if (Owner?.ShowsSelectionSummary != true) { base.OnDraw(canvas); return; }
-        var paint = Paint!;
+        if (Owner?.ShowsSelectionSummary != true)
+        {
+            base.OnDraw(canvas);
+            return;
+        }
+        TextPaint paint = Paint!;
         paint.Color = new Android.Graphics.Color(CurrentTextColor);
-        var clipped = TextUtils.Ellipsize(Owner.SelectionSummary, paint, System.Math.Max(0, Width - PaddingLeft - PaddingRight), TextUtils.TruncateAt.End);
-        var x = LayoutDirection == Android.Views.LayoutDirection.Rtl
+        string? clipped = TextUtils.Ellipsize(Owner.SelectionSummary, paint, System.Math.Max(0, Width - PaddingLeft - PaddingRight), TextUtils.TruncateAt.End);
+        float x = LayoutDirection == Android.Views.LayoutDirection.Rtl
             ? Width - PaddingRight - paint.MeasureText(clipped?.ToString()) : PaddingLeft;
         canvas.DrawText(clipped?.ToString() ?? string.Empty, x, Baseline, paint);
     }

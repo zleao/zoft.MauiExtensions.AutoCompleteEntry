@@ -1,4 +1,4 @@
-﻿using zoft.MauiExtensions.Controls.Handlers;
+using zoft.MauiExtensions.Controls.Handlers;
 
 namespace zoft.MauiExtensions.Controls;
 

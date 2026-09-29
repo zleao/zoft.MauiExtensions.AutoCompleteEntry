@@ -1,4 +1,4 @@
-﻿using CommunityToolkit.Maui;
+using CommunityToolkit.Maui;
 using zoft.MauiExtensions.Controls;
 
 namespace AutoCompleteEntry.Sample
@@ -7,7 +7,7 @@ namespace AutoCompleteEntry.Sample
     {
         public static MauiApp CreateMauiApp()
         {
-            var builder = MauiApp.CreateBuilder();
+            MauiAppBuilder builder = MauiApp.CreateBuilder();
             builder
                 .UseMauiApp<App>()
                 .UseMauiCommunityToolkit()

@@ -24,6 +24,13 @@ This file is the shared entry point for coding assistants, regardless of provide
 | `global.json` | SDK selection and roll-forward policy |
 | `.github/workflows/` | CI and publishing behavior |
 
+## Coding style
+
+- Follow the Microsoft C# conventions and repository exceptions in [CONTRIBUTING.md](CONTRIBUTING.md#coding-style). The root [.editorconfig](.editorconfig) is the machine-readable source of formatting and style preferences for the library, platform implementations, tests, and sample.
+- Use four spaces, Allman braces, braces around control-flow bodies, `System` imports first, C# type keywords, and explicit types when a local's type is not apparent. Use `_camelCase` private instance fields and `s_camelCase` private static fields; constants use PascalCase.
+- Preserve public API names, binding/XAML names, framework overrides, and generated members. Keep existing namespace declaration forms and descriptive test/event-handler names. Do not change behavior to satisfy a style preference.
+- Run the formatting checks in CONTRIBUTING.md after C# edits. Folder formatting covers platform files that the host's loaded project may exclude; semantic style checks and builds still need the appropriate target and host. Never edit generated files or claim native coverage from formatting.
+
 ## Control contracts
 
 - Preserve public member names, property defaults, and binding behavior. Prefer additive or opt-in API changes.

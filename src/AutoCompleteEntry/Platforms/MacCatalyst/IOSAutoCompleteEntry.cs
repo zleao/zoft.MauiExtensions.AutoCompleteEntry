@@ -1,7 +1,7 @@
+using System.Collections;
 using CoreGraphics;
 using Foundation;
 using ObjCRuntime;
-using System.Collections;
 using UIKit;
 
 namespace zoft.MauiExtensions.Controls.Platform;
@@ -41,7 +41,10 @@ public sealed class IOSAutoCompleteEntry : UIView
     private bool _showBottomBorder = true;
     private NSObject? _keyboardShownObserverToken;
     private NSObject? _keyboardHiddenObserverToken;
-    internal AutoCompleteEntry? Owner { get; set; }
+    internal AutoCompleteEntry? Owner
+    {
+        get; set;
+    }
     private readonly UILabel _summary = new() { Lines = 1, LineBreakMode = UILineBreakMode.TailTruncation, UserInteractionEnabled = false, Hidden = true };
     private int _highlight = -1;
     private NSLayoutConstraint[]? _listConstraints;
@@ -51,7 +54,11 @@ public sealed class IOSAutoCompleteEntry : UIView
     {
         Owner = owner;
         InputTextField.SearchKeyHandler = HandleSearchKeys;
-        if (!_resourcesFreed) return;
+        if (!_resourcesFreed)
+        {
+            return;
+        }
+
         _resourcesFreed = false;
         InputTextField.EditingDidBegin += InputText_OnEditingDidBegin;
         InputTextField.EditingDidEnd += InputText_OnEditingDidEnd;
@@ -66,7 +73,10 @@ public sealed class IOSAutoCompleteEntry : UIView
     /// <summary>
     /// Gets or sets the template used to render suggestion rows.
     /// </summary>
-    public DataTemplate? ItemTemplate { get; set; }
+    public DataTemplate? ItemTemplate
+    {
+        get; set;
+    }
 
     /// <summary>
     /// Gets a reference to the text field in the view
@@ -107,8 +117,16 @@ public sealed class IOSAutoCompleteEntry : UIView
                 return;
             }
             _isSuggestionListOpen = value;
-            if (!value) _highlight = -1;
-            if (Owner is not null) Owner.IsSuggestionListOpen = value;
+            if (!value)
+            {
+                _highlight = -1;
+            }
+
+            if (Owner is not null)
+            {
+                Owner.IsSuggestionListOpen = value;
+            }
+
             RefreshSelection();
             UpdateSuggestionListOpenState();
         }
@@ -146,7 +164,11 @@ public sealed class IOSAutoCompleteEntry : UIView
     /// </summary>
     public void FreeResources()
     {
-        if (_resourcesFreed) return;
+        if (_resourcesFreed)
+        {
+            return;
+        }
+
         _resourcesFreed = true;
         _isSuggestionListOpen = false;
         if (SelectionList.Source is AutoCompleteEntryTableSource source)
@@ -285,7 +307,7 @@ public sealed class IOSAutoCompleteEntry : UIView
 
     private void InputText_OnTextRangeChanged(object? sender, EventArgs e)
     {
-        var cp = InputTextField.GetOffsetFromPosition(InputTextField.BeginningOfDocument, InputTextField.SelectedTextRange?.Start ?? InputTextField.EndOfDocument).ToInt32();
+        int cp = InputTextField.GetOffsetFromPosition(InputTextField.BeginningOfDocument, InputTextField.SelectedTextRange?.Start ?? InputTextField.EndOfDocument).ToInt32();
 
         CursorPositionChanged?.Invoke(this, new AutoCompleteEntryCursorPositionChangedEventArgs(cp));
     }
@@ -307,13 +329,16 @@ public sealed class IOSAutoCompleteEntry : UIView
 
     private void AddBottomBorder()
     {
-        if (_border != null) return;
+        if (_border != null)
+        {
+            return;
+        }
 
-        const float width = 1f;
+        const float Width = 1f;
         _border = new CoreAnimation.CALayer();
         _border.BorderColor = UIColor.LightGray.CGColor;
-        _border.Frame = new CGRect(0, Frame.Size.Height - width, Frame.Size.Width, Frame.Size.Height);
-        _border.BorderWidth = width;
+        _border.Frame = new CGRect(0, Frame.Size.Height - Width, Frame.Size.Width, Frame.Size.Height);
+        _border.BorderWidth = Width;
         _border.Hidden = !ShowBottomBorder;
         Layer.AddSublayer(_border);
         Layer.MasksToBounds = true;
@@ -350,7 +375,11 @@ public sealed class IOSAutoCompleteEntry : UIView
 
     private void SuggestionTableSource_ItemsChanged(object? sender, EventArgs e)
     {
-        if (!ReferenceEquals(sender, SelectionList.Source)) return;
+        if (!ReferenceEquals(sender, SelectionList.Source))
+        {
+            return;
+        }
+
         _highlight = -1;
         // Refresh the native surface without reopening or resetting the query.
         UpdateSuggestionListOpenState();
@@ -360,7 +389,7 @@ public sealed class IOSAutoCompleteEntry : UIView
     {
         if (_isSuggestionListOpen && SelectionList.Source != null && SelectionList.Source.RowsInSection(SelectionList, 0) > 0)
         {
-            var viewController = InputTextField.Window?.RootViewController;
+            UIViewController? viewController = InputTextField.Window?.RootViewController;
             if (viewController == null)
             {
                 return;
@@ -374,7 +403,7 @@ public sealed class IOSAutoCompleteEntry : UIView
             if (SelectionList.Superview == null)
             {
                 viewController.Add(SelectionList);
-                var selectionListSuperview = SelectionList.Superview!;
+                UIView selectionListSuperview = SelectionList.Superview!;
                 _bottomConstraint = Owner?.IsMultiple == true
                     ? SelectionList.BottomAnchor.ConstraintEqualTo(selectionListSuperview.BottomAnchor, -_keyboardHeight)
                     : SelectionList.BottomAnchor.ConstraintGreaterThanOrEqualTo(selectionListSuperview.BottomAnchor, -_keyboardHeight);
@@ -437,7 +466,7 @@ public sealed class IOSAutoCompleteEntry : UIView
     private void SuggestionTableSource_TableRowSelected(object? sender, TableRowSelectedEventArgs<object> e)
     {
         SelectionList.DeselectRow(e.SelectedItemIndexPath, false);
-        var selection = e.SelectedItem;
+        object selection = e.SelectedItem;
         if (Owner?.IsMultiple == true)
         {
             Owner.OnSuggestionSelected(selection);
@@ -456,22 +485,37 @@ public sealed class IOSAutoCompleteEntry : UIView
 
     private void ReleaseListConstraints()
     {
-        if (_listConstraints is null) return;
+        if (_listConstraints is null)
+        {
+            return;
+        }
+
         NSLayoutConstraint.DeactivateConstraints(_listConstraints);
-        foreach (var constraint in _listConstraints) constraint.Dispose();
+        foreach (NSLayoutConstraint constraint in _listConstraints)
+        {
+            constraint.Dispose();
+        }
+
         _listConstraints = null;
         _bottomConstraint = null;
     }
 
     private void InputText_OnTouchDown(object? sender, EventArgs e)
     {
-        if (Owner?.IsMultiple == true) IsSuggestionListOpen = true;
+        if (Owner?.IsMultiple == true)
+        {
+            IsSuggestionListOpen = true;
+        }
     }
 
     internal void RefreshSelection()
     {
-        if (SelectionList.Source is AutoCompleteEntryTableSource source) source.RefreshSelection();
-        var show = Owner?.ShowsSelectionSummary == true;
+        if (SelectionList.Source is AutoCompleteEntryTableSource source)
+        {
+            source.RefreshSelection();
+        }
+
+        bool show = Owner?.ShowsSelectionSummary == true;
         _summary.Text = Owner?.SelectionSummary ?? string.Empty;
         _summary.Font = InputTextField.Font ?? UIFont.SystemFontOfSize(UIFont.SystemFontSize);
         _summary.TextColor = InputTextField.TextColor;
@@ -484,20 +528,26 @@ public sealed class IOSAutoCompleteEntry : UIView
 
     private bool HandleSearchKeys(NSSet<UIPress> presses)
     {
-        var key = presses.ToArray<UIPress>().FirstOrDefault()?.Key?.CharactersIgnoringModifiers;
+        string? key = presses.ToArray<UIPress>().FirstOrDefault()?.Key?.CharactersIgnoringModifiers;
         if (Owner?.IsMultiple == true && key == UIKeyCommand.Escape)
         {
             IsSuggestionListOpen = false;
             return true;
         }
         if (Owner?.IsMultiple == true && (key == UIKeyCommand.DownArrow || key == UIKeyCommand.UpArrow))
+        {
             IsSuggestionListOpen = true;
+        }
+
         if (Owner?.IsMultiple == true && IsSuggestionListOpen && Owner.ItemsSource is { Count: > 0 } items)
         {
             if (key == UIKeyCommand.DownArrow || key == UIKeyCommand.UpArrow)
             {
                 if (_highlight >= 0 && _highlight < items.Count)
+                {
                     SelectionList.CellAt(NSIndexPath.FromRowSection(_highlight, 0))?.SetHighlighted(false, false);
+                }
+
                 _highlight = Math.Clamp(_highlight + (key == UIKeyCommand.DownArrow ? 1 : -1), 0, items.Count - 1);
                 var index = NSIndexPath.FromRowSection(_highlight, 0);
                 SelectionList.ScrollToRow(index, UITableViewScrollPosition.Middle, false);
@@ -518,20 +568,30 @@ public sealed class IOSAutoCompleteEntry : UIView
     /// </summary>
     public class MyUITextField : UITextField
     {
-        internal Func<NSSet<UIPress>, bool>? SearchKeyHandler { get; set; }
+        internal Func<NSSet<UIPress>, bool>? SearchKeyHandler
+        {
+            get; set;
+        }
         private bool _handledSearchPress;
 
         /// <inheritdoc />
         public override void PressesBegan(NSSet<UIPress> presses, UIPressesEvent evt)
         {
             _handledSearchPress = SearchKeyHandler?.Invoke(presses) == true;
-            if (!_handledSearchPress) base.PressesBegan(presses, evt);
+            if (!_handledSearchPress)
+            {
+                base.PressesBegan(presses, evt);
+            }
         }
 
         /// <inheritdoc />
         public override void PressesEnded(NSSet<UIPress> presses, UIPressesEvent evt)
         {
-            if (!_handledSearchPress) base.PressesEnded(presses, evt);
+            if (!_handledSearchPress)
+            {
+                base.PressesEnded(presses, evt);
+            }
+
             _handledSearchPress = false;
         }
         /// <summary>

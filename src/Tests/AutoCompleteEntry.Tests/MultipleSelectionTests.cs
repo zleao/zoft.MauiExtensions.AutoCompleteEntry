@@ -14,12 +14,12 @@ public class MultipleSelectionTests
     {
         var entry = new Control { SelectedSuggestion = "A", Text = "query" };
         ((Microsoft.Maui.IEntry)entry).IsFocused = true;
-        var openings = 0;
+        int openings = 0;
         entry.SuggestionListOpening += (_, _) => openings++;
         entry.TextChanged += (_, _) => Assert.Fail("Dismiss/reopen must not edit single-mode text");
         entry.SuggestionChosen += (_, _) => Assert.Fail("Dismiss/reopen must not choose an item");
         entry.SelectionChanged += (_, _) => Assert.Fail("Dismiss/reopen must not alter selection");
-        for (var cycle = 1; cycle <= 3; cycle++)
+        for (int cycle = 1; cycle <= 3; cycle++)
         {
             entry.IsSuggestionListOpen = true;
             entry.IsSuggestionListOpen = true;
@@ -34,10 +34,10 @@ public class MultipleSelectionTests
     [Fact]
     public void DismissAndReopenWhileStillFocusedPreservesSelectionAndStartsOneSession()
     {
-        var entry = Multiple();
+        Control entry = Multiple();
         ((Microsoft.Maui.IEntry)entry).IsFocused = true;
         entry.SelectedSuggestions = new ObservableCollection<string> { "A", "B" };
-        var openings = 0;
+        int openings = 0;
         entry.SuggestionListOpening += (_, _) =>
         {
             openings++;
@@ -47,7 +47,7 @@ public class MultipleSelectionTests
         };
         entry.SelectionChanged += (_, _) => Assert.Fail("Dismissal/reopening must retain selection");
 
-        for (var cycle = 1; cycle <= 3; cycle++)
+        for (int cycle = 1; cycle <= 3; cycle++)
         {
             entry.IsSuggestionListOpen = true;
             entry.Text = "query";
@@ -79,7 +79,7 @@ public class MultipleSelectionTests
     [Fact]
     public void ToggleUpdatesBoundStateAndPresentationBeforeEventsWithoutChangingQuery()
     {
-        var entry = Multiple();
+        Control entry = Multiple();
         var bound = new ObservableCollection<string>();
         entry.SelectedSuggestions = bound;
         entry.IsSuggestionListOpen = true;
@@ -113,7 +113,7 @@ public class MultipleSelectionTests
     [Fact]
     public void FilteringNeverRemovesSelectionAndClearOnlyChangesQuery()
     {
-        var entry = Multiple();
+        Control entry = Multiple();
         entry.IsSuggestionListOpen = true;
         entry.ItemsSource = new[] { "A" };
         entry.OnSuggestionSelected("A");
@@ -131,7 +131,7 @@ public class MultipleSelectionTests
     [Fact]
     public void ObservableReplacementMutationMoveAndResetProduceEffectiveDeltas()
     {
-        var entry = Multiple();
+        Control entry = Multiple();
         var old = new ObservableCollection<string> { "A" };
         var current = new ObservableCollection<string> { "A", "B" };
         var changes = new List<AutoCompleteEntrySelectionChangedEventArgs>();
@@ -156,11 +156,11 @@ public class MultipleSelectionTests
     [Fact]
     public void DuplicateAndNullEntriesAreOneEffectiveSelectionEvenWithOtherObservers()
     {
-        var entry = Multiple();
+        Control entry = Multiple();
         var items = new ObservableCollection<object> { "A", "A", null! };
         items.CollectionChanged += (_, _) => { }; // ObservableCollection disallows nested edits with two observers.
         entry.SelectedSuggestions = items;
-        var changes = 0;
+        int changes = 0;
         entry.SelectionChanged += (_, _) => changes++;
         items.Add("A");
         Assert.Equal(0, changes);
@@ -174,7 +174,7 @@ public class MultipleSelectionTests
     [Fact]
     public void EqualityDoesNotUseDisplayText()
     {
-        var entry = Multiple();
+        Control entry = Multiple();
         entry.TextMemberPath = nameof(Item.Name);
         var first = new Item("same; text");
         var second = new Item("same; text");
@@ -189,7 +189,7 @@ public class MultipleSelectionTests
     [Fact]
     public void ValueEqualityAndSelectionOrderAreUsed()
     {
-        var entry = Multiple();
+        Control entry = Multiple();
         entry.OnSuggestionSelected(new ValueItem("A"));
         entry.OnSuggestionSelected(new ValueItem("B"));
         entry.OnSuggestionSelected(new ValueItem("A"));
@@ -199,8 +199,8 @@ public class MultipleSelectionTests
     [Fact]
     public void UnsupportedCollectionsFailBeforeReplacingState()
     {
-        var entry = Multiple();
-        var original = entry.SelectedSuggestions;
+        Control entry = Multiple();
+        IList original = entry.SelectedSuggestions;
         Assert.Throws<ArgumentException>(() => entry.SelectedSuggestions = new[] { "A" });
         Assert.Throws<ArgumentException>(() => entry.SelectedSuggestions = ArrayList.ReadOnly(new ArrayList()));
         Assert.Same(original, entry.SelectedSuggestions);
@@ -209,7 +209,7 @@ public class MultipleSelectionTests
     [Fact]
     public void NonObservableListRequiresReplacementForExternalEdits()
     {
-        var entry = Multiple();
+        Control entry = Multiple();
         var items = new List<string> { "A" };
         entry.SelectedSuggestions = items;
         items.Add("B");
@@ -221,14 +221,14 @@ public class MultipleSelectionTests
     [Fact]
     public void CloseResetsQueryOnceWithBothTextEventsButNoFiltering()
     {
-        var entry = Multiple();
+        Control entry = Multiple();
         entry.IsSuggestionListOpen = true;
         entry.OnSuggestionSelected("A");
         entry.Text = "refine";
-        var command = Substitute.For<ICommand>();
+        ICommand command = Substitute.For<ICommand>();
         command.CanExecute(Arg.Any<object>()).Returns(true);
         entry.TextChangedCommand = command;
-        var baseEvents = 0;
+        int baseEvents = 0;
         var reasons = new List<AutoCompleteEntryTextChangeReason>();
         ((Entry)entry).TextChanged += (_, _) => baseEvents++;
         entry.TextChanged += (_, e) => reasons.Add(e.Reason);
@@ -247,9 +247,9 @@ public class MultipleSelectionTests
     [InlineData(false)]
     public void OpeningNotificationCanPopulateEmptyOrStaleItemsAndDoesNotRepeat(bool multiple)
     {
-        var entry = multiple ? Multiple() : new Control();
+        Control entry = multiple ? Multiple() : new Control();
         entry.Text = "stale";
-        var openings = 0;
+        int openings = 0;
         entry.SuggestionListOpening += (_, _) =>
         {
             openings++;
@@ -301,12 +301,15 @@ public class MultipleSelectionTests
     [Fact]
     public void SelectionEventsSupportReentrantBindingEditsWithoutDuplicates()
     {
-        var entry = Multiple();
+        Control entry = Multiple();
         var events = new List<string>();
         entry.SelectionChanged += (_, e) =>
         {
             events.Add(string.Join(",", e.AddedItems));
-            if (e.AddedItems.Contains("A")) entry.SelectedSuggestions.Add("B");
+            if (e.AddedItems.Contains("A"))
+            {
+                entry.SelectedSuggestions.Add("B");
+            }
         };
         entry.OnSuggestionSelected("A");
         Assert.Equal(new[] { "A", "B" }, events);
@@ -316,7 +319,7 @@ public class MultipleSelectionTests
     [Fact]
     public void TextPathChangesRefreshSummaryWithoutQueryEvents()
     {
-        var entry = Multiple();
+        Control entry = Multiple();
         entry.OnSuggestionSelected(new Item("Name"));
         entry.TextChanged += (_, _) => Assert.Fail("Summary is not query text");
         entry.TextMemberPath = nameof(Item.Name);
@@ -327,7 +330,7 @@ public class MultipleSelectionTests
     public void SingleActivationRemainsSelectedAndProgrammaticSelectionIsNotActivation()
     {
         var entry = new Control();
-        var chosen = 0;
+        int chosen = 0;
         entry.SuggestionChosen += (_, e) => { chosen++; Assert.True(e.IsSelected); Assert.Equal(e.SelectedItem, entry.SelectedSuggestion); };
         entry.SelectedSuggestion = "A";
         Assert.Equal(0, chosen);
@@ -335,12 +338,15 @@ public class MultipleSelectionTests
         Assert.Equal(1, chosen);
     }
 
-    private sealed class Item(string name) { public string Name { get; } = name; }
+    private sealed class Item(string name)
+    {
+        public string Name { get; } = name;
+    }
 
     [Fact]
     public void RecycledWrapperKeepsOriginalItemAndRefreshesCheckedState()
     {
-        var entry = Multiple();
+        Control entry = Multiple();
         var label = new Label();
         label.SetBinding(Label.TextProperty, nameof(Item.Name));
         var row = new SelectionRow(label);
@@ -363,7 +369,7 @@ public class MultipleSelectionTests
     [Fact]
     public void NullReplacementReportsRemovalAndDetachesCollection()
     {
-        var entry = Multiple();
+        Control entry = Multiple();
         var old = new ObservableCollection<string> { "A" };
         entry.SelectedSuggestions = old;
         var changes = new List<AutoCompleteEntrySelectionChangedEventArgs>();
@@ -380,7 +386,7 @@ public class MultipleSelectionTests
     [InlineData(false)]
     public void UpdateTextOnSelectDoesNotChangeMultipleQuery(bool updateText)
     {
-        var entry = Multiple();
+        Control entry = Multiple();
         entry.UpdateTextOnSelect = updateText;
         entry.IsSuggestionListOpen = true;
         entry.Text = "search";
@@ -393,8 +399,8 @@ public class MultipleSelectionTests
     [Fact]
     public void OpeningAndSelectionNeverRunFilteringCommand()
     {
-        var entry = Multiple();
-        var command = Substitute.For<ICommand>();
+        Control entry = Multiple();
+        ICommand command = Substitute.For<ICommand>();
         command.CanExecute(Arg.Any<object>()).Returns(true);
         entry.TextChangedCommand = command;
         entry.IsSuggestionListOpen = true;
@@ -411,10 +417,10 @@ public class MultipleSelectionTests
     [Fact]
     public void TypingAfterDismissalOpensEmptySessionWithoutErasingFirstKeystroke()
     {
-        var entry = Multiple();
+        Control entry = Multiple();
         entry.OnSuggestionSelected("A");
         entry.SuggestionListOpening += (_, _) => Assert.Equal("", entry.Text);
-        var command = Substitute.For<ICommand>();
+        ICommand command = Substitute.For<ICommand>();
         command.CanExecute(Arg.Any<object>()).Returns(true);
         entry.TextChangedCommand = command;
         entry.OnTextChanged("j", AutoCompleteEntryTextChangeReason.UserInput);

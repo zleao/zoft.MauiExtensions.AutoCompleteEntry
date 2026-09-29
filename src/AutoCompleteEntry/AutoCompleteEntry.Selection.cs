@@ -24,9 +24,15 @@ public sealed class AutoCompleteEntrySelectionChangedEventArgs : EventArgs
     }
 
     /// <summary>Items added, in new selection order.</summary>
-    public IReadOnlyList<object> AddedItems { get; }
+    public IReadOnlyList<object> AddedItems
+    {
+        get;
+    }
     /// <summary>Items removed, in previous selection order.</summary>
-    public IReadOnlyList<object> RemovedItems { get; }
+    public IReadOnlyList<object> RemovedItems
+    {
+        get;
+    }
 }
 
 public partial class AutoCompleteEntry
@@ -92,25 +98,40 @@ public partial class AutoCompleteEntry
 
     private static IList ValidateSelection(object? value)
     {
-        var list = value as IList ?? new ObservableCollection<object>();
+        IList list = value as IList ?? new ObservableCollection<object>();
         if (list.IsReadOnly || list.IsFixedSize)
+        {
             throw new ArgumentException("SelectedSuggestions requires a mutable, variable-size IList.");
+        }
+
         return list;
     }
 
     private void ObserveSelection(IList list)
     {
         if (_observedSelection is not null && _selectionObserver is not null)
+        {
             _observedSelection.CollectionChanged -= _selectionObserver;
+        }
+
         _observedSelection = list as INotifyCollectionChanged;
-        if (_observedSelection is null) return;
+        if (_observedSelection is null)
+        {
+            return;
+        }
         // A long-lived view-model collection must not keep a discarded control alive.
         var weakOwner = new WeakReference<AutoCompleteEntry>(this);
         NotifyCollectionChangedEventHandler? observer = null;
         observer = (sender, args) =>
         {
-            if (weakOwner.TryGetTarget(out var owner)) owner.SynchronizeSelection();
-            else if (sender is INotifyCollectionChanged source) source.CollectionChanged -= observer;
+            if (weakOwner.TryGetTarget(out AutoCompleteEntry? owner))
+            {
+                owner.SynchronizeSelection();
+            }
+            else if (sender is INotifyCollectionChanged source)
+            {
+                source.CollectionChanged -= observer;
+            }
         };
         _selectionObserver = observer;
         _observedSelection.CollectionChanged += observer;
@@ -124,23 +145,31 @@ public partial class AutoCompleteEntry
 
     private void SynchronizeSelection()
     {
-        if (_changingSelection) return;
+        if (_changingSelection)
+        {
+            return;
+        }
         // Normalize the effective selection, without mutating a consumer's observable list
         // inside its CollectionChanged notification (ObservableCollection forbids reentrancy).
-        var next = IsMultiple ? SelectedSuggestions.Cast<object?>().OfType<object>().Distinct().ToList()
+        List<object> next = IsMultiple ? SelectedSuggestions.Cast<object?>().OfType<object>().Distinct().ToList()
             : SelectedSuggestion is { } item ? new List<object> { item } : [];
-        var previous = _effectiveSelection;
+        List<object> previous = _effectiveSelection;
         _effectiveSelection = next;
         RefreshSelectionPresentation();
-        var added = next.Except(previous).ToArray();
-        var removed = previous.Except(next).ToArray();
+        object[] added = next.Except(previous).ToArray();
+        object[] removed = previous.Except(next).ToArray();
         if (added.Length != 0 || removed.Length != 0)
+        {
             SelectionChanged?.Invoke(this, new(added, removed));
+        }
     }
 
     private void SingleSelectionChanged()
     {
-        if (!IsMultiple) SynchronizeSelection();
+        if (!IsMultiple)
+        {
+            SynchronizeSelection();
+        }
     }
 
     private void ConvertSelectionMode()
@@ -151,11 +180,15 @@ public partial class AutoCompleteEntry
             // Always end the previous search. Inactive state is discarded at conversion;
             // preselection is assigned after setting SelectionMode to Multiple.
             IsSuggestionListOpen = false;
-            var first = IsMultiple ? SelectedSuggestion : _effectiveSelection.FirstOrDefault();
+            object? first = IsMultiple ? SelectedSuggestion : _effectiveSelection.FirstOrDefault();
             SelectedSuggestions.Clear();
             if (IsMultiple)
             {
-                if (first is not null) SelectedSuggestions.Add(first);
+                if (first is not null)
+                {
+                    SelectedSuggestions.Add(first);
+                }
+
                 SelectedSuggestion = null;
                 Text = string.Empty;
             }
@@ -171,15 +204,29 @@ public partial class AutoCompleteEntry
 
     private void ToggleSuggestion(object? item)
     {
-        if (item is null) return;
-        var selected = !SelectedSuggestions.Cast<object?>().Any(value => Equals(value, item));
+        if (item is null)
+        {
+            return;
+        }
+
+        bool selected = !SelectedSuggestions.Cast<object?>().Any(value => Equals(value, item));
         _changingSelection = true;
         try
         {
-            if (selected) SelectedSuggestions.Add(item);
+            if (selected)
+            {
+                SelectedSuggestions.Add(item);
+            }
             else
-                for (var i = SelectedSuggestions.Count - 1; i >= 0; i--)
-                    if (Equals(SelectedSuggestions[i], item)) SelectedSuggestions.RemoveAt(i);
+            {
+                for (int i = SelectedSuggestions.Count - 1; i >= 0; i--)
+                {
+                    if (Equals(SelectedSuggestions[i], item))
+                    {
+                        SelectedSuggestions.RemoveAt(i);
+                    }
+                }
+            }
         }
         finally { _changingSelection = false; }
         SynchronizeSelection();
@@ -188,9 +235,16 @@ public partial class AutoCompleteEntry
 
     private void SuggestionListStateChanged(bool open)
     {
-        if (IsMultiple) Text = string.Empty;
+        if (IsMultiple)
+        {
+            Text = string.Empty;
+        }
+
         RefreshSelectionPresentation();
-        if (open) SuggestionListOpening?.Invoke(this, EventArgs.Empty);
+        if (open)
+        {
+            SuggestionListOpening?.Invoke(this, EventArgs.Empty);
+        }
     }
 
     private void RefreshSelectionPresentation()

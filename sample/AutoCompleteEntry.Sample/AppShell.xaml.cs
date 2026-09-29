@@ -1,4 +1,4 @@
-﻿namespace AutoCompleteEntry.Sample
+namespace AutoCompleteEntry.Sample
 {
     public partial class AppShell : Shell
     {

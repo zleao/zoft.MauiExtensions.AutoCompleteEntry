@@ -22,7 +22,10 @@ namespace AutoCompleteEntry.Sample.Views
         private void TemplateMode_Changed(object sender, EventArgs e)
         {
             if (CountryEntry is null || _groupCountryTemplate is null)
+            {
                 return;
+            }
+
             CountryEntry.ItemTemplate = TemplateMode.SelectedIndex switch
             {
                 1 => _groupCountryTemplate,
@@ -35,17 +38,21 @@ namespace AutoCompleteEntry.Sample.Views
         private void UpdateTextOnSelect_Toggled(object sender, ToggledEventArgs e)
         {
             if (CountryEntry is not null)
+            {
                 CountryEntry.UpdateTextOnSelect = e.Value;
+            }
         }
 
         private void AddSuggestion_Clicked(object sender, EventArgs e)
         {
             if (BindingContext is SampleViewModel viewModel)
+            {
                 viewModel.FilteredList.Add(new ListItem
                 {
                     Group = "Long row",
                     Country = "A long suggestion for checking wrapping, variable row heights and window resizing without replacing the observable collection."
                 });
+            }
         }
 
         private sealed class CountryTemplateSelector(DataTemplate compact, DataTemplate wrapped) : DataTemplateSelector
@@ -66,7 +73,10 @@ namespace AutoCompleteEntry.Sample.Views
 
         private void CountryEntry_Opening(object sender, EventArgs e)
         {
-            if (BindingContext is SampleViewModel model) model.FilterList(CountryEntry.Text);
+            if (BindingContext is SampleViewModel model)
+            {
+                model.FilterList(CountryEntry.Text);
+            }
         }
 
         private void MultipleSelection_Toggled(object sender, ToggledEventArgs e)

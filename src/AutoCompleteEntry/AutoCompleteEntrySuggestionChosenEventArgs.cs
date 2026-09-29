@@ -1,4 +1,4 @@
-﻿namespace zoft.MauiExtensions.Controls;
+namespace zoft.MauiExtensions.Controls;
 
 /// <summary>
 /// Provides data for the <see cref="AutoCompleteEntry.SuggestionChosen"/> event.
@@ -22,8 +22,14 @@ public sealed class AutoCompleteEntrySuggestionChosenEventArgs : EventArgs
     /// Gets a reference to the selected item.
     /// </summary>
     /// <value>A reference to the selected item.</value>
-    public object? SelectedItem { get; }
+    public object? SelectedItem
+    {
+        get;
+    }
 
     /// <summary>Whether the activated suggestion is selected after this interaction.</summary>
-    public bool IsSelected { get; }
+    public bool IsSelected
+    {
+        get;
+    }
 }

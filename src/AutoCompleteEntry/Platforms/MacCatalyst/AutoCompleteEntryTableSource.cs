@@ -1,8 +1,8 @@
-﻿using Foundation;
-using Microsoft.Maui.Controls.Internals;
-using Microsoft.Maui.Platform;
 using System.Collections;
 using System.Collections.Specialized;
+using Foundation;
+using Microsoft.Maui.Controls.Internals;
+using Microsoft.Maui.Platform;
 using UIKit;
 
 namespace zoft.MauiExtensions.Controls.Platform;
@@ -20,13 +20,15 @@ internal class AutoCompleteEntryTableSource : UITableViewSource
 
     internal void RefreshSelection()
     {
-        foreach (var reference in _cells)
-            if (reference.TryGetTarget(out var cell) && cell.MauiView is SelectionRow row && row.BindingContext is { } item && _owner is not null)
+        foreach (WeakReference<AutoCompleteCell> reference in _cells)
+        {
+            if (reference.TryGetTarget(out AutoCompleteCell? cell) && cell.MauiView is SelectionRow row && row.BindingContext is { } item && _owner is not null)
             {
                 row.Update(_owner, item);
                 cell.AccessibilityLabel = _owner.GetSelectionText(item);
                 cell.AccessibilityTraits = UIAccessibilityTrait.Button | (_owner.IsSuggestionSelected(item) ? UIAccessibilityTrait.Selected : UIAccessibilityTrait.None);
             }
+        }
     }
 
     private DataTemplate? _defaultItemTemplate;
@@ -91,7 +93,11 @@ internal class AutoCompleteEntryTableSource : UITableViewSource
     private void CollectionChanged(NotifyCollectionChangedEventArgs args)
     {
         // Ignore queued notifications from a source that has since been replaced.
-        if (!ReferenceEquals(_view.Source, this)) return;
+        if (!ReferenceEquals(_view.Source, this))
+        {
+            return;
+        }
+
         _view.ReloadData();
         ItemsChanged?.Invoke(this, EventArgs.Empty);
     }
@@ -102,8 +108,14 @@ internal class AutoCompleteEntryTableSource : UITableViewSource
     {
         if (disposing)
         {
-            foreach (var reference in _cells)
-                if (reference.TryGetTarget(out var cell)) cell.ReleaseContent();
+            foreach (WeakReference<AutoCompleteCell> reference in _cells)
+            {
+                if (reference.TryGetTarget(out AutoCompleteCell? cell))
+                {
+                    cell.ReleaseContent();
+                }
+            }
+
             _cells.Clear();
         }
         base.Dispose(disposing);
@@ -116,31 +128,35 @@ internal class AutoCompleteEntryTableSource : UITableViewSource
 
     public override UITableViewCell GetCell(UITableView tableView, NSIndexPath indexPath)
     {
-        var item = _items[indexPath.Row];
-        var templateToUse = _itemTemplate ?? DefaultItemTemplate;
+        object? item = _items[indexPath.Row];
+        DataTemplate templateToUse = _itemTemplate ?? DefaultItemTemplate;
 
         // Resolve template (returns self for plain DataTemplate, selects for DataTemplateSelector)
-        var resolvedTemplate = templateToUse.SelectDataTemplate(item, _listViewContainer)
+        DataTemplate resolvedTemplate = templateToUse.SelectDataTemplate(item, _listViewContainer)
             ?? throw new InvalidOperationException(
                 $"DataTemplateSelector '{templateToUse.GetType().FullName}' returned null for item '{item}'.");
 
-        var cellId = ((IDataTemplateController)resolvedTemplate).IdString + (_owner?.IsMultiple == true ? "-multiple" : "");
+        string cellId = ((IDataTemplateController)resolvedTemplate).IdString + (_owner?.IsMultiple == true ? "-multiple" : "");
 
-        var cell = tableView.DequeueReusableCell(cellId) as AutoCompleteCell ?? new AutoCompleteCell(cellId);
+        AutoCompleteCell cell = tableView.DequeueReusableCell(cellId) as AutoCompleteCell ?? new AutoCompleteCell(cellId);
         // A prior source releases its owned MAUI content; native cells may remain in
         // UITableView's reuse pool. Recreate content without growing that pool per query.
         if (cell.MauiView is null)
         {
             // First time for this template type — create the MAUI view and its handler
 
-            var templateView = resolvedTemplate.CreateContent() as View
+            View templateView = resolvedTemplate.CreateContent() as View
                 ?? throw new InvalidOperationException(
                     $"DataTemplate did not produce a View for item '{item}'.");
-            if (_owner?.IsMultiple == true) templateView = new SelectionRow(templateView);
+            if (_owner?.IsMultiple == true)
+            {
+                templateView = new SelectionRow(templateView);
+            }
+
             templateView.BindingContext = item;
             cell.MauiView = templateView;
 
-            var nativeView = templateView.ToPlatform(_mauiContext);
+            UIView nativeView = templateView.ToPlatform(_mauiContext);
             nativeView.TranslatesAutoresizingMaskIntoConstraints = false;
             cell.ContentView.AddSubview(nativeView);
 
@@ -162,8 +178,10 @@ internal class AutoCompleteEntryTableSource : UITableViewSource
         }
 
         _cells.RemoveAll(reference => !reference.TryGetTarget(out _));
-        if (!_cells.Any(reference => reference.TryGetTarget(out var existing) && ReferenceEquals(existing, cell)))
+        if (!_cells.Any(reference => reference.TryGetTarget(out AutoCompleteCell? existing) && ReferenceEquals(existing, cell)))
+        {
             _cells.Add(new(cell));
+        }
 
         if (cell.MauiView is SelectionRow row && _owner is not null && item is not null)
         {
@@ -179,8 +197,8 @@ internal class AutoCompleteEntryTableSource : UITableViewSource
         }
 
         // Measure on every GetCell call because recycled rows may bind to data of a different height
-        var widthConstraint = tableView.Bounds.Width > 0 ? (double)tableView.Bounds.Width : double.PositiveInfinity;
-        var measure = ((IView)cell.MauiView!).Measure(widthConstraint, double.PositiveInfinity);
+        double widthConstraint = tableView.Bounds.Width > 0 ? (double)tableView.Bounds.Width : double.PositiveInfinity;
+        Size measure = ((IView)cell.MauiView!).Measure(widthConstraint, double.PositiveInfinity);
         cell.HeightConstraint!.Constant = (nfloat)System.Math.Max(measure.Height, 44);
 
         return cell;
@@ -200,7 +218,7 @@ internal class AutoCompleteEntryTableSource : UITableViewSource
 
     private void OnTableRowSelected(NSIndexPath itemIndexPath)
     {
-        var item = _items[itemIndexPath.Row];
+        object? item = _items[itemIndexPath.Row];
         if (item is null)
         {
             return;
@@ -216,8 +234,14 @@ internal class AutoCompleteEntryTableSource : UITableViewSource
 /// </summary>
 internal sealed class AutoCompleteCell : UITableViewCell
 {
-    internal View? MauiView { get; set; }
-    internal NSLayoutConstraint? HeightConstraint { get; set; }
+    internal View? MauiView
+    {
+        get; set;
+    }
+    internal NSLayoutConstraint? HeightConstraint
+    {
+        get; set;
+    }
 
     internal AutoCompleteCell(string cellId) : base(UITableViewCellStyle.Default, cellId) { }
 
@@ -231,7 +255,7 @@ internal sealed class AutoCompleteCell : UITableViewCell
         }
         MauiView?.DisconnectHandlers();
         MauiView = null;
-        foreach (var child in ContentView.Subviews)
+        foreach (UIView child in ContentView.Subviews)
         {
             child.RemoveFromSuperview();
             child.Dispose();

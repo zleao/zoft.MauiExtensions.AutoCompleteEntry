@@ -51,7 +51,7 @@ public class SuggestionTemplateContentTests
     [Fact]
     public void ReportsInvalidContent()
     {
-        var error = Assert.Throws<InvalidOperationException>(() =>
+        InvalidOperationException error = Assert.Throws<InvalidOperationException>(() =>
             SuggestionTemplateContent.Create(new DataTemplate(() => new object()), new object(), new Entry()));
         Assert.Contains("must create a Microsoft.Maui.Controls.View", error.Message);
     }
@@ -59,7 +59,7 @@ public class SuggestionTemplateContentTests
     [Fact]
     public void ReportsNullSelectorResult()
     {
-        var error = Assert.Throws<InvalidOperationException>(() =>
+        InvalidOperationException error = Assert.Throws<InvalidOperationException>(() =>
             SuggestionTemplateContent.Create(new Selector((_, _) => null!), new object(), new Entry()));
         Assert.Contains("concrete DataTemplate", error.Message);
     }

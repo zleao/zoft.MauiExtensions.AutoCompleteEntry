@@ -1,4 +1,4 @@
-﻿namespace zoft.MauiExtensions.Controls;
+namespace zoft.MauiExtensions.Controls;
 
 /// <summary>
 /// Provides data for the TextChanged event.
@@ -18,5 +18,8 @@ public sealed class AutoCompleteEntryTextChangedEventArgs : EventArgs
     /// Gets or sets a value that indicates the reason for the text changing in the <see cref="AutoCompleteEntry"/>.
     /// </summary>
     /// <value>The reason for the text changing in the <see cref="AutoCompleteEntry"/>.</value>
-    public AutoCompleteEntryTextChangeReason Reason { get; }
+    public AutoCompleteEntryTextChangeReason Reason
+    {
+        get;
+    }
 }

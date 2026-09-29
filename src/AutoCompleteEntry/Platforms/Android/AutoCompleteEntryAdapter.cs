@@ -1,4 +1,6 @@
 using Android.Content;
+using Android.Content.Res;
+using Android.Util;
 using Android.Views;
 using Android.Widget;
 using Java.Lang;
@@ -10,7 +12,7 @@ namespace zoft.MauiExtensions.Controls.Platform;
 internal class AutoCompleteEntryAdapter : BaseAdapter, IFilterable
 {
     private CustomFilter? _filter;
-    private List<object> resultList = new();
+    private List<object> _resultList = new();
     private string? _displayMemberPath;
     private DataTemplate? _defaultTemplate;
     private readonly Dictionary<DataTemplate, int> _templateToIdMap = new();
@@ -18,7 +20,10 @@ internal class AutoCompleteEntryAdapter : BaseAdapter, IFilterable
     private readonly Page _listViewContainer;
     private bool _disposed = false;
     private int _templateGeneration;
-    internal AutoCompleteEntry? Owner { get; set; }
+    internal AutoCompleteEntry? Owner
+    {
+        get; set;
+    }
     private readonly List<WeakReference<ViewWrapperTag>> _rows = [];
     private readonly SelectionAccessibilityDelegate _selectionAccessibility;
 
@@ -26,16 +31,20 @@ internal class AutoCompleteEntryAdapter : BaseAdapter, IFilterable
     {
         // Weak references can still resolve after MAUI has disposed the Java peer.
         // Forget retired/native-disposed rows before touching presentation or JNI.
-        _rows.RemoveAll(reference => !reference.TryGetTarget(out var tag) ||
-            tag.MauiView.Handler is null || tag.NativeView?.TryGetTarget(out var native) != true ||
+        _rows.RemoveAll(reference => !reference.TryGetTarget(out ViewWrapperTag? tag) ||
+            tag.MauiView.Handler is null || tag.NativeView?.TryGetTarget(out AView? native) != true ||
             native is null || native.Handle == IntPtr.Zero);
-        foreach (var reference in _rows)
-            if (reference.TryGetTarget(out var tag) && tag.MauiView is SelectionRow row && row.BindingContext is { } item && Owner is not null)
+        foreach (WeakReference<ViewWrapperTag> reference in _rows)
+        {
+            if (reference.TryGetTarget(out ViewWrapperTag? tag) && tag.MauiView is SelectionRow row && row.BindingContext is { } item && Owner is not null)
             {
                 row.Update(Owner, item);
-                if (tag.NativeView?.TryGetTarget(out var native) == true)
+                if (tag.NativeView?.TryGetTarget(out AView? native) == true)
+                {
                     native.SendAccessibilityEvent(Android.Views.Accessibility.EventTypes.WindowContentChanged);
+                }
             }
+        }
     }
 
     internal void ResetPresentation()
@@ -55,7 +64,9 @@ internal class AutoCompleteEntryAdapter : BaseAdapter, IFilterable
         internal set
         {
             if (_itemTemplate == value)
+            {
                 return;
+            }
 
             _itemTemplate = value;
             // Clear stale IDs — old template instances are no longer valid keys
@@ -66,8 +77,14 @@ internal class AutoCompleteEntryAdapter : BaseAdapter, IFilterable
 
             // Tell the widget to discard all recycled views so stale layouts
             // from the previous template set are never handed to GetView.
-            if (Owner?.IsMultiple == true) NotifyDataSetChanged();
-            else NotifyDataSetInvalidated();
+            if (Owner?.IsMultiple == true)
+            {
+                NotifyDataSetChanged();
+            }
+            else
+            {
+                NotifyDataSetInvalidated();
+            }
         }
     }
 
@@ -104,20 +121,28 @@ internal class AutoCompleteEntryAdapter : BaseAdapter, IFilterable
     protected override void Dispose(bool disposing)
     {
         if (_disposed)
+        {
             return;
+        }
 
         _disposed = true;
 
         if (disposing)
         {
             _filter?.Dispose();
-            foreach (var reference in _rows)
-                if (reference.TryGetTarget(out var tag))
+            foreach (WeakReference<ViewWrapperTag> reference in _rows)
+            {
+                if (reference.TryGetTarget(out ViewWrapperTag? tag))
                 {
-                    if (tag.NativeView?.TryGetTarget(out var native) == true && native.Handle != IntPtr.Zero)
+                    if (tag.NativeView?.TryGetTarget(out AView? native) == true && native.Handle != IntPtr.Zero)
+                    {
                         native.SetAccessibilityDelegate(null);
+                    }
+
                     tag.MauiView.DisconnectHandlers();
                 }
+            }
+
             _rows.Clear();
             _selectionAccessibility.Dispose();
             Owner = null;
@@ -138,7 +163,7 @@ internal class AutoCompleteEntryAdapter : BaseAdapter, IFilterable
         }
         _displayMemberPath = displayMemberPath;
 
-        resultList = list.ToList();
+        _resultList = list.ToList();
         _resolvedTemplateCache.Clear();
 
         // When using a DataTemplateSelector the map can accumulate entries from
@@ -149,8 +174,14 @@ internal class AutoCompleteEntryAdapter : BaseAdapter, IFilterable
         {
             _templateToIdMap.Clear();
             _templateGeneration++;
-            if (Owner?.IsMultiple == true) NotifyDataSetChanged();
-            else NotifyDataSetInvalidated();
+            if (Owner?.IsMultiple == true)
+            {
+                NotifyDataSetChanged();
+            }
+            else
+            {
+                NotifyDataSetInvalidated();
+            }
         }
         else
         {
@@ -158,13 +189,13 @@ internal class AutoCompleteEntryAdapter : BaseAdapter, IFilterable
         }
     }
 
-    public override int Count => resultList.Count;
+    public override int Count => _resultList.Count;
 
     public Filter Filter => _filter ??= new CustomFilter(this);
 
     public override Java.Lang.Object GetItem(int position) => new ObjectWrapper(GetObject(position));
 
-    public object GetObject(int position) => resultList[position];
+    public object GetObject(int position) => _resultList[position];
 
     public override long GetItemId(int position)
     {
@@ -182,13 +213,13 @@ internal class AutoCompleteEntryAdapter : BaseAdapter, IFilterable
     /// </summary>
     private DataTemplate ResolveTemplate(int position, object item)
     {
-        if (_resolvedTemplateCache.TryGetValue(position, out var cached))
+        if (_resolvedTemplateCache.TryGetValue(position, out DataTemplate? cached))
         {
             _resolvedTemplateCache.Remove(position);
             return cached;
         }
 
-        var template = ItemTemplate ?? DefaultTemplate;
+        DataTemplate template = ItemTemplate ?? DefaultTemplate;
         return template is DataTemplateSelector selector
             ? selector.SelectTemplate(item, _listViewContainer)
                 ?? throw new InvalidOperationException(
@@ -201,11 +232,11 @@ internal class AutoCompleteEntryAdapter : BaseAdapter, IFilterable
     // Also caches the resolved template so GetView uses the exact same one.
     public override int GetItemViewType(int position)
     {
-        var item = GetObject(position);
-        var template = ItemTemplate ?? DefaultTemplate;
+        object item = GetObject(position);
+        DataTemplate template = ItemTemplate ?? DefaultTemplate;
 
         // Resolve and cache the template for this position
-        var resolvedTemplate = ResolveTemplate(position, item);
+        DataTemplate resolvedTemplate = ResolveTemplate(position, item);
         _resolvedTemplateCache[position] = resolvedTemplate;
 
         return template is DataTemplateSelector
@@ -215,10 +246,10 @@ internal class AutoCompleteEntryAdapter : BaseAdapter, IFilterable
 
     public override AView GetView(int position, AView? convertView, ViewGroup? parent)
     {
-        var item = GetObject(position);
+        object item = GetObject(position);
 
         // Use the cached resolved template from GetItemViewType to guarantee consistency
-        var resolvedTemplate = ResolveTemplate(position, item);
+        DataTemplate resolvedTemplate = ResolveTemplate(position, item);
 
         Microsoft.Maui.Controls.View templateView;
         AView nativeView;
@@ -237,19 +268,25 @@ internal class AutoCompleteEntryAdapter : BaseAdapter, IFilterable
             // First few visible rows: create MAUI view + native handler from scratch
             if (convertView?.Tag is ViewWrapperTag retired)
             {
-                _rows.RemoveAll(reference => !reference.TryGetTarget(out var row) || ReferenceEquals(row, retired));
+                _rows.RemoveAll(reference => !reference.TryGetTarget(out ViewWrapperTag? row) || ReferenceEquals(row, retired));
                 convertView.SetAccessibilityDelegate(null);
                 retired.MauiView.DisconnectHandlers();
             }
-            var createdContent = resolvedTemplate.CreateContent();
+            object createdContent = resolvedTemplate.CreateContent();
             if (createdContent is not Microsoft.Maui.Controls.View createdView)
+            {
                 throw new InvalidOperationException(
                     $"The resolved item template '{resolvedTemplate.GetType().FullName}' must create a " +
                     $"{typeof(Microsoft.Maui.Controls.View).FullName}, but created " +
                     $"'{createdContent?.GetType().FullName ?? "null"}'.");
+            }
 
             templateView = createdView;
-            if (Owner?.IsMultiple == true) templateView = new SelectionRow(templateView);
+            if (Owner?.IsMultiple == true)
+            {
+                templateView = new SelectionRow(templateView);
+            }
+
             templateView.BindingContext = item;
 
             nativeView = templateView.ToPlatform(MauiContext);
@@ -262,7 +299,11 @@ internal class AutoCompleteEntryAdapter : BaseAdapter, IFilterable
             _rows.Add(new(rowTag));
         }
 
-        if (templateView is SelectionRow selectionRow && Owner is not null) selectionRow.Update(Owner, item);
+        if (templateView is SelectionRow selectionRow && Owner is not null)
+        {
+            selectionRow.Update(Owner, item);
+        }
+
         if (Owner?.IsMultiple == true)
         {
             nativeView.ContentDescription = Owner.GetSelectionText(item);
@@ -273,25 +314,27 @@ internal class AutoCompleteEntryAdapter : BaseAdapter, IFilterable
             if (nativeView is ViewGroup group)
             {
                 group.DescendantFocusability = DescendantFocusability.BlockDescendants;
-                for (var i = 0; i < group.ChildCount; i++)
+                for (int i = 0; i < group.ChildCount; i++)
+                {
                     group.GetChildAt(i)!.ImportantForAccessibility = ImportantForAccessibility.NoHideDescendants;
+                }
             }
         }
 
         // Measure after handler creation so MAUI's layout system can resolve sizes.
         // Re-measure on every GetView call because recycled rows may bind to data of a different height.
-        var parentView = parent
+        ViewGroup parentView = parent
             ?? throw new InvalidOperationException($"{nameof(AutoCompleteEntryAdapter)} requires a non-null parent view.");
-        var resources = parentView.Context?.Resources
+        Resources resources = parentView.Context?.Resources
             ?? throw new InvalidOperationException($"{nameof(AutoCompleteEntryAdapter)} requires the parent view to expose Resources.");
-        var displayMetrics = resources.DisplayMetrics
+        DisplayMetrics displayMetrics = resources.DisplayMetrics
             ?? throw new InvalidOperationException($"{nameof(AutoCompleteEntryAdapter)} requires Android display metrics.");
-        var density = (double)displayMetrics.Density;
-        var widthConstraint = DensityHelper.WidthPixelsToDipConstraint(parentView.Width, density);
-        var measure = ((IView)templateView).Measure(widthConstraint, double.PositiveInfinity);
-        var heightDip = System.Math.Max(measure.Height, 44);
+        double density = (double)displayMetrics.Density;
+        double widthConstraint = DensityHelper.WidthPixelsToDipConstraint(parentView.Width, density);
+        Microsoft.Maui.Graphics.Size measure = ((IView)templateView).Measure(widthConstraint, double.PositiveInfinity);
+        double heightDip = System.Math.Max(measure.Height, 44);
 
-        var heightPx = DensityHelper.HeightDipToPixels(heightDip, density);
+        int heightPx = DensityHelper.HeightDipToPixels(heightDip, density);
         if (nativeView.LayoutParameters is { } lp)
         {
             lp.Width = ViewGroup.LayoutParams.MatchParent;
@@ -315,9 +358,18 @@ internal class AutoCompleteEntryAdapter : BaseAdapter, IFilterable
             TemplateGeneration = templateGeneration;
         }
 
-        internal Microsoft.Maui.Controls.View MauiView { get; }
-        internal int TemplateGeneration { get; }
-        internal WeakReference<AView>? NativeView { get; set; }
+        internal Microsoft.Maui.Controls.View MauiView
+        {
+            get;
+        }
+        internal int TemplateGeneration
+        {
+            get;
+        }
+        internal WeakReference<AView>? NativeView
+        {
+            get; set;
+        }
     }
 
     private sealed class SelectionAccessibilityDelegate(AutoCompleteEntryAdapter adapter) : AView.AccessibilityDelegate
@@ -325,13 +377,23 @@ internal class AutoCompleteEntryAdapter : BaseAdapter, IFilterable
         public override void OnInitializeAccessibilityNodeInfo(AView host, Android.Views.Accessibility.AccessibilityNodeInfo info)
         {
             base.OnInitializeAccessibilityNodeInfo(host, info);
-            if (info is null || host?.Tag is not ViewWrapperTag tag || adapter.Owner is not { } owner) return;
+            if (info is null || host?.Tag is not ViewWrapperTag tag || adapter.Owner is not { } owner)
+            {
+                return;
+            }
+
             info.ClassName = "android.widget.CheckBox";
             info.Checkable = true;
-            var selected = owner.IsSuggestionSelected(tag.MauiView.BindingContext);
+            bool selected = owner.IsSuggestionSelected(tag.MauiView.BindingContext);
             if (OperatingSystem.IsAndroidVersionAtLeast(36))
+            {
                 info.CheckedState = selected ? Android.Views.Accessibility.CheckedState.True : Android.Views.Accessibility.CheckedState.False;
-            else info.Checked = selected;
+            }
+            else
+            {
+                info.Checked = selected;
+            }
+
             info.Clickable = true;
             info.AddAction(Android.Views.Accessibility.AccessibilityNodeInfo.AccessibilityAction.ActionClick);
         }
@@ -379,7 +441,10 @@ internal class AutoCompleteEntryAdapter : BaseAdapter, IFilterable
             Object = obj;
         }
 
-        public object Object { get; set; }
+        public object Object
+        {
+            get; set;
+        }
 
         public override string ToString() => DoNotUpdateMarker;
     }
